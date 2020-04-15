@@ -93,8 +93,8 @@ void MemoryPool<T, block_size>::AllocateBlock() {
 
 template <typename T, size_t block_size>
 inline typename MemoryPool<T, block_size>::SizeType
-MemoryPool<T, block_size>::PadPointer(DataPointer p, SizeType align) const
-    noexcept {
+MemoryPool<T, block_size>::PadPointer(DataPointer p,
+                                      SizeType align) const noexcept {
   auto result{reinterpret_cast<std::uintptr_t>(p)};
   return ((align - result) % align);
 }

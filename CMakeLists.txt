@@ -101,11 +101,9 @@ foreach(USUAL_FILE ${USUAL_FILES})
            COMMAND ${TEST_BINARY_DIR}/${USUAL_FILE_NAME}_opt)
 endforeach()
 
-add_test(
-  NAME "COMPILE--ZCC"
-  COMMAND
-    ${KCC_EXECUTABLE} ${CMAKE_SOURCE_DIR}/test/zcc/*.c -O0 -g -std=gnu17 -o
-    ${TEST_BINARY_DIR}/zcc)
+add_test(NAME "COMPILE--ZCC"
+         COMMAND ${KCC_EXECUTABLE} ${CMAKE_SOURCE_DIR}/test/zcc/*.c -O0 -g
+                 -std=gnu17 -o ${TEST_BINARY_DIR}/zcc)
 
 add_test(NAME "COMPILE--ZCC--OPT"
          COMMAND ${KCC_EXECUTABLE} ${CMAKE_SOURCE_DIR}/test/zcc/*.c -O3
@@ -134,15 +132,17 @@ foreach(8CC_FILE ${8CC_FILES})
 
   add_test(
     NAME "COMPILE--${8CC_FILE_NAME}_8cc"
-    COMMAND ${TEST_BINARY_DIR}/8cc ${8CC_FILE}
-            -DBUILD_DIR=\"${CMAKE_SOURCE_DIR}/test/8cc\" -c -o
-            ${TEST_OBJ_DIR}/${8CC_FILE_NAME}.o)
+    COMMAND
+      ${TEST_BINARY_DIR}/8cc ${8CC_FILE}
+      -DBUILD_DIR=\"${CMAKE_SOURCE_DIR}/test/8cc\" -c -o
+      ${TEST_OBJ_DIR}/${8CC_FILE_NAME}.o)
 
   add_test(
     NAME "COMPILE--${8CC_FILE_NAME}_8cc_opt"
-    COMMAND ${TEST_BINARY_DIR}/8cc_opt ${8CC_FILE}
-            -DBUILD_DIR=\"${CMAKE_SOURCE_DIR}/test/8cc\" -c -o
-            ${TEST_OBJ_DIR}/${8CC_FILE_NAME}.o)
+    COMMAND
+      ${TEST_BINARY_DIR}/8cc_opt ${8CC_FILE}
+      -DBUILD_DIR=\"${CMAKE_SOURCE_DIR}/test/8cc\" -c -o
+      ${TEST_OBJ_DIR}/${8CC_FILE_NAME}.o)
 endforeach()
 
 add_test(
@@ -200,13 +200,9 @@ add_test(NAME check_sqlite_opt_executable COMMAND ${TEST_BINARY_DIR}/sqlite_opt
                                                   -version)
 
 if(CMAKE_BUILD_TYPE MATCHES "Debug")
-  add_custom_target(
-    test_all
-    COMMAND
-      ctest -j1 -C Debug -T test --output-on-failure)
+  add_custom_target(test_all COMMAND ctest -j1 -C Debug -T test
+                                     --output-on-failure)
 else()
-  add_custom_target(
-    test_all
-    COMMAND
-      ctest -j1 -C Release -T test --output-on-failure)
+  add_custom_target(test_all COMMAND ctest -j1 -C Release -T test
+                                     --output-on-failure)
 endif()

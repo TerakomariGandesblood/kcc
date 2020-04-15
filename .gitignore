@@ -34,10 +34,11 @@
 # IDE files
 .clangd
 .idea
-cmake-build-*
+.vscode
 build
-compile_commands.json
+cmake-build-*
 default.profraw
+compile_commands.json
 
 # Dev files
 dev

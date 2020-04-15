@@ -72,7 +72,7 @@ llvm::Value *GetZero(llvm::Type *type);
 llvm::GlobalVariable *CreateGlobalString(llvm::Constant *init,
                                          std::int32_t align);
 
-llvm::GlobalVariable* CreateGlobalVar(const ObjectExpr *obj);
+llvm::GlobalVariable *CreateGlobalVar(const ObjectExpr *obj);
 
 const llvm::fltSemantics &GetFloatTypeSemantics(llvm::Type *type);
 

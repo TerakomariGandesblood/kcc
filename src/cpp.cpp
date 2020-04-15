@@ -27,8 +27,8 @@ Preprocessor::Preprocessor() {
   /*
    * Platform Specific Code
    */
-  AddIncludePath("/usr/lib/gcc/x86_64-pc-linux-gnu/9.2.0/include", true);
-  AddIncludePath("/usr/lib/gcc/x86_64-pc-linux-gnu/9.2.0/include-fixed", true);
+  AddIncludePath("/usr/lib/gcc/x86_64-pc-linux-gnu/9.3.0/include", true);
+  AddIncludePath("/usr/lib/gcc/x86_64-pc-linux-gnu/9.3.0/include-fixed", true);
   /*
    * End of Platform Specific Code
    */

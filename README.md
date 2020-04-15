@@ -7,7 +7,7 @@ A small C11 compiler
 #### Environment:
 
 * Linux(I use Manjaro)
-* gcc 9.2(For header files and link libraries)
+* gcc 9.3(For header files and link libraries)
 * gcc/clang(Request to support C++17)
 
 #### Libraries:

@@ -17,15 +17,15 @@ bool Link() {
   std::vector<const char *> args{
       "--eh-frame-hdr",
       "-melf_x86_64",
-      "/usr/bin/../lib64/gcc/x86_64-pc-linux-gnu/9.2.0/../../../../lib64/"
+      "/usr/bin/../lib64/gcc/x86_64-pc-linux-gnu/9.3.0/../../../../lib64/"
       "crti.o",
-      "/usr/bin/../lib64/gcc/x86_64-pc-linux-gnu/9.2.0/crtbeginS.o",
-      "-L/usr/bin/../lib64/gcc/x86_64-pc-linux-gnu/9.2.0",
-      "-L/usr/bin/../lib64/gcc/x86_64-pc-linux-gnu/9.2.0/../../../../lib64",
+      "/usr/bin/../lib64/gcc/x86_64-pc-linux-gnu/9.3.0/crtbeginS.o",
+      "-L/usr/bin/../lib64/gcc/x86_64-pc-linux-gnu/9.3.0",
+      "-L/usr/bin/../lib64/gcc/x86_64-pc-linux-gnu/9.3.0/../../../../lib64",
       "-L/usr/bin/../lib64",
       "-L/lib/../lib64",
       "-L/usr/lib/../lib64",
-      "-L/usr/bin/../lib64/gcc/x86_64-pc-linux-gnu/9.2.0/../../..",
+      "-L/usr/bin/../lib64/gcc/x86_64-pc-linux-gnu/9.3.0/../../..",
       "-L/usr/bin/../lib",
       "-L/lib",
       "-L/usr/lib",
@@ -38,8 +38,8 @@ bool Link() {
       "--as-needed",
       "-lgcc_s",
       "--no-as-needed",
-      "/usr/bin/../lib64/gcc/x86_64-pc-linux-gnu/9.2.0/crtendS.o",
-      "/usr/bin/../lib64/gcc/x86_64-pc-linux-gnu/9.2.0/../../../../lib64/"
+      "/usr/bin/../lib64/gcc/x86_64-pc-linux-gnu/9.3.0/crtendS.o",
+      "/usr/bin/../lib64/gcc/x86_64-pc-linux-gnu/9.3.0/../../../../lib64/"
       "crtn.o"};
 
   if (Shared) {
@@ -49,7 +49,7 @@ bool Link() {
     args.push_back("-dynamic-linker");
     args.push_back("/lib64/ld-linux-x86-64.so.2");
     args.push_back(
-        "/usr/bin/../lib64/gcc/x86_64-pc-linux-gnu/9.2.0/../../../../lib64/"
+        "/usr/bin/../lib64/gcc/x86_64-pc-linux-gnu/9.3.0/../../../../lib64/"
         "Scrt1.o");
   }
   /*
