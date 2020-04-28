@@ -837,7 +837,10 @@ std::int32_t StructType::GetAlign() const {
   }
 
   auto struct_type{llvm::cast<llvm::StructType>(llvm_type_)};
-  return Module->getDataLayout().getStructLayout(struct_type)->getAlignment();
+  return Module->getDataLayout()
+      .getStructLayout(struct_type)
+      ->getAlignment()
+      .value();
 }
 
 // 若一者以标签声明, 则另一者必须以同一标签声明。

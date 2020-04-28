@@ -70,7 +70,7 @@ void Preprocessor::AddMacroDefinitions(
 std::string Preprocessor::Cpp(const std::string &input_file) {
   Module->setSourceFileName(input_file);
 
-  auto file{Ci.getFileManager().getFile(input_file)};
+  auto file{Ci.getFileManager().getFileRef(input_file).get()};
   Ci.getSourceManager().setMainFileID(Ci.getSourceManager().createFileID(
       file, clang::SourceLocation(), clang::SrcMgr::C_User));
 
@@ -97,12 +97,14 @@ std::string Preprocessor::Cpp(const std::string &input_file) {
 
 void Preprocessor::AddIncludePath(const std::string &path, bool is_system) {
   if (is_system) {
-    clang::DirectoryLookup directory{Ci.getFileManager().getDirectory(path),
-                                     clang::SrcMgr::C_System, false};
+    clang::DirectoryLookup directory{
+        Ci.getFileManager().getDirectoryRef(path).get(),
+        clang::SrcMgr::C_System, false};
     header_search_->AddSearchPath(directory, true);
   } else {
-    clang::DirectoryLookup directory{Ci.getFileManager().getDirectory(path),
-                                     clang::SrcMgr::C_User, false};
+    clang::DirectoryLookup directory{
+        Ci.getFileManager().getDirectoryRef(path).get(), clang::SrcMgr::C_User,
+        false};
     header_search_->AddSearchPath(directory, false);
   }
 }

@@ -10,8 +10,8 @@
 
 namespace kcc {
 
-void ObjGen(const std::string &obj_file,
-            llvm::TargetMachine::CodeGenFileType file_type =
-                llvm::TargetMachine::CodeGenFileType::CGFT_ObjectFile);
+void ObjGen(
+    const std::string &obj_file,
+    llvm::CodeGenFileType file_type = llvm::CodeGenFileType::CGFT_ObjectFile);
 
 }  // namespace kcc

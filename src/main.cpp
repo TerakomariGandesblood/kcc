@@ -166,10 +166,9 @@ void RunKcc(const std::string &file_name) {
   if (OutputAssembly) {
     if (std::empty(OutputFilePath)) {
       ObjGen(GetFileName(file_name, ".s"),
-             llvm::TargetMachine::CodeGenFileType::CGFT_AssemblyFile);
+             llvm::CodeGenFileType::CGFT_AssemblyFile);
     } else {
-      ObjGen(OutputFilePath,
-             llvm::TargetMachine::CodeGenFileType::CGFT_AssemblyFile);
+      ObjGen(OutputFilePath, llvm::CodeGenFileType::CGFT_AssemblyFile);
     }
     return;
   }

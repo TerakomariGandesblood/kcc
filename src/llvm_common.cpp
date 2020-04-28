@@ -7,9 +7,9 @@
 #include <cassert>
 
 #include <clang/Basic/LangOptions.h>
+#include <clang/Basic/LangStandard.h>
 #include <clang/Basic/TargetOptions.h>
 #include <clang/Frontend/FrontendOptions.h>
-#include <clang/Frontend/LangStandard.h>
 #include <llvm/ADT/Optional.h>
 #include <llvm/Support/Casting.h>
 #include <llvm/Support/CodeGen.h>
@@ -40,8 +40,9 @@ void InitLLVM() {
 
   Ci.setTarget(TargetInfo);
   Ci.getInvocation().setLangDefaults(
-      Ci.getLangOpts(), clang::InputKind::C, TargetInfo->getTriple(),
-      Ci.getPreprocessorOpts(), clang::LangStandard::lang_c17);
+      Ci.getLangOpts(), clang::InputKind{clang::Language::C},
+      TargetInfo->getTriple(), Ci.getPreprocessorOpts(),
+      clang::LangStandard::lang_c17);
 
   auto &lang_opt{Ci.getLangOpts()};
   lang_opt.C17 = true;
@@ -328,7 +329,7 @@ llvm::GlobalVariable *CreateGlobalString(llvm::Constant *init,
                                     llvm::GlobalValue::PrivateLinkage, init,
                                     ".str")};
   var->setUnnamedAddr(llvm::GlobalValue::UnnamedAddr::Global);
-  var->setAlignment(align);
+  var->setAlignment(llvm::MaybeAlign{static_cast<std::uint64_t>(align)});
 
   return var;
 }
@@ -366,7 +367,8 @@ llvm::GlobalVariable *CreateGlobalVar(const ObjectExpr *obj) {
     ptr->setDSOLocal(true);
   }
 
-  ptr->setAlignment(obj->GetType()->GetAlign());
+  ptr->setAlignment(
+      llvm::MaybeAlign{static_cast<std::uint64_t>(obj->GetType()->GetAlign())});
 
   if (decl->HasConstantInit()) {
     ptr->setInitializer(decl->GetConstant());

@@ -949,7 +949,9 @@ llvm::GlobalVariable* ObjectExpr::GetGlobalPtr() const {
     assert(false);
   }
 
-  ptr->setAlignment(GetType()->GetAlign());
+  // TODO align: int32 to uint64
+  ptr->setAlignment(
+      llvm::MaybeAlign{static_cast<std::uint64_t>(GetType()->GetAlign())});
 
   if (GetDecl()->HasConstantInit()) {
     ptr->setInitializer(GetDecl()->GetConstant());

@@ -15,8 +15,7 @@
 
 namespace kcc {
 
-void ObjGen(const std::string& obj_file,
-            llvm::TargetMachine::CodeGenFileType file_type) {
+void ObjGen(const std::string& obj_file, llvm::CodeGenFileType file_type) {
   std::error_code error_code;
   llvm::raw_fd_ostream dest{obj_file, error_code, llvm::sys::fs::F_None};
 

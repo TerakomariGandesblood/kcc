@@ -5,6 +5,7 @@
 #include "link.h"
 
 #include <lld/Common/Driver.h>
+#include <llvm/Support/raw_ostream.h>
 
 #include "util.h"
 
@@ -86,7 +87,8 @@ bool Link() {
     args.push_back(level_str.c_str());
   }
 
-  return lld::elf::link(args, false);
+  // TODO 后两个参数的作用
+  return lld::elf::link(args, false, llvm::outs(), llvm::errs());
 }
 
 }  // namespace kcc

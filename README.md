@@ -19,7 +19,7 @@ A small C11 compiler
 * Qt
 * Boost
 
-#### Build
+#### Build(For the time being, you can only use the lld linker to link, which needs to be repaired)
 
 ```bash
 mkdir build && cd build

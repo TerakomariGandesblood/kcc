@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.13)
+cmake_minimum_required(VERSION 3.16)
 
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   message(STATUS "Setting build type to 'Release' as none was specified")
@@ -55,12 +55,9 @@ target_link_libraries(
   ${Boost_LIBRARIES}
   Qt5::Core
   fmt::fmt
-  clangLex
-  clangDriver
-  clangFrontend
-  clangBasic
-  clangSerialization
+  clang-cpp
   LLVM
+  lldCommon
   lldELF)
 
 install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin)

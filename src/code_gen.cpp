@@ -258,7 +258,7 @@ llvm::AllocaInst* CodeGen::CreateEntryBlockAlloca(llvm::Type* type,
   auto ptr{new llvm::AllocaInst{type, 0, name, alloc_insert_point_}};
 #endif
 
-  ptr->setAlignment(align);
+  ptr->setAlignment(llvm::MaybeAlign{static_cast<std::uint64_t>(align)});
   return ptr;
 }
 
@@ -479,9 +479,9 @@ void CodeGen::DealLocaleDecl(const Declaration* node) {
       result_ = Builder.CreateBitCast(ptr, Builder.getInt8PtrTy());
     }
 
-    Builder.CreateMemCpy(result_, obj->GetAlign(), node->GetConstant(),
-                         obj->GetAlign(), obj->GetType()->GetWidth(),
-                         is_volatile_);
+    auto align{llvm::MaybeAlign{static_cast<std::uint64_t>(obj->GetAlign())}};
+    Builder.CreateMemCpy(result_, align, node->GetConstant(), align,
+                         obj->GetType()->GetWidth(), is_volatile_);
     is_volatile_ = false;
   }
 }
@@ -493,8 +493,10 @@ void CodeGen::InitLocalAggregate(const Declaration* node) {
   auto width{obj->GetType()->GetWidth()};
 
   result_ = Builder.CreateBitCast(obj->GetLocalPtr(), Builder.getInt8PtrTy());
-  Builder.CreateMemSet(result_, Builder.getInt8(0), width, obj->GetAlign(),
-                       is_volatile_);
+  Builder.CreateMemSet(
+      result_, Builder.getInt8(0), width,
+      llvm::MaybeAlign{static_cast<std::uint64_t>(obj->GetAlign())},
+      is_volatile_);
 
   for (const auto& item : node->GetLocalInits()) {
     Load_Struct_Obj();
