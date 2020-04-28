@@ -187,6 +187,10 @@ void RunKcc(const std::string &file_name) {
 
 #ifdef DEV
 void Run(const std::string &file) {
+  std::string cmd{"clang -std=gnu17 -S -emit-llvm -O0 " + file + " -o " +
+                  GetFileName(file, ".std.ll")};
+  std::system(cmd.c_str());
+
   Preprocessor preprocessor;
   preprocessor.AddIncludePaths(IncludePaths);
   preprocessor.AddMacroDefinitions(MacroDefines);
@@ -208,14 +212,6 @@ void Run(const std::string &file) {
   Parser parser{std::move(tokens)};
   auto unit{parser.ParseTranslationUnit()};
   JsonGen{file}.GenJson(unit, GetFileName(file, ".html"));
-
-  std::string cmd{"clang -std=gnu17 -S -emit-llvm -O0 -g " + file + " -o " +
-                  GetFileName(file, ".std.ll")};
-  std::system(cmd.c_str());
-
-  cmd = "./clang -std=gnu99 -S -emit-llvm -O0 -g " + file + " -o " +
-        GetFileName(file, ".old.ll");
-  std::system(cmd.c_str());
 
   CodeGen code_gen;
   code_gen.GenCode(unit);

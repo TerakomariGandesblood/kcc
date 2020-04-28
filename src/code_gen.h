@@ -160,6 +160,9 @@ class CodeGen : public Visitor {
   llvm::Value *Ctz(Expr *arg);
   llvm::Value *IsInfSign(Expr *arg);
   llvm::Value *IsFinite(Expr *arg);
+  llvm::Value *Bswap16(Expr *arg);
+  llvm::Value *Bswap32(Expr *arg);
+  llvm::Value *Bswap64(Expr *arg);
 
   void DealLocaleDecl(const Declaration *node);
   void InitLocalAggregate(const Declaration *node);

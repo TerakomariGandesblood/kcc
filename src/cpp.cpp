@@ -35,6 +35,9 @@ Preprocessor::Preprocessor() {
 
   pp_->setPredefines(pp_->getPredefines() +
                      "#define __KCC__ 1\n"
+                     "#define __GNUC__ 9\n"
+                     "#define __GNUC_MINOR__ 3\n"
+                     "#define __GNUC_PATCHLEVEL__ 0\n"
                      "#define __STDC_NO_ATOMICS__ 1\n"
                      "#define __STDC_NO_COMPLEX__ 1\n"
                      "#define __STDC_NO_THREADS__ 1\n"

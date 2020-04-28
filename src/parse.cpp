@@ -633,6 +633,23 @@ void Parser::AddBuiltin() {
   isfinite->FuncSetName("__builtin_isfinite");
   scope_->InsertUsual(MakeAstNode<IdentifierExpr>(
       loc, "__builtin_isfinite", isfinite, Linkage::kExternal, false));
+
+  auto bswap32{FunctionType::Get(ArithmeticType::Get(kInt), {integer})};
+  bswap32->FuncSetName("__builtin_bswap32");
+  scope_->InsertUsual(MakeAstNode<IdentifierExpr>(
+      loc, "__builtin_bswap32", bswap32, Linkage::kExternal, false));
+
+  auto bswap64{FunctionType::Get(ArithmeticType::Get(kLong), {long_integer})};
+  bswap64->FuncSetName("__builtin_bswap64");
+  scope_->InsertUsual(MakeAstNode<IdentifierExpr>(
+      loc, "__builtin_bswap64", bswap64, Linkage::kExternal, false));
+
+  auto short_integer{
+      MakeAstNode<ObjectExpr>(loc, "", ArithmeticType::Get(kShort))};
+  auto bswap16{FunctionType::Get(ArithmeticType::Get(kShort), {short_integer})};
+  bswap16->FuncSetName("__builtin_bswap16");
+  scope_->InsertUsual(MakeAstNode<IdentifierExpr>(
+      loc, "__builtin_bswap16", bswap16, Linkage::kExternal, false));
 }
 
 }  // namespace kcc

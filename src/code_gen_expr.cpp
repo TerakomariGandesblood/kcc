@@ -823,6 +823,15 @@ bool CodeGen::MayCallBuiltinFunc(const FuncCallExpr* node) {
   } else if (func_name == "__builtin_isfinite") {
     result_ = IsFinite(node->GetArgs().front());
     return true;
+  } else if (func_name == "__builtin_bswap16") {
+    result_ = Bswap16(node->GetArgs().front());
+    return true;
+  } else if (func_name == "__builtin_bswap32") {
+    result_ = Bswap32(node->GetArgs().front());
+    return true;
+  } else if (func_name == "__builtin_bswap64") {
+    result_ = Bswap64(node->GetArgs().front());
+    return true;
   } else {
     return false;
   }
@@ -1029,6 +1038,42 @@ llvm::Value* CodeGen::IsFinite(Expr* arg) {
           llvm::APFloat::getInf(GetFloatTypeSemantics(Builder.getFloatTy()))));
 
   return Builder.CreateZExt(result_, Builder.getInt32Ty());
+}
+
+llvm::Value* CodeGen::Bswap16(Expr* arg) {
+  static auto func_type{llvm::FunctionType::get(Builder.getInt16Ty(),
+                                                {Builder.getInt16Ty()}, false)};
+
+  static auto bswap_i16{llvm::Function::Create(func_type,
+                                               llvm::Function::ExternalLinkage,
+                                               "llvm.bswap.i16", Module.get())};
+
+  arg->Accept(*this);
+  return Builder.CreateCall(bswap_i16, {result_});
+}
+
+llvm::Value* CodeGen::Bswap32(Expr* arg) {
+  static auto func_type{llvm::FunctionType::get(Builder.getInt32Ty(),
+                                                {Builder.getInt32Ty()}, false)};
+
+  static auto bswap_i32{llvm::Function::Create(func_type,
+                                               llvm::Function::ExternalLinkage,
+                                               "llvm.bswap.i32", Module.get())};
+
+  arg->Accept(*this);
+  return Builder.CreateCall(bswap_i32, {result_});
+}
+
+llvm::Value* CodeGen::Bswap64(Expr* arg) {
+  static auto func_type{llvm::FunctionType::get(Builder.getInt64Ty(),
+                                                {Builder.getInt64Ty()}, false)};
+
+  static auto bswap_i64{llvm::Function::Create(func_type,
+                                               llvm::Function::ExternalLinkage,
+                                               "llvm.bswap.i64", Module.get())};
+
+  arg->Accept(*this);
+  return Builder.CreateCall(bswap_i64, {result_});
 }
 
 }  // namespace kcc

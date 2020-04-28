@@ -64,6 +64,12 @@ KeywordsDictionary::KeywordsDictionary() {
   keywords_.insert({"__extension__", Tag::kExtension});
   keywords_.insert({"__FUNCTION__", Tag::kFuncName});
   keywords_.insert({"__PRETTY_FUNCTION__", Tag::kFuncSignature});
+  keywords_.insert({"_Float32", Tag::kFloat});
+  keywords_.insert({"_Float64", Tag::kDouble});
+  keywords_.insert({"_Float32x", Tag::kDouble});
+  // FIXME
+  keywords_.insert({"_Float64x", Tag::kDouble});
+  keywords_.insert({"_Float128", Tag::kDouble});
 
   keywords_.insert({"__inline", Tag::kInline});
   keywords_.insert({"__alignof__", Tag::kAlignof});
