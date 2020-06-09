@@ -183,7 +183,6 @@ void Parser::ParseStructInitializer(std::vector<Initializer>& inits, Type* type,
       indexs_.pop_back();
     }
 
-    designated = false;
     ++member_iter;
 
     if (!type->IsStructTy()) {
@@ -443,7 +442,6 @@ llvm::Constant* Parser::ParseConstantStructInitializer(Type* type,
                                             designated, false);
     }
 
-    designated = false;
     ++member_iter;
 
     if (!type->IsStructTy()) {
