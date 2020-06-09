@@ -1,5 +1,11 @@
 # kcc
 
+[![CI](https://github.com/KaiserLancelot/kcc/workflows/CI/badge.svg)](https://github.com/KaiserLancelot/kcc/actions)
+[![Coverage Status](https://coveralls.io/repos/github/KaiserLancelot/kcc/badge.svg?branch=master)](https://coveralls.io/github/KaiserLancelot/kcc?branch=master)
+[![License](https://img.shields.io/github/license/KaiserLancelot/kcc)](LICENSE)
+[![Badge](https://img.shields.io/badge/link-996.icu-%23FF4D5B.svg?style=flat-square)](https://996.icu/#/en_US)
+[![Lines](https://tokei.rs/b1/github/KaiserLancelot/kcc)](https://github.com/Aaronepower/tokei)
+
 A small C11 compiler
 
 # Quick Start
@@ -7,24 +13,24 @@ A small C11 compiler
 #### Environment:
 
 * Linux(I use Manjaro)
-* gcc 9.3(For header files and link libraries)
+* gcc 10.1(For header files and link libraries)
 * gcc/clang(Request to support C++17)
 
 #### Libraries:
 
 * fmt
-* LLVM
+* LLVM 10
 * clang
 * lld
 * Qt
 * Boost
 
-#### Build(For the time being, you can only use the lld linker to link, which needs to be repaired)
+#### Build
 
 ```bash
 mkdir build && cd build
 cmake ..
-make -j8
+cmake --build . -j8
 ```
 
 #### Install
@@ -60,5 +66,3 @@ kcc test.c -O3 -o test
 * Project
   * https://github.com/wgtdkp/wgtcc
   * https://github.com/rui314/8cc
-  * https://github.com/cacay/MemoryPool
-  * https://github.com/zhangjiantao/llvm-cxxapi

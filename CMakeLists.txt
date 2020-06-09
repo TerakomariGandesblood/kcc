@@ -1,34 +1,23 @@
-cmake_minimum_required(VERSION 3.16)
-
-if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
-  message(STATUS "Setting build type to 'Release' as none was specified")
-  set(CMAKE_BUILD_TYPE
-      "Release"
-      CACHE STRING "Choose the type of build" FORCE)
-endif()
+cmake_minimum_required(VERSION 3.13)
 
 project(
   kcc
   VERSION 0.4
   LANGUAGES CXX)
 
-file(GLOB cppsrc src/*.cpp)
-file(GLOB cppheader src/*.h)
-file(GLOB cmakesrc CMakeLists.txt cmake/*.cmake)
-
-if((CMAKE_BUILD_TYPE MATCHES "Debug") OR (CMAKE_BUILD_TYPE MATCHES
-                                          "RelWithDebInfo"))
-  # Address Thread Undefined None
-  set(sanitizer "Undefined")
+if((CMAKE_BUILD_TYPE STREQUAL "Debug") OR (CMAKE_BUILD_TYPE STREQUAL
+                                           "RelWithDebInfo"))
+  # Address Memory Thread None
+  set(SANITIZER "Address")
 else()
-  set(sanitizer "None")
+  set(SANITIZER "None")
 endif()
 
-set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
-include(check)
-include(sanitizers)
-include(clang-tidy)
-include(compiler-options)
+set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
+include(Check)
+include(ClangTidy)
+include(CompilerOptions)
+include(Sanitizers)
 
 set(CMAKE_AUTOMOC ON)
 
@@ -38,16 +27,24 @@ find_package(LLVM REQUIRED CONFIG)
 find_package(Boost REQUIRED COMPONENTS locale)
 find_package(Qt5 REQUIRED COMPONENTS Core)
 
-include_directories(${LLVM_INCLUDE_DIRS})
 add_definitions(-DKCC_VERSION="${PROJECT_VERSION}" -DFMT_STRING_ALIAS
                 ${LLVM_DEFINITIONS})
 
-add_executable(${PROJECT_NAME} ${cppsrc})
+set(PROGRAM_NAME ${PROJECT_NAME})
+set(COVERAGE_RUN_ARGS "")
 
+file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS src/*.cpp)
+file(GLOB_RECURSE CLANG_FORMAT_SOURCES CONFIGURE_DEPENDS src/*.h src/*.cpp)
+file(GLOB_RECURSE CMAKE_FORMAT_SOURCES CONFIGURE_DEPENDS cmake/*.cmake
+     CMakeLists.txt)
+
+add_executable(${PROJECT_NAME} ${SOURCES})
+
+include(Coverage)
 if((CMAKE_BUILD_TYPE MATCHES "Debug") OR (CMAKE_BUILD_TYPE MATCHES
                                           "RelWithDebInfo"))
   add_definitions(-DDEV)
-  include(format)
+  include(Format)
 endif()
 
 target_link_libraries(
@@ -55,6 +52,7 @@ target_link_libraries(
   ${Boost_LIBRARIES}
   Qt5::Core
   fmt::fmt
+  clang
   clang-cpp
   LLVM
   lldCommon

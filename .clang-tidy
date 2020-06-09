@@ -1,51 +1,46 @@
-Checks: '-*,clang-diagnostic-*,clang-analyzer-*,llvm-namespace-comment,
-        llvm-twine-local,misc-*,-misc-unused-parameters,
-        -misc-non-private-member-variables-in-classes,readability-identifier-naming'
-WarningsAsErrors: '*'
+Checks: '-*,boost-*,bugprone-*,clang-analyzer-*,cppcoreguidelines-*,
+        misc-*,modernize-*,performance-*,portability-*,readability-*,
+        -modernize-use-trailing-return-type,-readability-qualified-auto,
+        -readability-else-after-return'
+WarningsAsErrors: 'clang-analyzer-*'
 CheckOptions:
   - key:             readability-identifier-naming.ClassCase
     value:           CamelCase
-  - key:             readability-identifier-naming.StructCase
-    value:           CamelCase
-  - key:             readability-identifier-naming.UnionCase
-    value:           CamelCase
-  - key:             readability-identifier-naming.TypedefCase
-    value:           CamelCase
+  - key:             readability-identifier-naming.ClassMemberCase
+    value:           lower_case
+  - key:             readability-identifier-naming.ClassMemberSuffix
+    value:           '_'
   - key:             readability-identifier-naming.EnumCase
     value:           CamelCase
-  - key:             readability-identifier-naming.TypeTemplateParameterCase
+  - key:             readability-identifier-naming.EnumConstantCase
     value:           CamelCase
-  - key:             readability-identifier-naming.LocalVariableCase
+  - key:             readability-identifier-naming.FunctionCase
     value:           lower_case
-  - key:             readability-identifier-naming.StaticVariableCase
+  - key:             readability-identifier-naming.MemberCase
     value:           lower_case
-  - key:             readability-identifier-naming.ValueTemplateParameterCase
+  - key:             readability-identifier-naming.MethodCase
+    value:           lower_case
+  - key:             readability-identifier-naming.NamespaceCase
     value:           lower_case
   - key:             readability-identifier-naming.ParameterCase
-    value:           lower_case
-  - key:             readability-identifier-naming.PublicMemberCase
     value:           lower_case
   - key:             readability-identifier-naming.PrivateMemberCase
     value:           lower_case
   - key:             readability-identifier-naming.PrivateMemberSuffix
     value:           '_'
-  - key:             readability-identifier-naming.ConstantCase
+  - key:             readability-identifier-naming.StructCase
     value:           CamelCase
-  - key:             readability-identifier-naming.ConstantPrefix
-    value:           'k'
-  - key:             readability-identifier-naming.FunctionCase
+  - key:             readability-identifier-naming.TemplateParameterCase
     value:           CamelCase
-  - key:             readability-identifier-naming.ClassConstantCase
+  - key:             readability-identifier-naming.TypeAliasCase
     value:           CamelCase
-  - key:             readability-identifier-naming.GlobalVariableCase
+  - key:             readability-identifier-naming.TypedefCase
     value:           CamelCase
-  - key:             readability-identifier-naming.GlobalConstantCase
+  - key:             readability-identifier-naming.UnionCase
     value:           CamelCase
-  - key:             readability-identifier-naming.NamespaceCase
+  - key:             readability-identifier-naming.ValueTemplateParameterCase
     value:           lower_case
-  - key:             readability-identifier-naming.EnumConstantCase
-    value:           CamelCase
-  - key:             readability-identifier-naming.EnumConstantPrefix
-    value:           'k'
+  - key:             readability-identifier-naming.VariableCase
+    value:           lower_case
   - key:             readability-identifier-naming.MacroDefinitionCase
     value:           UPPER_CASE

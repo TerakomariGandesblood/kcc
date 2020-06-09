@@ -27,16 +27,16 @@ Preprocessor::Preprocessor() {
   /*
    * Platform Specific Code
    */
-  AddIncludePath("/usr/lib/gcc/x86_64-pc-linux-gnu/9.3.0/include", true);
-  AddIncludePath("/usr/lib/gcc/x86_64-pc-linux-gnu/9.3.0/include-fixed", true);
+  AddIncludePath("/usr/lib/gcc/x86_64-pc-linux-gnu/10.1.0/include", true);
+  AddIncludePath("/usr/lib/gcc/x86_64-pc-linux-gnu/10.1.0/include-fixed", true);
   /*
    * End of Platform Specific Code
    */
 
   pp_->setPredefines(pp_->getPredefines() +
                      "#define __KCC__ 1\n"
-                     "#define __GNUC__ 9\n"
-                     "#define __GNUC_MINOR__ 3\n"
+                     "#define __GNUC__ 10\n"
+                     "#define __GNUC_MINOR__ 1\n"
                      "#define __GNUC_PATCHLEVEL__ 0\n"
                      "#define __STDC_NO_ATOMICS__ 1\n"
                      "#define __STDC_NO_COMPLEX__ 1\n"

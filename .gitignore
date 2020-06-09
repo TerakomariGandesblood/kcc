@@ -31,14 +31,15 @@
 *.out
 *.app
 
-# IDE files
+# Development files
 .clangd
 .idea
-.vscode
+# .vscode
 build
 cmake-build-*
-default.profraw
+*.profraw
 compile_commands.json
+
 
 # Dev files
 dev
@@ -48,7 +49,6 @@ test/sqlite/speedtest1
 *.txt
 *.s
 *.ll
-*.profraw
 vgcore.*
 cachegrind.out.*
 *.db
