@@ -22,12 +22,12 @@ if(${COVERAGE})
       add_custom_target(
         coverage
         COMMAND ${LCOV_PATH} --directory . --zerocounters
-        COMMAND ${TEST_PROGRAM_NAME} ${COVERAGE_RUN_ARGS}
+        COMMAND ${PROGRAM_NAME} ${COVERAGE_RUN_ARGS}
         COMMAND ${LCOV_PATH} --no-external -b ${CMAKE_SOURCE_DIR} --directory .
                 --capture --output-file coverage.info
         COMMAND ${GENHTML_PATH} -o coverage coverage.info
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-        DEPENDS ${TEST_PROGRAM_NAME})
+        DEPENDS ${PROGRAM_NAME})
     else()
       message(FATAL_ERROR "lcov or genhtml not found")
     endif()
@@ -41,19 +41,18 @@ if(${COVERAGE})
     if(LLVM_PROFDATA_PATH AND LLVM_COV_PATH)
       add_custom_target(
         coverage
-        COMMAND ${TEST_PROGRAM_NAME} ${COVERAGE_RUN_ARGS}
-        COMMAND ${LLVM_PROFDATA_PATH} merge -sparse -o
-                ${TEST_PROGRAM_NAME}.profdata default.profraw
+        COMMAND ${PROGRAM_NAME} ${COVERAGE_RUN_ARGS}
+        COMMAND ${LLVM_PROFDATA_PATH} merge -sparse -o ${PROGRAM_NAME}.profdata
+                default.profraw
         COMMAND
-          ${LLVM_COV_PATH} show ${TEST_PROGRAM_NAME}
-          -instr-profile=${TEST_PROGRAM_NAME}.profdata -format=html
+          ${LLVM_COV_PATH} show ${PROGRAM_NAME}
+          -instr-profile=${PROGRAM_NAME}.profdata -format=html
           -output-dir=coverage
         COMMAND
-          ${LLVM_COV_PATH} export ${TEST_PROGRAM_NAME}
-          -instr-profile=${TEST_PROGRAM_NAME}.profdata -format=lcov >
-          coverage.info
+          ${LLVM_COV_PATH} export ${PROGRAM_NAME}
+          -instr-profile=${PROGRAM_NAME}.profdata -format=lcov > coverage.info
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-        DEPENDS ${TEST_PROGRAM_NAME})
+        DEPENDS ${PROGRAM_NAME})
     else()
       message(FATAL_ERROR "llvm-profdata or llvm-cov not found")
     endif()

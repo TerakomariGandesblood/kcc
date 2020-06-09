@@ -31,7 +31,7 @@ add_definitions(-DKCC_VERSION="${PROJECT_VERSION}" -DFMT_STRING_ALIAS
                 ${LLVM_DEFINITIONS})
 
 set(PROGRAM_NAME ${PROJECT_NAME})
-set(COVERAGE_RUN_ARGS "")
+set(COVERAGE_RUN_ARGS -h)
 
 file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS src/*.cpp)
 file(GLOB_RECURSE CLANG_FORMAT_SOURCES CONFIGURE_DEPENDS src/*.h src/*.cpp)
@@ -72,14 +72,12 @@ file(MAKE_DIRECTORY ${TEST_OBJ_DIR})
 add_test(NAME check_kcc_executable COMMAND ${PROGRAM_NAME} -help)
 
 add_test(NAME COMPILE--testmain
-    COMMAND
-    ${PROGRAM_NAME} ${CMAKE_SOURCE_DIR}/test/usual/testmain.c
-    -O0 -g -std=gnu17 -c -o ${TEST_OBJ_DIR}/testmain.o)
+         COMMAND ${PROGRAM_NAME} ${CMAKE_SOURCE_DIR}/test/usual/testmain.c -O0
+                 -g -std=gnu17 -c -o ${TEST_OBJ_DIR}/testmain.o)
 
 add_test(NAME COMPILE--testmain--OPT
-    COMMAND
-    ${PROGRAM_NAME} ${CMAKE_SOURCE_DIR}/test/usual/testmain.c
-    -O3 -g -std=gnu17 -c -o ${TEST_OBJ_DIR}/testmain_opt.o)
+         COMMAND ${PROGRAM_NAME} ${CMAKE_SOURCE_DIR}/test/usual/testmain.c -O3
+                 -g -std=gnu17 -c -o ${TEST_OBJ_DIR}/testmain_opt.o)
 
 aux_source_directory(${CMAKE_SOURCE_DIR}/test/usual USUAL_FILES)
 
@@ -89,27 +87,23 @@ foreach(USUAL_FILE ${USUAL_FILES})
     continue()
   endif()
 
-  add_test(
-    NAME COMPILE--${USUAL_FILE_NAME}
-    COMMAND
-      ${PROGRAM_NAME} ${USUAL_FILE} ${TEST_OBJ_DIR}/testmain.o
-      -O0 -g -std=gnu17 -o ${TEST_BINARY_DIR}/${USUAL_FILE_NAME})
+  add_test(NAME COMPILE--${USUAL_FILE_NAME}
+           COMMAND ${PROGRAM_NAME} ${USUAL_FILE} ${TEST_OBJ_DIR}/testmain.o -O0
+                   -g -std=gnu17 -o ${TEST_BINARY_DIR}/${USUAL_FILE_NAME})
   add_test(NAME RUN--${USUAL_FILE_NAME}
            COMMAND ${TEST_BINARY_DIR}/${USUAL_FILE_NAME})
-  set_tests_properties(COMPILE--${USUAL_FILE_NAME}
-      PROPERTIES DEPENDS COMPILE--testmain)
+  set_tests_properties(COMPILE--${USUAL_FILE_NAME} PROPERTIES DEPENDS
+                                                              COMPILE--testmain)
   set_tests_properties(RUN--${USUAL_FILE_NAME}
                        PROPERTIES DEPENDS COMPILE--${USUAL_FILE_NAME})
 
-  add_test(
-    NAME COMPILE--${USUAL_FILE_NAME}--OPT
-    COMMAND
-      ${PROGRAM_NAME} ${USUAL_FILE} ${TEST_OBJ_DIR}/testmain_opt.o
-      -O3 -std=gnu17 -o ${TEST_BINARY_DIR}/${USUAL_FILE_NAME}_opt)
+  add_test(NAME COMPILE--${USUAL_FILE_NAME}--OPT
+           COMMAND ${PROGRAM_NAME} ${USUAL_FILE} ${TEST_OBJ_DIR}/testmain_opt.o
+                   -O3 -std=gnu17 -o ${TEST_BINARY_DIR}/${USUAL_FILE_NAME}_opt)
   add_test(NAME RUN--${USUAL_FILE_NAME}--OPT
            COMMAND ${TEST_BINARY_DIR}/${USUAL_FILE_NAME}_opt)
   set_tests_properties(COMPILE--${USUAL_FILE_NAME}--OPT
-      PROPERTIES DEPENDS COMPILE--testmain--OPT)
+                       PROPERTIES DEPENDS COMPILE--testmain--OPT)
   set_tests_properties(RUN--${USUAL_FILE_NAME}--OPT
                        PROPERTIES DEPENDS COMPILE--${USUAL_FILE_NAME}--OPT)
 
