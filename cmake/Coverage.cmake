@@ -21,8 +21,8 @@ if(${COVERAGE})
       # TODO 考虑使用 llvm-cov
       add_custom_target(
         coverage
-        COMMAND ${LCOV_PATH} --directory . --zerocounters
-        COMMAND ${PROGRAM_NAME} ${COVERAGE_RUN_ARGS}
+        # COMMAND ${LCOV_PATH} --directory . --zerocounters
+        # COMMAND ${PROGRAM_NAME} ${COVERAGE_RUN_ARGS}
         COMMAND ${LCOV_PATH} --no-external -b ${CMAKE_SOURCE_DIR} --directory .
                 --capture --output-file coverage.info
         COMMAND ${GENHTML_PATH} -o coverage coverage.info

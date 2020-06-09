@@ -51,11 +51,11 @@ jobs:
       - name: build
         run: cmake --build build -j4 --target all
 
-      - name: test
-        run: cd build && ctest -j1 --output-on-failure
-
       - name: install
         run: cmake --build build -j4 --target install
+
+      - name: test
+        run: cd build && ctest -j1 --output-on-failure
 
       - name: uninstall
         run: cmake --build build -j4 --target uninstall
@@ -64,7 +64,7 @@ jobs:
         run: cmake --build build -j4 --target coverage
 
       - name: coveralls
-        if: ${{ matrix.compiler == 'clang++' }}
+        if: ${{ matrix.compiler == 'g++' }}
         uses: coverallsapp/github-action@master
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
