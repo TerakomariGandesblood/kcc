@@ -199,9 +199,4 @@ add_test(
 add_test(NAME check_sqlite_opt_executable COMMAND ${TEST_BINARY_DIR}/sqlite_opt
                                                   -version)
 
-if(${Sqlite_Speed_Test})
-  add_test(NAME sqlite_test
-           COMMAND ${CMAKE_SOURCE_DIR}/test/sqlite/run-speed-test.sh speed)
-endif()
-
 add_custom_target(test_all COMMAND ctest -j1 --output-on-failure)

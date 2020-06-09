@@ -46,16 +46,16 @@ jobs:
       - name: cmake
         env:
           CXX: ${{ matrix.compiler }}
-        run: mkdir build && cd build && cmake -DCOVERAGE=TRUE -DCLANG_TIDY=TRUE -DSqlite_Speed_Test=TRUE ..
+        run: mkdir build && cd build && cmake -DCOVERAGE=TRUE -DCLANG_TIDY=TRUE ..
 
       - name: build
         run: cmake --build build -j4 --target all
 
-      - name: install
-        run: cmake --build build -j4 --target install
-
       - name: test
         run: cd build && ctest -j1 --output-on-failure
+
+      - name: install
+        run: cmake --build build -j4 --target install
 
       - name: uninstall
         run: cmake --build build -j4 --target uninstall
