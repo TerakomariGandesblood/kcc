@@ -321,6 +321,7 @@ llvm::Constant* CalcConstantExpr::Addr(const UnaryOpExpr* node) {
   if (auto obj{dynamic_cast<const ObjectExpr*>(expr)}) {
     assert(obj->IsGlobalVar() || obj->IsLocalStaticVar());
     return obj->GetGlobalPtr();
+    // Called C++ object pointer is null
   } else if (expr->Kind() == AstNodeType::kIdentifierExpr) {
     return Throw(CalcConstantExpr{node->GetLoc()}.Calc(expr));
   } else if (auto unary{dynamic_cast<const UnaryOpExpr*>(expr)}) {

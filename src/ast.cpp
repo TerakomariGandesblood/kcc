@@ -950,6 +950,7 @@ llvm::GlobalVariable* ObjectExpr::GetGlobalPtr() const {
   }
 
   // TODO align: int32 to uint64
+  // Called C++ object pointer is null
   ptr->setAlignment(
       llvm::MaybeAlign{static_cast<std::uint64_t>(GetType()->GetAlign())});
 

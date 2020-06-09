@@ -106,6 +106,7 @@ void CodeGen::EnsureInsertPoint() {
 
 llvm::Value* CodeGen::EvaluateExprAsBool(const Expr* expr) {
   assert(expr != nullptr);
+  // Called C++ object pointer is null
   expr->Accept(*this);
   return CastToBool(result_);
 }
