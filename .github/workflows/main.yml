@@ -22,7 +22,7 @@ jobs:
         run: |
           pacman -Syu --noconfirm
           pacman -S --noconfirm base-devel clang lld llvm cmake wget unzip git \
-          intel-tbb boost fmt nlohmann-json
+          intel-tbb boost fmt nlohmann-json qt5-base
           wget https://github.com/Neargye/magic_enum/archive/v0.6.6.zip
           unzip v0.6.6.zip
           cd magic_enum-0.6.6
