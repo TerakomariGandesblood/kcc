@@ -52,7 +52,7 @@ jobs:
         run: cmake --build build -j4 --target all
 
       - name: test
-        run: cd build && ctest -j4 --output-on-failure
+        run: cd build && ctest -j1 --output-on-failure
 
       - name: install
         run: cmake --build build -j4 --target install
