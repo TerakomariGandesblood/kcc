@@ -16,13 +16,11 @@ if(${COVERAGE})
 
     add_custom_target(
       coverage
-      COMMAND ${LCOV_PATH} -d . -z
-      COMMAND ${TEST_PROGRAM_NAME} ${RUN_ARGS}
       COMMAND ${LCOV_PATH} --include '${CMAKE_SOURCE_DIR}/*' -d . -c -o
               coverage.info
       COMMAND ${GENHTML_PATH} coverage.info -o coverage
       WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-      DEPENDS ${TEST_PROGRAM_NAME})
+      DEPENDS ${PROGRAM_NAME})
   else()
     message(STATUS "Building with llvm-cov code coverage tool")
     set(CMAKE_CXX_FLAGS
@@ -41,18 +39,17 @@ if(${COVERAGE})
 
     add_custom_target(
       coverage
-      COMMAND ${TEST_PROGRAM_NAME} ${RUN_ARGS}
-      COMMAND ${LLVM_PROFDATA_PATH} merge -sparse -o
-              ${TEST_PROGRAM_NAME}.profdata default.profraw
+      COMMAND ${PROGRAM_NAME} ${RUN_ARGS}
+      COMMAND ${LLVM_PROFDATA_PATH} merge -sparse -o ${PROGRAM_NAME}.profdata
+              default.profraw
       COMMAND
-        ${LLVM_COV_PATH} show ${TEST_PROGRAM_NAME}
-        -instr-profile=${TEST_PROGRAM_NAME}.profdata -format=html
+        ${LLVM_COV_PATH} show ${PROGRAM_NAME}
+        -instr-profile=${PROGRAM_NAME}.profdata -format=html
         -output-dir=coverage
       COMMAND
-        ${LLVM_COV_PATH} export ${TEST_PROGRAM_NAME}
-        -instr-profile=${TEST_PROGRAM_NAME}.profdata -format=lcov >
-        coverage.info
+        ${LLVM_COV_PATH} export ${PROGRAM_NAME}
+        -instr-profile=${PROGRAM_NAME}.profdata -format=lcov > coverage.info
       WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-      DEPENDS ${TEST_PROGRAM_NAME})
+      DEPENDS ${PROGRAM_NAME})
   endif()
 endif()
