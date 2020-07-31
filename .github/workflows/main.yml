@@ -45,7 +45,8 @@ jobs:
       - name: CMake
         env:
           CXX: ${{ matrix.compiler }}
-        run: mkdir build && cd build && cmake -DCOVERAGE=TRUE -DCLANG_TIDY=TRUE ..
+        # FIXME -DCLANG_TIDY=TRUE
+        run: mkdir build && cd build && cmake -DCOVERAGE=TRUE ..
 
       - name: Build
         run: cmake --build build -j4 --target all
