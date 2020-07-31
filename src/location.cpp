@@ -11,12 +11,12 @@
 
 namespace kcc {
 
-void Location::SetFileName(const std::string& file_name) {
+void Location::SetFileName(const std::string &file_name) {
   assert(!std::empty(file_name));
   file_name_ = file_name;
 }
 
-void Location::SetContent(const char* content) {
+void Location::SetContent(const char *content) {
   assert(content != nullptr);
   content_ = content;
 }
@@ -86,4 +86,4 @@ std::int32_t Location::GetRow() const { return row_; }
 
 std::int32_t Location::GetColumn() const { return column_; }
 
-}  // namespace kcc
+} // namespace kcc

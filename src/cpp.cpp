@@ -112,4 +112,4 @@ void Preprocessor::AddIncludePath(const std::string &path, bool is_system) {
   }
 }
 
-}  // namespace kcc
+} // namespace kcc

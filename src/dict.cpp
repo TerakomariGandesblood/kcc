@@ -86,7 +86,7 @@ KeywordsDictionary::KeywordsDictionary() {
   keywords_.insert({"typeid", Tag::kTypeid});
 }
 
-Tag KeywordsDictionary::Find(const std::string& name) const {
+Tag KeywordsDictionary::Find(const std::string &name) const {
   if (auto iter{keywords_.find(name)}; iter != std::end(keywords_)) {
     return iter->second;
   } else {
@@ -94,4 +94,4 @@ Tag KeywordsDictionary::Find(const std::string& name) const {
   }
 }
 
-}  // namespace kcc
+} // namespace kcc

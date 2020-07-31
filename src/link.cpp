@@ -91,4 +91,4 @@ bool Link() {
   return lld::elf::link(args, false, llvm::outs(), llvm::errs());
 }
 
-}  // namespace kcc
+} // namespace kcc

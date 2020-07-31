@@ -22,7 +22,7 @@ Parser::Parser(std::vector<Token> tokens) : tokens_{std::move(tokens)} {
   AddBuiltin();
 }
 
-TranslationUnit* Parser::ParseTranslationUnit() {
+TranslationUnit *Parser::ParseTranslationUnit() {
   while (HasNext()) {
     unit_->AddExtDecl(ParseExternalDecl());
   }
@@ -32,9 +32,9 @@ TranslationUnit* Parser::ParseTranslationUnit() {
 
 bool Parser::HasNext() { return !Peek().TagIs(Tag::kEof); }
 
-const Token& Parser::Peek() { return tokens_[index_]; }
+const Token &Parser::Peek() { return tokens_[index_]; }
 
-const Token& Parser::Next() { return tokens_[index_++]; }
+const Token &Parser::Next() { return tokens_[index_++]; }
 
 void Parser::PutBack() {
   assert(index_ > 0);
@@ -52,7 +52,7 @@ bool Parser::Try(Tag tag) {
   }
 }
 
-const Token& Parser::Expect(Tag tag) {
+const Token &Parser::Expect(Tag tag) {
   if (!Test(tag)) {
     Error(tag, Peek());
   } else {
@@ -60,11 +60,11 @@ const Token& Parser::Expect(Tag tag) {
   }
 }
 
-void Parser::EnterBlock(Type* func_type) {
+void Parser::EnterBlock(Type *func_type) {
   scope_ = Scope::Get(scope_, kBlock);
 
   if (func_type) {
-    for (const auto& param : func_type->FuncGetParams()) {
+    for (const auto &param : func_type->FuncGetParams()) {
       scope_->InsertUsual(param);
     }
   }
@@ -72,7 +72,7 @@ void Parser::EnterBlock(Type* func_type) {
 
 void Parser::ExitBlock() { scope_ = scope_->GetParent(); }
 
-void Parser::EnterFunc(IdentifierExpr* ident) {
+void Parser::EnterFunc(IdentifierExpr *ident) {
   func_def_ = MakeAstNode<FuncDef>(ident->GetLoc(), ident);
 }
 
@@ -82,7 +82,7 @@ void Parser::EnterProto() { scope_ = Scope::Get(scope_, kFuncProto); }
 
 void Parser::ExitProto() { scope_ = scope_->GetParent(); }
 
-bool Parser::IsTypeName(const Token& tok) {
+bool Parser::IsTypeName(const Token &tok) {
   if (tok.IsTypeSpecQual()) {
     return true;
   } else if (tok.IsIdentifier()) {
@@ -95,7 +95,7 @@ bool Parser::IsTypeName(const Token& tok) {
   return false;
 }
 
-bool Parser::IsDecl(const Token& tok) {
+bool Parser::IsDecl(const Token &tok) {
   if (tok.IsDeclSpec()) {
     return true;
   } else if (tok.IsIdentifier()) {
@@ -119,7 +119,7 @@ std::int64_t Parser::ParseInt64Constant() {
   return val;
 }
 
-LabelStmt* Parser::FindLabel(const std::string& name) const {
+LabelStmt *Parser::FindLabel(const std::string &name) const {
   if (auto iter{labels_.find(name)}; iter != std::end(labels_)) {
     return iter->second;
   } else {
@@ -127,7 +127,7 @@ LabelStmt* Parser::FindLabel(const std::string& name) const {
   }
 }
 
-auto Parser::GetStructDesignator(Type* type, const std::string& name)
+auto Parser::GetStructDesignator(Type *type, const std::string &name)
     -> decltype(std::begin(type->StructGetMembers())) {
   auto iter{std::begin(type->StructGetMembers())};
 
@@ -146,7 +146,7 @@ auto Parser::GetStructDesignator(Type* type, const std::string& name)
   return iter;
 }
 
-Declaration* Parser::MakeDeclaration(const Token& token, QualType type,
+Declaration *Parser::MakeDeclaration(const Token &token, QualType type,
                                      std::uint32_t storage_class_spec,
                                      std::uint32_t func_spec,
                                      std::int32_t align) {
@@ -304,7 +304,7 @@ Declaration* Parser::MakeDeclaration(const Token& token, QualType type,
 /*
  * ExtDecl
  */
-ExtDecl* Parser::ParseExternalDecl() {
+ExtDecl *Parser::ParseExternalDecl() {
   auto ext_decl{ParseDecl(true)};
 
   // _Static_assert / e.g. int;
@@ -321,14 +321,14 @@ ExtDecl* Parser::ParseExternalDecl() {
       Error(Peek(), "unexpect left braces");
     }
 
-    return ParseFuncDef(dynamic_cast<Declaration*>(stmt.front()));
+    return ParseFuncDef(dynamic_cast<Declaration *>(stmt.front()));
   } else {
     Expect(Tag::kSemicolon);
     return ext_decl;
   }
 }
 
-FuncDef* Parser::ParseFuncDef(const Declaration* decl) {
+FuncDef *Parser::ParseFuncDef(const Declaration *decl) {
   auto ident{decl->GetIdent()};
   if (!ident->GetType()->IsFunctionTy()) {
     Error(decl->GetLoc(), "func def need func type");
@@ -340,7 +340,7 @@ FuncDef* Parser::ParseFuncDef(const Declaration* decl) {
   ExitFunc();
 
   // label 具有函数作用域
-  for (auto&& item : gotos_) {
+  for (auto &&item : gotos_) {
     auto label{FindLabel(item->GetName())};
     if (label) {
       item->SetLabel(label);
@@ -457,7 +457,7 @@ QualType Parser::ParseTypeof() {
   return type;
 }
 
-Expr* Parser::TryParseStmtExpr() {
+Expr *Parser::TryParseStmtExpr() {
   Try(Tag::kExtension);
 
   if (Try(Tag::kLeftParen)) {
@@ -471,13 +471,13 @@ Expr* Parser::TryParseStmtExpr() {
   return nullptr;
 }
 
-Expr* Parser::ParseStmtExpr() {
+Expr *Parser::ParseStmtExpr() {
   auto block{ParseCompoundStmt()};
   Expect(Tag::kRightParen);
   return MakeAstNode<StmtExpr>(block->GetLoc(), block);
 }
 
-Expr* Parser::ParseTypeid() {
+Expr *Parser::ParseTypeid() {
   auto token{Expect(Tag::kLeftParen)};
   auto expr{ParseExpr()};
   Expect(Tag::kRightParen);
@@ -489,7 +489,7 @@ Expr* Parser::ParseTypeid() {
 /*
  * built in
  */
-Expr* Parser::ParseOffsetof() {
+Expr *Parser::ParseOffsetof() {
   Expect(Tag::kLeftParen);
 
   auto token{Peek()};
@@ -529,7 +529,7 @@ Expr* Parser::ParseOffsetof() {
       token, ArithmeticType::Get(kLong | kUnsigned), offset);
 }
 
-Expr* Parser::ParseHugeVal() {
+Expr *Parser::ParseHugeVal() {
   auto tok{Expect(Tag::kLeftParen)};
   Expect(Tag::kRightParen);
 
@@ -538,7 +538,7 @@ Expr* Parser::ParseHugeVal() {
       std::to_string(std::numeric_limits<double>::infinity()));
 }
 
-Expr* Parser::ParseInff() {
+Expr *Parser::ParseInff() {
   auto tok{Expect(Tag::kLeftParen)};
   Expect(Tag::kRightParen);
 
@@ -652,4 +652,4 @@ void Parser::AddBuiltin() {
       loc, "__builtin_bswap16", bswap16, Linkage::kExternal, false));
 }
 
-}  // namespace kcc
+} // namespace kcc

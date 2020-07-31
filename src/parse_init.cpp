@@ -16,7 +16,7 @@ namespace kcc {
 /*
  * Init
  */
-llvm::Constant* Parser::ParseInitializer(std::vector<Initializer>& inits,
+llvm::Constant *Parser::ParseInitializer(std::vector<Initializer> &inits,
                                          QualType type, bool designated,
                                          bool force_brace) {
   // 比如解析 {[2]=1}
@@ -80,7 +80,7 @@ llvm::Constant* Parser::ParseInitializer(std::vector<Initializer>& inits,
   return nullptr;
 }
 
-void Parser::ParseArrayInitializer(std::vector<Initializer>& inits, Type* type,
+void Parser::ParseArrayInitializer(std::vector<Initializer> &inits, Type *type,
                                    bool designated) {
   std::size_t index{};
   auto has_brace{Try(Tag::kLeftBrace)};
@@ -136,7 +136,7 @@ void Parser::ParseArrayInitializer(std::vector<Initializer>& inits, Type* type,
   }
 }
 
-void Parser::ParseStructInitializer(std::vector<Initializer>& inits, Type* type,
+void Parser::ParseStructInitializer(std::vector<Initializer> &inits, Type *type,
                                     bool designated) {
   auto has_brace{Try(Tag::kLeftBrace)};
   auto member_iter{std::begin(type->StructGetMembers())};
@@ -212,7 +212,7 @@ void Parser::ParseStructInitializer(std::vector<Initializer>& inits, Type* type,
 /*
  * ConstantInit
  */
-llvm::Constant* Parser::ParseConstantInitializer(QualType type, bool designated,
+llvm::Constant *Parser::ParseConstantInitializer(QualType type, bool designated,
                                                  bool force_brace) {
   if (designated && !Test(Tag::kPeriod) && !Test(Tag::kLeftSquare)) {
     Expect(Tag::kEqual);
@@ -252,14 +252,14 @@ llvm::Constant* Parser::ParseConstantInitializer(QualType type, bool designated,
   return nullptr;
 }
 
-llvm::Constant* Parser::ParseConstantArrayInitializer(Type* type,
+llvm::Constant *Parser::ParseConstantArrayInitializer(Type *type,
                                                       bool designated) {
   std::size_t index{};
   auto has_brace{Try(Tag::kLeftBrace)};
 
   auto size{type->ArrayGetNumElements()};
   auto zero{GetConstantZero(type->ArrayGetElementType()->GetLLVMType())};
-  std::vector<llvm::Constant*> val(size, zero);
+  std::vector<llvm::Constant *> val(size, zero);
 
   while (true) {
     if (Test(Tag::kRightBrace)) {
@@ -337,11 +337,11 @@ llvm::Constant* Parser::ParseConstantArrayInitializer(Type* type,
       llvm::cast<llvm::ArrayType>(type->GetLLVMType()), val);
 }
 
-llvm::Constant* Parser::ParseConstantStructInitializer(Type* type,
+llvm::Constant *Parser::ParseConstantStructInitializer(Type *type,
                                                        bool designated) {
   auto has_brace{Try(Tag::kLeftBrace)};
   auto member_iter{std::begin(type->StructGetMembers())};
-  std::vector<llvm::Constant*> val;
+  std::vector<llvm::Constant *> val;
   bool is_struct{type->IsStructTy()};
 
   for (std::size_t i{}; i < type->GetLLVMType()->getStructNumElements(); ++i) {
@@ -386,7 +386,7 @@ llvm::Constant* Parser::ParseConstantStructInitializer(Type* type,
     auto member_type{type->GetLLVMType()->getStructElementType(index)};
 
     if (width) {
-      llvm::Constant* old_value{
+      llvm::Constant *old_value{
           llvm::ConstantInt::get(Builder.getInt32Ty(), 0)};
 
       if (member_type->isArrayTy()) {
@@ -420,7 +420,7 @@ llvm::Constant* Parser::ParseConstantStructInitializer(Type* type,
       new_value = llvm::ConstantExpr::getOr(old_value, new_value);
 
       if (member_type->isArrayTy()) {
-        std::vector<llvm::Constant*> v;
+        std::vector<llvm::Constant *> v;
         auto arr_size{member_type->getArrayNumElements()};
         for (std::size_t i{}; i < arr_size; ++i) {
           auto temp{
@@ -472,7 +472,7 @@ llvm::Constant* Parser::ParseConstantStructInitializer(Type* type,
       llvm::cast<llvm::StructType>(type->GetLLVMType()), val);
 }
 
-llvm::Constant* Parser::ParseLiteralInitializer(Type* type, bool need_ptr) {
+llvm::Constant *Parser::ParseLiteralInitializer(Type *type, bool need_ptr) {
   if (!type->ArrayGetElementType()->IsIntegerTy()) {
     return nullptr;
   }
@@ -519,4 +519,4 @@ llvm::Constant* Parser::ParseLiteralInitializer(Type* type, bool need_ptr) {
   }
 }
 
-}  // namespace kcc
+} // namespace kcc

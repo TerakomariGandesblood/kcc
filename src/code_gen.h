@@ -24,22 +24,22 @@
 
 namespace kcc {
 
-#define Load_Struct_Obj()      \
-  {                            \
-    auto backup{load_struct_}; \
+#define Load_Struct_Obj()                                                      \
+  {                                                                            \
+    auto backup{load_struct_};                                                 \
     load_struct_ = true;
 
-#define Finish_Load()    \
-  load_struct_ = backup; \
+#define Finish_Load()                                                          \
+  load_struct_ = backup;                                                       \
   }
 
 class CodeGen : public Visitor {
- public:
+public:
   void GenCode(const TranslationUnit *root);
 
- private:
+private:
   struct BreakContinue {
-   public:
+  public:
     BreakContinue(llvm::BasicBlock *break_block,
                   llvm::BasicBlock *continue_block);
 
@@ -194,4 +194,4 @@ class CodeGen : public Visitor {
   std::unique_ptr<DebugInfo> debug_info_;
 };
 
-}  // namespace kcc
+} // namespace kcc

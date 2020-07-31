@@ -4,8 +4,8 @@
 
 #include "code_gen.h"
 
-#include <assert.h>
 #include <algorithm>
+#include <assert.h>
 #include <vector>
 
 #include <llvm/IR/CFG.h>
@@ -18,74 +18,74 @@
 
 namespace kcc {
 
-void CodeGen::Visit(const UnaryOpExpr* node) {
+void CodeGen::Visit(const UnaryOpExpr *node) {
   auto is_unsigned{node->GetExpr()->GetType()->IsUnsigned()};
 
   switch (node->GetOp()) {
-    case Tag::kPlusPlus:
-      result_ = IncOrDec(node->GetExpr(), true, false);
-      break;
-    case Tag::kPostfixPlusPlus:
-      result_ = IncOrDec(node->GetExpr(), true, true);
-      break;
-    case Tag::kMinusMinus:
-      result_ = IncOrDec(node->GetExpr(), false, false);
-      break;
-    case Tag::kPostfixMinusMinus:
-      result_ = IncOrDec(node->GetExpr(), false, true);
-      break;
-    case Tag::kPlus:
-      node->GetExpr()->Accept(*this);
-      break;
-    case Tag::kMinus:
-      node->GetExpr()->Accept(*this);
-      TryEmitLocation(node);
-      result_ = NegOp(result_, is_unsigned);
-      break;
-    case Tag::kTilde:
-      node->GetExpr()->Accept(*this);
-      TryEmitLocation(node);
-      result_ = Builder.CreateNot(result_);
-      break;
-    case Tag::kExclaim:
-      node->GetExpr()->Accept(*this);
-      TryEmitLocation(node);
-      result_ = LogicNotOp(result_);
-      break;
-    case Tag::kStar:
-      result_ = Deref(node);
-      break;
-    case Tag::kAmp:
-      result_ = GetPtr(node->GetExpr());
-      break;
-    default:
-      assert(false);
+  case Tag::kPlusPlus:
+    result_ = IncOrDec(node->GetExpr(), true, false);
+    break;
+  case Tag::kPostfixPlusPlus:
+    result_ = IncOrDec(node->GetExpr(), true, true);
+    break;
+  case Tag::kMinusMinus:
+    result_ = IncOrDec(node->GetExpr(), false, false);
+    break;
+  case Tag::kPostfixMinusMinus:
+    result_ = IncOrDec(node->GetExpr(), false, true);
+    break;
+  case Tag::kPlus:
+    node->GetExpr()->Accept(*this);
+    break;
+  case Tag::kMinus:
+    node->GetExpr()->Accept(*this);
+    TryEmitLocation(node);
+    result_ = NegOp(result_, is_unsigned);
+    break;
+  case Tag::kTilde:
+    node->GetExpr()->Accept(*this);
+    TryEmitLocation(node);
+    result_ = Builder.CreateNot(result_);
+    break;
+  case Tag::kExclaim:
+    node->GetExpr()->Accept(*this);
+    TryEmitLocation(node);
+    result_ = LogicNotOp(result_);
+    break;
+  case Tag::kStar:
+    result_ = Deref(node);
+    break;
+  case Tag::kAmp:
+    result_ = GetPtr(node->GetExpr());
+    break;
+  default:
+    assert(false);
   }
 }
 
-void CodeGen::Visit(const TypeCastExpr* node) {
+void CodeGen::Visit(const TypeCastExpr *node) {
   node->GetExpr()->Accept(*this);
   TryEmitLocation(node);
   result_ = CastTo(result_, node->GetCastToType()->GetLLVMType(),
                    node->GetExpr()->GetType()->IsUnsigned());
 }
 
-void CodeGen::Visit(const BinaryOpExpr* node) {
+void CodeGen::Visit(const BinaryOpExpr *node) {
   switch (node->GetOp()) {
-    case Tag::kPipePipe:
-      result_ = LogicOrOp(node);
-      return;
-    case Tag::kAmpAmp:
-      result_ = LogicAndOp(node);
-      return;
-    case Tag::kEqual:
-      result_ = AssignOp(node);
-      return;
-    case Tag::kPeriod:
-      result_ = MemberRef(node);
-      return;
-    default:
-      break;
+  case Tag::kPipePipe:
+    result_ = LogicOrOp(node);
+    return;
+  case Tag::kAmpAmp:
+    result_ = LogicAndOp(node);
+    return;
+  case Tag::kEqual:
+    result_ = AssignOp(node);
+    return;
+  case Tag::kPeriod:
+    result_ = MemberRef(node);
+    return;
+  default:
+    break;
   }
 
   node->GetLHS()->Accept(*this);
@@ -98,63 +98,63 @@ void CodeGen::Visit(const BinaryOpExpr* node) {
   bool is_unsigned{node->GetLHS()->GetType()->IsUnsigned()};
 
   switch (node->GetOp()) {
-    case Tag::kPlus:
-      result_ = AddOp(lhs, rhs, is_unsigned);
-      break;
-    case Tag::kMinus:
-      result_ = SubOp(lhs, rhs, is_unsigned);
-      break;
-    case Tag::kStar:
-      result_ = MulOp(lhs, rhs, is_unsigned);
-      break;
-    case Tag::kSlash:
-      result_ = DivOp(lhs, rhs, is_unsigned);
-      break;
-    case Tag::kPercent:
-      result_ = ModOp(lhs, rhs, is_unsigned);
-      break;
-    case Tag::kPipe:
-      result_ = OrOp(lhs, rhs);
-      break;
-    case Tag::kAmp:
-      result_ = AndOp(lhs, rhs);
-      break;
-    case Tag::kCaret:
-      result_ = XorOp(lhs, rhs);
-      break;
-    case Tag::kLessLess:
-      result_ = ShlOp(lhs, rhs);
-      break;
-    case Tag::kGreaterGreater:
-      result_ = ShrOp(lhs, rhs, is_unsigned);
-      break;
-    case Tag::kEqualEqual:
-      result_ = EqualOp(lhs, rhs);
-      break;
-    case Tag::kExclaimEqual:
-      result_ = NotEqualOp(lhs, rhs);
-      break;
-    case Tag::kLess:
-      result_ = LessOp(lhs, rhs, is_unsigned);
-      break;
-    case Tag::kLessEqual:
-      result_ = LessEqualOp(lhs, rhs, is_unsigned);
-      break;
-    case Tag::kGreater:
-      result_ = GreaterOp(lhs, rhs, is_unsigned);
-      break;
-    case Tag::kGreaterEqual:
-      result_ = GreaterEqualOp(lhs, rhs, is_unsigned);
-      break;
-    case Tag::kComma:
-      result_ = rhs;
-      break;
-    default:
-      assert(false);
+  case Tag::kPlus:
+    result_ = AddOp(lhs, rhs, is_unsigned);
+    break;
+  case Tag::kMinus:
+    result_ = SubOp(lhs, rhs, is_unsigned);
+    break;
+  case Tag::kStar:
+    result_ = MulOp(lhs, rhs, is_unsigned);
+    break;
+  case Tag::kSlash:
+    result_ = DivOp(lhs, rhs, is_unsigned);
+    break;
+  case Tag::kPercent:
+    result_ = ModOp(lhs, rhs, is_unsigned);
+    break;
+  case Tag::kPipe:
+    result_ = OrOp(lhs, rhs);
+    break;
+  case Tag::kAmp:
+    result_ = AndOp(lhs, rhs);
+    break;
+  case Tag::kCaret:
+    result_ = XorOp(lhs, rhs);
+    break;
+  case Tag::kLessLess:
+    result_ = ShlOp(lhs, rhs);
+    break;
+  case Tag::kGreaterGreater:
+    result_ = ShrOp(lhs, rhs, is_unsigned);
+    break;
+  case Tag::kEqualEqual:
+    result_ = EqualOp(lhs, rhs);
+    break;
+  case Tag::kExclaimEqual:
+    result_ = NotEqualOp(lhs, rhs);
+    break;
+  case Tag::kLess:
+    result_ = LessOp(lhs, rhs, is_unsigned);
+    break;
+  case Tag::kLessEqual:
+    result_ = LessEqualOp(lhs, rhs, is_unsigned);
+    break;
+  case Tag::kGreater:
+    result_ = GreaterOp(lhs, rhs, is_unsigned);
+    break;
+  case Tag::kGreaterEqual:
+    result_ = GreaterEqualOp(lhs, rhs, is_unsigned);
+    break;
+  case Tag::kComma:
+    result_ = rhs;
+    break;
+  default:
+    assert(false);
   }
 }
 
-void CodeGen::Visit(const ConditionOpExpr* node) {
+void CodeGen::Visit(const ConditionOpExpr *node) {
   if (auto cond{CalcConstantExpr{}.Calc(node->GetCond())}) {
     TryEmitLocation(node);
     auto live{node->GetLHS()}, dead{node->GetRHS()};
@@ -214,7 +214,7 @@ void CodeGen::Visit(const ConditionOpExpr* node) {
 }
 
 // LLVM 默认使用本机 C 调用约定
-void CodeGen::Visit(const FuncCallExpr* node) {
+void CodeGen::Visit(const FuncCallExpr *node) {
   if (MayCallBuiltinFunc(node)) {
     return;
   }
@@ -222,9 +222,9 @@ void CodeGen::Visit(const FuncCallExpr* node) {
   node->GetCallee()->Accept(*this);
   auto callee{result_};
 
-  std::vector<llvm::Value*> args;
+  std::vector<llvm::Value *> args;
   Load_Struct_Obj();
-  for (const auto& item : node->GetArgs()) {
+  for (const auto &item : node->GetArgs()) {
     item->Accept(*this);
     args.push_back(result_);
   }
@@ -236,7 +236,7 @@ void CodeGen::Visit(const FuncCallExpr* node) {
 
 // 常量用 ConstantFP / ConstantInt 类表示
 // 在 LLVM IR 中, 常量都是唯一且共享的
-void CodeGen::Visit(const ConstantExpr* node) {
+void CodeGen::Visit(const ConstantExpr *node) {
   TryEmitLocation(node);
 
   auto type{node->GetType()->GetLLVMType()};
@@ -251,12 +251,12 @@ void CodeGen::Visit(const ConstantExpr* node) {
 }
 
 // 注意已经添加空字符了
-void CodeGen::Visit(const StringLiteralExpr* node) {
+void CodeGen::Visit(const StringLiteralExpr *node) {
   TryEmitLocation(node);
   result_ = node->GetPtr();
 }
 
-void CodeGen::Visit(const IdentifierExpr* node) {
+void CodeGen::Visit(const IdentifierExpr *node) {
   TryEmitLocation(node);
 
   auto type{node->GetType()};
@@ -277,13 +277,13 @@ void CodeGen::Visit(const IdentifierExpr* node) {
   result_ = func;
 }
 
-void CodeGen::Visit(const EnumeratorExpr* node) {
+void CodeGen::Visit(const EnumeratorExpr *node) {
   TryEmitLocation(node);
   result_ = llvm::ConstantInt::get(Builder.getInt32Ty(), node->GetVal());
 }
 
-void CodeGen::Visit(const ObjectExpr* node) {
-  llvm::Value* ptr;
+void CodeGen::Visit(const ObjectExpr *node) {
+  llvm::Value *ptr;
   if (node->IsGlobalVar() || node->IsLocalStaticVar()) {
     ptr = node->GetGlobalPtr();
   } else {
@@ -301,17 +301,17 @@ void CodeGen::Visit(const ObjectExpr* node) {
   }
 }
 
-void CodeGen::Visit(const StmtExpr* node) {
+void CodeGen::Visit(const StmtExpr *node) {
   TryEmitLocation(node);
   node->GetBlock()->Accept(*this);
 }
 
-llvm::Value* CodeGen::IncOrDec(const Expr* expr, bool is_inc, bool is_postfix) {
+llvm::Value *CodeGen::IncOrDec(const Expr *expr, bool is_inc, bool is_postfix) {
   auto is_unsigned{expr->GetType()->IsUnsigned()};
   auto lhs_ptr{GetPtr(expr)};
 
   TryEmitLocation(expr);
-  llvm::Value* lhs_value{Builder.CreateLoad(lhs_ptr, is_volatile_)};
+  llvm::Value *lhs_value{Builder.CreateLoad(lhs_ptr, is_volatile_)};
 
   if (is_bit_field_) {
     auto size{bit_field_->GetType()->IsCharacterTy() ? 8 : 32};
@@ -321,9 +321,9 @@ llvm::Value* CodeGen::IncOrDec(const Expr* expr, bool is_inc, bool is_postfix) {
         bit_field_->GetBitFieldBegin(), bit_field_->GetType()->IsUnsigned());
   }
 
-  llvm::Value* rhs_value{};
+  llvm::Value *rhs_value{};
 
-  llvm::Value* one_value{};
+  llvm::Value *one_value{};
   auto type{expr->GetType()->GetLLVMType()};
 
   if (type->isIntegerTy()) {
@@ -347,7 +347,7 @@ llvm::Value* CodeGen::IncOrDec(const Expr* expr, bool is_inc, bool is_postfix) {
   return is_postfix ? lhs_value : rhs_value;
 }
 
-llvm::Value* CodeGen::NegOp(llvm::Value* value, bool is_unsigned) {
+llvm::Value *CodeGen::NegOp(llvm::Value *value, bool is_unsigned) {
   if (IsIntegerTy(value)) {
     if (is_unsigned) {
       return Builder.CreateNeg(value);
@@ -362,13 +362,13 @@ llvm::Value* CodeGen::NegOp(llvm::Value* value, bool is_unsigned) {
   }
 }
 
-llvm::Value* CodeGen::LogicNotOp(llvm::Value* value) {
+llvm::Value *CodeGen::LogicNotOp(llvm::Value *value) {
   result_ = Builder.CreateNot(CastToBool(value));
   return Builder.CreateZExt(result_, Builder.getInt32Ty());
 }
 
-llvm::Value* CodeGen::Deref(const UnaryOpExpr* node) {
-  auto binary{dynamic_cast<const BinaryOpExpr*>(node->GetExpr())};
+llvm::Value *CodeGen::Deref(const UnaryOpExpr *node) {
+  auto binary{dynamic_cast<const BinaryOpExpr *>(node->GetExpr())};
   // e.g. a[1] / *(p + 1)
   if (binary && binary->GetOp() == Tag::kPlus) {
     binary->GetLHS()->Accept(*this);
@@ -398,7 +398,7 @@ llvm::Value* CodeGen::Deref(const UnaryOpExpr* node) {
   return result_;
 }
 
-llvm::Value* CodeGen::AddOp(llvm::Value* lhs, llvm::Value* rhs,
+llvm::Value *CodeGen::AddOp(llvm::Value *lhs, llvm::Value *rhs,
                             bool is_unsigned) {
   if (IsIntegerTy(lhs)) {
     if (is_unsigned) {
@@ -417,7 +417,7 @@ llvm::Value* CodeGen::AddOp(llvm::Value* lhs, llvm::Value* rhs,
   }
 }
 
-llvm::Value* CodeGen::SubOp(llvm::Value* lhs, llvm::Value* rhs,
+llvm::Value *CodeGen::SubOp(llvm::Value *lhs, llvm::Value *rhs,
                             bool is_unsigned) {
   if (IsIntegerTy(lhs)) {
     if (is_unsigned) {
@@ -445,7 +445,7 @@ llvm::Value* CodeGen::SubOp(llvm::Value* lhs, llvm::Value* rhs,
   }
 }
 
-llvm::Value* CodeGen::MulOp(llvm::Value* lhs, llvm::Value* rhs,
+llvm::Value *CodeGen::MulOp(llvm::Value *lhs, llvm::Value *rhs,
                             bool is_unsigned) {
   if (IsIntegerTy(lhs)) {
     if (is_unsigned) {
@@ -461,7 +461,7 @@ llvm::Value* CodeGen::MulOp(llvm::Value* lhs, llvm::Value* rhs,
   }
 }
 
-llvm::Value* CodeGen::DivOp(llvm::Value* lhs, llvm::Value* rhs,
+llvm::Value *CodeGen::DivOp(llvm::Value *lhs, llvm::Value *rhs,
                             bool is_unsigned) {
   if (IsIntegerTy(lhs)) {
     if (is_unsigned) {
@@ -477,7 +477,7 @@ llvm::Value* CodeGen::DivOp(llvm::Value* lhs, llvm::Value* rhs,
   }
 }
 
-llvm::Value* CodeGen::ModOp(llvm::Value* lhs, llvm::Value* rhs,
+llvm::Value *CodeGen::ModOp(llvm::Value *lhs, llvm::Value *rhs,
                             bool is_unsigned) {
   if (is_unsigned) {
     return Builder.CreateURem(lhs, rhs);
@@ -486,23 +486,23 @@ llvm::Value* CodeGen::ModOp(llvm::Value* lhs, llvm::Value* rhs,
   }
 }
 
-llvm::Value* CodeGen::OrOp(llvm::Value* lhs, llvm::Value* rhs) {
+llvm::Value *CodeGen::OrOp(llvm::Value *lhs, llvm::Value *rhs) {
   return Builder.CreateOr(lhs, rhs);
 }
 
-llvm::Value* CodeGen::AndOp(llvm::Value* lhs, llvm::Value* rhs) {
+llvm::Value *CodeGen::AndOp(llvm::Value *lhs, llvm::Value *rhs) {
   return Builder.CreateAnd(lhs, rhs);
 }
 
-llvm::Value* CodeGen::XorOp(llvm::Value* lhs, llvm::Value* rhs) {
+llvm::Value *CodeGen::XorOp(llvm::Value *lhs, llvm::Value *rhs) {
   return Builder.CreateXor(lhs, rhs);
 }
 
-llvm::Value* CodeGen::ShlOp(llvm::Value* lhs, llvm::Value* rhs) {
+llvm::Value *CodeGen::ShlOp(llvm::Value *lhs, llvm::Value *rhs) {
   return Builder.CreateShl(lhs, rhs);
 }
 
-llvm::Value* CodeGen::ShrOp(llvm::Value* lhs, llvm::Value* rhs,
+llvm::Value *CodeGen::ShrOp(llvm::Value *lhs, llvm::Value *rhs,
                             bool is_unsigned) {
   if (is_unsigned) {
     return Builder.CreateLShr(lhs, rhs);
@@ -511,9 +511,9 @@ llvm::Value* CodeGen::ShrOp(llvm::Value* lhs, llvm::Value* rhs,
   }
 }
 
-llvm::Value* CodeGen::LessEqualOp(llvm::Value* lhs, llvm::Value* rhs,
+llvm::Value *CodeGen::LessEqualOp(llvm::Value *lhs, llvm::Value *rhs,
                                   bool is_unsigned) {
-  llvm::Value* value{};
+  llvm::Value *value{};
 
   if (IsIntegerTy(lhs)) {
     if (is_unsigned) {
@@ -533,9 +533,9 @@ llvm::Value* CodeGen::LessEqualOp(llvm::Value* lhs, llvm::Value* rhs,
   return Builder.CreateZExt(value, Builder.getInt32Ty());
 }
 
-llvm::Value* CodeGen::LessOp(llvm::Value* lhs, llvm::Value* rhs,
+llvm::Value *CodeGen::LessOp(llvm::Value *lhs, llvm::Value *rhs,
                              bool is_unsigned) {
-  llvm::Value* value{};
+  llvm::Value *value{};
 
   if (IsIntegerTy(lhs)) {
     if (is_unsigned) {
@@ -555,9 +555,9 @@ llvm::Value* CodeGen::LessOp(llvm::Value* lhs, llvm::Value* rhs,
   return Builder.CreateZExt(value, Builder.getInt32Ty());
 }
 
-llvm::Value* CodeGen::GreaterEqualOp(llvm::Value* lhs, llvm::Value* rhs,
+llvm::Value *CodeGen::GreaterEqualOp(llvm::Value *lhs, llvm::Value *rhs,
                                      bool is_unsigned) {
-  llvm::Value* value{};
+  llvm::Value *value{};
 
   if (IsIntegerTy(lhs)) {
     if (is_unsigned) {
@@ -577,9 +577,9 @@ llvm::Value* CodeGen::GreaterEqualOp(llvm::Value* lhs, llvm::Value* rhs,
   return Builder.CreateZExt(value, Builder.getInt32Ty());
 }
 
-llvm::Value* CodeGen::GreaterOp(llvm::Value* lhs, llvm::Value* rhs,
+llvm::Value *CodeGen::GreaterOp(llvm::Value *lhs, llvm::Value *rhs,
                                 bool is_unsigned) {
-  llvm::Value* value{};
+  llvm::Value *value{};
 
   if (IsIntegerTy(lhs)) {
     if (is_unsigned) {
@@ -599,8 +599,8 @@ llvm::Value* CodeGen::GreaterOp(llvm::Value* lhs, llvm::Value* rhs,
   return Builder.CreateZExt(value, Builder.getInt32Ty());
 }
 
-llvm::Value* CodeGen::EqualOp(llvm::Value* lhs, llvm::Value* rhs) {
-  llvm::Value* value{};
+llvm::Value *CodeGen::EqualOp(llvm::Value *lhs, llvm::Value *rhs) {
+  llvm::Value *value{};
 
   if (IsIntegerTy(lhs) || IsPointerTy(lhs)) {
     value = Builder.CreateICmpEQ(lhs, rhs);
@@ -614,8 +614,8 @@ llvm::Value* CodeGen::EqualOp(llvm::Value* lhs, llvm::Value* rhs) {
   return Builder.CreateZExt(value, Builder.getInt32Ty());
 }
 
-llvm::Value* CodeGen::NotEqualOp(llvm::Value* lhs, llvm::Value* rhs) {
-  llvm::Value* value{};
+llvm::Value *CodeGen::NotEqualOp(llvm::Value *lhs, llvm::Value *rhs) {
+  llvm::Value *value{};
 
   if (IsIntegerTy(lhs) || IsPointerTy(lhs)) {
     value = Builder.CreateICmpNE(lhs, rhs);
@@ -629,7 +629,7 @@ llvm::Value* CodeGen::NotEqualOp(llvm::Value* lhs, llvm::Value* rhs) {
   return Builder.CreateZExt(value, Builder.getInt32Ty());
 }
 
-llvm::Value* CodeGen::LogicOrOp(const BinaryOpExpr* node) {
+llvm::Value *CodeGen::LogicOrOp(const BinaryOpExpr *node) {
   if (auto lhs{CalcConstantExpr{}.Calc(node->GetLHS())}) {
     if (lhs->isZeroValue()) {
       auto rhs{EvaluateExprAsBool(node->GetRHS())};
@@ -646,7 +646,7 @@ llvm::Value* CodeGen::LogicOrOp(const BinaryOpExpr* node) {
   auto phi{llvm::PHINode::Create(Builder.getInt1Ty(), 2, "", end_block)};
 
   // llvm::predecessors 获取 basic block 的所有前驱
-  for (const auto& item : llvm::predecessors(end_block)) {
+  for (const auto &item : llvm::predecessors(end_block)) {
     phi->addIncoming(Builder.getTrue(), item);
   }
 
@@ -662,7 +662,7 @@ llvm::Value* CodeGen::LogicOrOp(const BinaryOpExpr* node) {
   return Builder.CreateZExt(phi, Builder.getInt32Ty());
 }
 
-llvm::Value* CodeGen::LogicAndOp(const BinaryOpExpr* node) {
+llvm::Value *CodeGen::LogicAndOp(const BinaryOpExpr *node) {
   if (auto lhs{CalcConstantExpr{}.Calc(node->GetLHS())}) {
     if (lhs->isOneValue()) {
       auto rhs{EvaluateExprAsBool(node->GetRHS())};
@@ -678,7 +678,7 @@ llvm::Value* CodeGen::LogicAndOp(const BinaryOpExpr* node) {
   EmitBranchOnBoolExpr(node->GetLHS(), rhs_block, end_block);
   auto phi{llvm::PHINode::Create(Builder.getInt1Ty(), 2, "", end_block)};
 
-  for (const auto& item : llvm::predecessors(end_block)) {
+  for (const auto &item : llvm::predecessors(end_block)) {
     phi->addIncoming(Builder.getFalse(), item);
   }
 
@@ -695,7 +695,7 @@ llvm::Value* CodeGen::LogicAndOp(const BinaryOpExpr* node) {
   return Builder.CreateZExt(phi, Builder.getInt32Ty());
 }
 
-llvm::Value* CodeGen::AssignOp(const BinaryOpExpr* node) {
+llvm::Value *CodeGen::AssignOp(const BinaryOpExpr *node) {
   Load_Struct_Obj();
   node->GetRHS()->Accept(*this);
   Finish_Load();
@@ -707,7 +707,7 @@ llvm::Value* CodeGen::AssignOp(const BinaryOpExpr* node) {
   return Assign(lhs_ptr, rhs, node->GetRHS()->GetType()->IsUnsigned());
 }
 
-llvm::Value* CodeGen::MemberRef(const BinaryOpExpr* node) {
+llvm::Value *CodeGen::MemberRef(const BinaryOpExpr *node) {
   auto ptr{GetPtr(node)};
   TryEmitLocation(node);
   auto type{ptr->getType()->getPointerElementType()};
@@ -734,7 +734,7 @@ llvm::Value* CodeGen::MemberRef(const BinaryOpExpr* node) {
   return result_;
 }
 
-llvm::Value* CodeGen::Assign(llvm::Value* lhs_ptr, llvm::Value* rhs,
+llvm::Value *CodeGen::Assign(llvm::Value *lhs_ptr, llvm::Value *rhs,
                              bool is_unsigned) {
   if (is_bit_field_) {
     result_ = Builder.CreateLoad(lhs_ptr, is_volatile_);
@@ -782,7 +782,7 @@ llvm::Value* CodeGen::Assign(llvm::Value* lhs_ptr, llvm::Value* rhs,
   }
 }
 
-bool CodeGen::MayCallBuiltinFunc(const FuncCallExpr* node) {
+bool CodeGen::MayCallBuiltinFunc(const FuncCallExpr *node) {
   auto func_name{node->GetFuncType()->FuncGetName()};
 
   if (func_name == "__builtin_va_start") {
@@ -837,7 +837,7 @@ bool CodeGen::MayCallBuiltinFunc(const FuncCallExpr* node) {
   }
 }
 
-llvm::Value* CodeGen::VaStart(Expr* arg) {
+llvm::Value *CodeGen::VaStart(Expr *arg) {
   static auto func_type{llvm::FunctionType::get(
       Builder.getVoidTy(), {Builder.getInt8PtrTy()}, false)};
 
@@ -851,7 +851,7 @@ llvm::Value* CodeGen::VaStart(Expr* arg) {
   return Builder.CreateCall(va_start, {result_});
 }
 
-llvm::Value* CodeGen::VaEnd(Expr* arg) {
+llvm::Value *CodeGen::VaEnd(Expr *arg) {
   static auto func_type{llvm::FunctionType::get(
       Builder.getVoidTy(), {Builder.getInt8PtrTy()}, false)};
 
@@ -864,13 +864,13 @@ llvm::Value* CodeGen::VaEnd(Expr* arg) {
   return Builder.CreateCall(va_end, {result_});
 }
 
-llvm::Value* CodeGen::VaArg(Expr* arg, llvm::Type* type) {
+llvm::Value *CodeGen::VaArg(Expr *arg, llvm::Type *type) {
   auto lhs_block{CreateBasicBlock("va.arg.lhs")};
   auto rhs_block{CreateBasicBlock("va.arg.rhs")};
   auto end_block{CreateBasicBlock("va.arg.end")};
 
-  llvm::Value* offset_ptr{};
-  llvm::Value* offset{};
+  llvm::Value *offset_ptr{};
+  llvm::Value *offset{};
 
   arg->Accept(*this);
   auto ptr{result_};
@@ -927,7 +927,7 @@ llvm::Value* CodeGen::VaArg(Expr* arg, llvm::Type* type) {
   return phi;
 }
 
-llvm::Value* CodeGen::VaCopy(Expr* arg, Expr* arg2) {
+llvm::Value *CodeGen::VaCopy(Expr *arg, Expr *arg2) {
   static auto func_type{llvm::FunctionType::get(
       Builder.getVoidTy(), {Builder.getInt8PtrTy(), Builder.getInt8PtrTy()},
       false)};
@@ -946,17 +946,17 @@ llvm::Value* CodeGen::VaCopy(Expr* arg, Expr* arg2) {
                 Builder.CreateBitCast(param2, Builder.getInt8PtrTy())});
 }
 
-llvm::Value* CodeGen::SyncSynchronize() {
+llvm::Value *CodeGen::SyncSynchronize() {
   return Builder.CreateFence(llvm::AtomicOrdering::SequentiallyConsistent,
                              llvm::SyncScope::System);
 }
 
-llvm::Value* CodeGen::Alloc(Expr* arg) {
+llvm::Value *CodeGen::Alloc(Expr *arg) {
   arg->Accept(*this);
   return Builder.CreateAlloca(Builder.getInt8Ty(), result_);
 }
 
-llvm::Value* CodeGen::PopCount(Expr* arg) {
+llvm::Value *CodeGen::PopCount(Expr *arg) {
   static auto func_type{llvm::FunctionType::get(Builder.getInt32Ty(),
                                                 {Builder.getInt32Ty()}, false)};
 
@@ -968,7 +968,7 @@ llvm::Value* CodeGen::PopCount(Expr* arg) {
   return Builder.CreateCall(ctpop_i32, {result_});
 }
 
-llvm::Value* CodeGen::Clz(Expr* arg) {
+llvm::Value *CodeGen::Clz(Expr *arg) {
   static auto func_type{llvm::FunctionType::get(
       Builder.getInt32Ty(), {Builder.getInt32Ty(), Builder.getInt1Ty()},
       false)};
@@ -981,7 +981,7 @@ llvm::Value* CodeGen::Clz(Expr* arg) {
   return Builder.CreateCall(ctlz_i32, {result_, Builder.getTrue()});
 }
 
-llvm::Value* CodeGen::Ctz(Expr* arg) {
+llvm::Value *CodeGen::Ctz(Expr *arg) {
   static auto func_type{llvm::FunctionType::get(
       Builder.getInt32Ty(), {Builder.getInt32Ty(), Builder.getInt1Ty()},
       false)};
@@ -994,7 +994,7 @@ llvm::Value* CodeGen::Ctz(Expr* arg) {
   return Builder.CreateCall(cttz_i32, {result_, Builder.getTrue()});
 }
 
-llvm::Value* CodeGen::IsInfSign(Expr* arg) {
+llvm::Value *CodeGen::IsInfSign(Expr *arg) {
   static auto func_type{llvm::FunctionType::get(Builder.getFloatTy(),
                                                 {Builder.getFloatTy()}, false)};
 
@@ -1020,7 +1020,7 @@ llvm::Value* CodeGen::IsInfSign(Expr* arg) {
   return Builder.CreateSelect(mark, result_, Builder.getInt32(0));
 }
 
-llvm::Value* CodeGen::IsFinite(Expr* arg) {
+llvm::Value *CodeGen::IsFinite(Expr *arg) {
   static auto func_type{llvm::FunctionType::get(Builder.getFloatTy(),
                                                 {Builder.getFloatTy()}, false)};
 
@@ -1040,7 +1040,7 @@ llvm::Value* CodeGen::IsFinite(Expr* arg) {
   return Builder.CreateZExt(result_, Builder.getInt32Ty());
 }
 
-llvm::Value* CodeGen::Bswap16(Expr* arg) {
+llvm::Value *CodeGen::Bswap16(Expr *arg) {
   static auto func_type{llvm::FunctionType::get(Builder.getInt16Ty(),
                                                 {Builder.getInt16Ty()}, false)};
 
@@ -1052,7 +1052,7 @@ llvm::Value* CodeGen::Bswap16(Expr* arg) {
   return Builder.CreateCall(bswap_i16, {result_});
 }
 
-llvm::Value* CodeGen::Bswap32(Expr* arg) {
+llvm::Value *CodeGen::Bswap32(Expr *arg) {
   static auto func_type{llvm::FunctionType::get(Builder.getInt32Ty(),
                                                 {Builder.getInt32Ty()}, false)};
 
@@ -1064,7 +1064,7 @@ llvm::Value* CodeGen::Bswap32(Expr* arg) {
   return Builder.CreateCall(bswap_i32, {result_});
 }
 
-llvm::Value* CodeGen::Bswap64(Expr* arg) {
+llvm::Value *CodeGen::Bswap64(Expr *arg) {
   static auto func_type{llvm::FunctionType::get(Builder.getInt64Ty(),
                                                 {Builder.getInt64Ty()}, false)};
 
@@ -1076,4 +1076,4 @@ llvm::Value* CodeGen::Bswap64(Expr* arg) {
   return Builder.CreateCall(bswap_i64, {result_});
 }
 
-}  // namespace kcc
+} // namespace kcc

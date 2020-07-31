@@ -46,7 +46,7 @@ void DebugInfo::Finalize() {
   builder_->finalize();
 }
 
-void DebugInfo::EmitLocation(const AstNode* node) {
+void DebugInfo::EmitLocation(const AstNode *node) {
   if (!node) {
     return Builder.SetCurrentDebugLocation(llvm::DebugLoc{});
   }
@@ -56,7 +56,7 @@ void DebugInfo::EmitLocation(const AstNode* node) {
       llvm::DebugLoc::get(loc.GetRow(), loc.GetColumn(), GetScope()));
 }
 
-void DebugInfo::EmitFuncStart(const FuncDef* node) {
+void DebugInfo::EmitFuncStart(const FuncDef *node) {
   assert(node != nullptr);
 
   auto func_type{node->GetFuncType()};
@@ -82,8 +82,8 @@ void DebugInfo::EmitFuncEnd() {
   lexical_blocks_.pop_back();
 }
 
-void DebugInfo::EmitParamVar(const std::string& name, Type* type,
-                             llvm::AllocaInst* ptr, const Location& loc) {
+void DebugInfo::EmitParamVar(const std::string &name, Type *type,
+                             llvm::AllocaInst *ptr, const Location &loc) {
   assert(subprogram_ != nullptr);
 
   auto line_no{loc.GetRow()};
@@ -96,14 +96,14 @@ void DebugInfo::EmitParamVar(const std::string& name, Type* type,
                           Builder.GetInsertBlock());
 }
 
-void DebugInfo::EmitLocalVar(const Declaration* decl) {
+void DebugInfo::EmitLocalVar(const Declaration *decl) {
   assert(decl && decl->IsObjDecl());
 
   if (Builder.GetInsertBlock() == nullptr) {
     return;
   }
 
-  llvm::DIScope* scope{lexical_blocks_.back()};
+  llvm::DIScope *scope{lexical_blocks_.back()};
   auto ident{decl->GetIdent()};
   auto loc{decl->GetLoc()};
   auto ptr{decl->GetIdent()->ToObjectExpr()->GetLocalPtr()};
@@ -118,7 +118,7 @@ void DebugInfo::EmitLocalVar(const Declaration* decl) {
       Builder.GetInsertBlock());
 }
 
-void DebugInfo::EmitGlobalVar(const Declaration* decl) {
+void DebugInfo::EmitGlobalVar(const Declaration *decl) {
   assert(decl != nullptr);
 
   auto ptr{decl->GetIdent()->ToObjectExpr()->GetGlobalPtr()};
@@ -133,7 +133,7 @@ void DebugInfo::EmitGlobalVar(const Declaration* decl) {
   ptr->addDebugInfo(info);
 }
 
-llvm::DIScope* DebugInfo::GetScope() {
+llvm::DIScope *DebugInfo::GetScope() {
   // 该作用域既可以是 compile-unit level
   // 也可以是最近的封闭词法块(如当前函数)
   if (std::empty(lexical_blocks_)) {
@@ -143,10 +143,10 @@ llvm::DIScope* DebugInfo::GetScope() {
   }
 }
 
-llvm::DIType* DebugInfo::GetOrCreateType(Type* type, const Location& loc) {
+llvm::DIType *DebugInfo::GetOrCreateType(Type *type, const Location &loc) {
   assert(type != nullptr);
 
-  auto& cache{type_cache_[type]};
+  auto &cache{type_cache_[type]};
   if (cache) {
     return cache;
   }
@@ -166,7 +166,7 @@ llvm::DIType* DebugInfo::GetOrCreateType(Type* type, const Location& loc) {
   return cache;
 }
 
-llvm::DIType* DebugInfo::CreateBuiltinType(Type* type) {
+llvm::DIType *DebugInfo::CreateBuiltinType(Type *type) {
   std::int32_t encoding{};
 
   if (type->IsVoidTy()) {
@@ -189,7 +189,7 @@ llvm::DIType* DebugInfo::CreateBuiltinType(Type* type) {
                                    encoding);
 }
 
-llvm::DIType* DebugInfo::CreatePointerType(Type* type) {
+llvm::DIType *DebugInfo::CreatePointerType(Type *type) {
   auto pointee_type{GetOrCreateType(type->PointerGetElementType().GetType())};
   auto size_in_bit{type->GetWidth() * 8};
   auto align_in_bit{type->GetAlign() * 8};
@@ -197,7 +197,7 @@ llvm::DIType* DebugInfo::CreatePointerType(Type* type) {
   return builder_->createPointerType(pointee_type, size_in_bit, align_in_bit);
 }
 
-llvm::DIType* DebugInfo::CreateArrayType(Type* type) {
+llvm::DIType *DebugInfo::CreateArrayType(Type *type) {
   std::int32_t size{}, align{};
 
   if (type->IsComplete()) {
@@ -208,7 +208,7 @@ llvm::DIType* DebugInfo::CreateArrayType(Type* type) {
   }
 
   // 下标范围
-  llvm::SmallVector<llvm::Metadata*, 8> subscripts;
+  llvm::SmallVector<llvm::Metadata *, 8> subscripts;
   QualType qual_type{type};
   while (qual_type->IsArrayTy()) {
     subscripts.push_back(
@@ -221,7 +221,7 @@ llvm::DIType* DebugInfo::CreateArrayType(Type* type) {
       builder_->getOrCreateArray(subscripts));
 }
 
-llvm::DIType* DebugInfo::CreateStructType(Type* type, const Location& loc) {
+llvm::DIType *DebugInfo::CreateStructType(Type *type, const Location &loc) {
   std::int32_t tag{};
   if (type->IsStructTy()) {
     tag = llvm::dwarf::DW_TAG_structure_type;
@@ -242,8 +242,8 @@ llvm::DIType* DebugInfo::CreateStructType(Type* type, const Location& loc) {
 
   type_cache_[type] = fwd_type;
 
-  llvm::SmallVector<llvm::Metadata*, 16> ele_types;
-  for (const auto& [name, ident] : *type->StructGetScope()) {
+  llvm::SmallVector<llvm::Metadata *, 16> ele_types;
+  for (const auto &[name, ident] : *type->StructGetScope()) {
     auto member_type{GetOrCreateType(ident->GetType(), ident->GetLoc())};
 
     if (std::empty(name)) {
@@ -277,12 +277,12 @@ llvm::DIType* DebugInfo::CreateStructType(Type* type, const Location& loc) {
   return real_type;
 }
 
-llvm::DISubroutineType* DebugInfo::CreateFunctionType(Type* type) {
-  llvm::SmallVector<llvm::Metadata*, 8> ele_types;
+llvm::DISubroutineType *DebugInfo::CreateFunctionType(Type *type) {
+  llvm::SmallVector<llvm::Metadata *, 8> ele_types;
 
   ele_types.push_back(GetOrCreateType(type->FuncGetReturnType().GetType()));
 
-  for (const auto& item : type->FuncGetParams()) {
+  for (const auto &item : type->FuncGetParams()) {
     ele_types.push_back(GetOrCreateType(item->GetType()));
   }
 
@@ -290,4 +290,4 @@ llvm::DISubroutineType* DebugInfo::CreateFunctionType(Type* type) {
       builder_->getOrCreateTypeArray(ele_types));
 }
 
-}  // namespace kcc
+} // namespace kcc

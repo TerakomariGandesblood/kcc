@@ -18,10 +18,10 @@
 namespace kcc {
 
 class Scanner {
- public:
+public:
   explicit Scanner(std::string preprocessed_code);
   // for parser
-  Scanner(std::string code, const Location& loc);
+  Scanner(std::string code, const Location &loc);
 
   std::vector<Token> Tokenize();
 
@@ -29,7 +29,7 @@ class Scanner {
   std::pair<std::int32_t, Encoding> HandleCharacter();
   std::pair<std::string, Encoding> HandleStringLiteral(bool handle_escape);
 
- private:
+private:
   bool HasNext();
   std::int32_t Peek();
   std::int32_t Next(bool push = true);
@@ -38,18 +38,18 @@ class Scanner {
   bool Try(std::int32_t c);
   bool IsUCN(std::int32_t ch);
 
-  const Token& MakeToken(Tag tag);
+  const Token &MakeToken(Tag tag);
   void MarkLocation();
 
-  const Token& Scan();
+  const Token &Scan();
 
   void SkipSpace();
   void SkipLineDirectives();
 
-  const Token& SkipNumber();
-  const Token& SkipIdentifier();
-  const Token& SkipCharacter();
-  const Token& SkipStringLiteral();
+  const Token &SkipNumber();
+  const Token &SkipIdentifier();
+  const Token &SkipCharacter();
+  const Token &SkipStringLiteral();
 
   Encoding HandleEncoding();
   std::int32_t HandleEscape();
@@ -70,4 +70,4 @@ class Scanner {
   inline static KeywordsDictionary Keywords;
 };
 
-}  // namespace kcc
+} // namespace kcc

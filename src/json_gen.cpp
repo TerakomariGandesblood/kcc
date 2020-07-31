@@ -14,10 +14,10 @@
 
 namespace kcc {
 
-JsonGen::JsonGen(const std::string& filter) : filter_{filter} {}
+JsonGen::JsonGen(const std::string &filter) : filter_{filter} {}
 
-void JsonGen::GenJson(const TranslationUnit* root,
-                      const std::string& file_name) {
+void JsonGen::GenJson(const TranslationUnit *root,
+                      const std::string &file_name) {
   Visit(root);
 
   QJsonDocument document{result_};
@@ -27,7 +27,7 @@ void JsonGen::GenJson(const TranslationUnit* root,
       << std::flush;
 }
 
-bool JsonGen::CheckFileName(const AstNode* node) const {
+bool JsonGen::CheckFileName(const AstNode *node) const {
   if (std::empty(filter_)) {
     return true;
   } else {
@@ -35,7 +35,7 @@ bool JsonGen::CheckFileName(const AstNode* node) const {
   }
 }
 
-void JsonGen::Visit(const UnaryOpExpr* node) {
+void JsonGen::Visit(const UnaryOpExpr *node) {
   QJsonObject root;
   root["name"] = node->KindQString().append(' ').append(
       TokenTag::ToQString(node->GetOp()));
@@ -49,7 +49,7 @@ void JsonGen::Visit(const UnaryOpExpr* node) {
   result_ = root;
 }
 
-void JsonGen::Visit(const TypeCastExpr* node) {
+void JsonGen::Visit(const TypeCastExpr *node) {
   QJsonObject root;
   root["name"] = node->KindQString();
 
@@ -67,7 +67,7 @@ void JsonGen::Visit(const TypeCastExpr* node) {
   result_ = root;
 }
 
-void JsonGen::Visit(const BinaryOpExpr* node) {
+void JsonGen::Visit(const BinaryOpExpr *node) {
   QJsonObject root;
   root["name"] = node->KindQString().append(' ').append(
       TokenTag::ToQString(node->GetOp()));
@@ -85,7 +85,7 @@ void JsonGen::Visit(const BinaryOpExpr* node) {
   result_ = root;
 }
 
-void JsonGen::Visit(const ConditionOpExpr* node) {
+void JsonGen::Visit(const ConditionOpExpr *node) {
   QJsonObject root;
   root["name"] = node->KindQString();
 
@@ -104,7 +104,7 @@ void JsonGen::Visit(const ConditionOpExpr* node) {
   result_ = root;
 }
 
-void JsonGen::Visit(const FuncCallExpr* node) {
+void JsonGen::Visit(const FuncCallExpr *node) {
   QJsonObject root;
   root["name"] = node->KindQString();
 
@@ -112,7 +112,7 @@ void JsonGen::Visit(const FuncCallExpr* node) {
   node->GetCallee()->Accept(*this);
   children.append(result_);
 
-  for (const auto& arg : node->GetArgs()) {
+  for (const auto &arg : node->GetArgs()) {
     arg->Accept(*this);
     children.append(result_);
   }
@@ -122,7 +122,7 @@ void JsonGen::Visit(const FuncCallExpr* node) {
   result_ = root;
 }
 
-void JsonGen::Visit(const ConstantExpr* node) {
+void JsonGen::Visit(const ConstantExpr *node) {
   auto str{node->KindQString().append(": ")};
 
   if (node->GetType()->IsIntegerTy()) {
@@ -139,7 +139,7 @@ void JsonGen::Visit(const ConstantExpr* node) {
   result_ = root;
 }
 
-void JsonGen::Visit(const StringLiteralExpr* node) {
+void JsonGen::Visit(const StringLiteralExpr *node) {
   QJsonObject root;
   root["name"] = node->KindQString().append(": ").append(
       QString::fromStdString(node->GetStr()));
@@ -147,7 +147,7 @@ void JsonGen::Visit(const StringLiteralExpr* node) {
   result_ = root;
 }
 
-void JsonGen::Visit(const IdentifierExpr* node) {
+void JsonGen::Visit(const IdentifierExpr *node) {
   QJsonObject root;
   root["name"] = node->KindQString();
 
@@ -166,7 +166,7 @@ void JsonGen::Visit(const IdentifierExpr* node) {
   result_ = root;
 }
 
-void JsonGen::Visit(const EnumeratorExpr* node) {
+void JsonGen::Visit(const EnumeratorExpr *node) {
   QJsonObject root;
   root["name"] = node->KindQString();
 
@@ -185,7 +185,7 @@ void JsonGen::Visit(const EnumeratorExpr* node) {
   result_ = root;
 }
 
-void JsonGen::Visit(const ObjectExpr* node) {
+void JsonGen::Visit(const ObjectExpr *node) {
   QJsonObject root;
   root["name"] = node->KindQString();
 
@@ -204,7 +204,7 @@ void JsonGen::Visit(const ObjectExpr* node) {
   result_ = root;
 }
 
-void JsonGen::Visit(const StmtExpr* node) {
+void JsonGen::Visit(const StmtExpr *node) {
   QJsonObject root;
   root["name"] = node->KindQString();
 
@@ -217,7 +217,7 @@ void JsonGen::Visit(const StmtExpr* node) {
   result_ = root;
 }
 
-void JsonGen::Visit(const LabelStmt* node) {
+void JsonGen::Visit(const LabelStmt *node) {
   QJsonObject root;
   root["name"] = node->KindQString();
 
@@ -235,7 +235,7 @@ void JsonGen::Visit(const LabelStmt* node) {
   result_ = root;
 }
 
-void JsonGen::Visit(const CaseStmt* node) {
+void JsonGen::Visit(const CaseStmt *node) {
   QJsonObject root;
 
   auto rhs{node->GetRHS()};
@@ -261,7 +261,7 @@ void JsonGen::Visit(const CaseStmt* node) {
   result_ = root;
 }
 
-void JsonGen::Visit(const DefaultStmt* node) {
+void JsonGen::Visit(const DefaultStmt *node) {
   QJsonObject root;
   root["name"] = node->KindQString();
 
@@ -276,13 +276,13 @@ void JsonGen::Visit(const DefaultStmt* node) {
   result_ = root;
 }
 
-void JsonGen::Visit(const CompoundStmt* node) {
+void JsonGen::Visit(const CompoundStmt *node) {
   QJsonObject root;
   root["name"] = node->KindQString();
 
   QJsonArray children;
 
-  for (const auto& item : node->GetStmts()) {
+  for (const auto &item : node->GetStmts()) {
     item->Accept(*this);
     children.append(result_);
   }
@@ -292,7 +292,7 @@ void JsonGen::Visit(const CompoundStmt* node) {
   result_ = root;
 }
 
-void JsonGen::Visit(const ExprStmt* node) {
+void JsonGen::Visit(const ExprStmt *node) {
   QJsonObject root;
   root["name"] = node->KindQString();
 
@@ -311,7 +311,7 @@ void JsonGen::Visit(const ExprStmt* node) {
   result_ = root;
 }
 
-void JsonGen::Visit(const IfStmt* node) {
+void JsonGen::Visit(const IfStmt *node) {
   QJsonObject root;
   root["name"] = node->KindQString();
 
@@ -333,7 +333,7 @@ void JsonGen::Visit(const IfStmt* node) {
   result_ = root;
 }
 
-void JsonGen::Visit(const SwitchStmt* node) {
+void JsonGen::Visit(const SwitchStmt *node) {
   QJsonObject root;
   root["name"] = node->KindQString();
 
@@ -349,7 +349,7 @@ void JsonGen::Visit(const SwitchStmt* node) {
   result_ = root;
 }
 
-void JsonGen::Visit(const WhileStmt* node) {
+void JsonGen::Visit(const WhileStmt *node) {
   QJsonObject root;
   root["name"] = node->KindQString();
 
@@ -366,7 +366,7 @@ void JsonGen::Visit(const WhileStmt* node) {
   result_ = root;
 }
 
-void JsonGen::Visit(const DoWhileStmt* node) {
+void JsonGen::Visit(const DoWhileStmt *node) {
   QJsonObject root;
   root["name"] = node->KindQString();
 
@@ -383,7 +383,7 @@ void JsonGen::Visit(const DoWhileStmt* node) {
   result_ = root;
 }
 
-void JsonGen::Visit(const ForStmt* node) {
+void JsonGen::Visit(const ForStmt *node) {
   QJsonObject root;
   root["name"] = node->KindQString();
 
@@ -414,7 +414,7 @@ void JsonGen::Visit(const ForStmt* node) {
   result_ = root;
 }
 
-void JsonGen::Visit(const GotoStmt* node) {
+void JsonGen::Visit(const GotoStmt *node) {
   QJsonObject root;
   root["name"] = node->KindQString();
 
@@ -428,19 +428,19 @@ void JsonGen::Visit(const GotoStmt* node) {
   result_ = root;
 }
 
-void JsonGen::Visit(const ContinueStmt* node) {
+void JsonGen::Visit(const ContinueStmt *node) {
   QJsonObject root;
   root["name"] = node->KindQString();
   result_ = root;
 }
 
-void JsonGen::Visit(const BreakStmt* node) {
+void JsonGen::Visit(const BreakStmt *node) {
   QJsonObject root;
   root["name"] = node->KindQString();
   result_ = root;
 }
 
-void JsonGen::Visit(const ReturnStmt* node) {
+void JsonGen::Visit(const ReturnStmt *node) {
   QJsonObject root;
   root["name"] = node->KindQString();
 
@@ -459,12 +459,12 @@ void JsonGen::Visit(const ReturnStmt* node) {
   result_ = root;
 }
 
-void JsonGen::Visit(const TranslationUnit* node) {
+void JsonGen::Visit(const TranslationUnit *node) {
   QJsonObject root;
   root["name"] = node->KindQString();
 
   QJsonArray children;
-  for (const auto& item : node->GetExtDecl()) {
+  for (const auto &item : node->GetExtDecl()) {
     if (!CheckFileName(item)) {
       continue;
     }
@@ -477,7 +477,7 @@ void JsonGen::Visit(const TranslationUnit* node) {
   result_ = root;
 }
 
-void JsonGen::Visit(const Declaration* node) {
+void JsonGen::Visit(const Declaration *node) {
   QJsonObject root;
   root["name"] = node->KindQString();
 
@@ -495,11 +495,11 @@ void JsonGen::Visit(const Declaration* node) {
     obj["name"] = "value init";
     children.append(obj);
   } else if (node->HasLocalInit()) {
-    for (const auto& item : node->GetLocalInits()) {
+    for (const auto &item : node->GetLocalInits()) {
       QJsonObject obj;
 
       QString str;
-      for (const auto& index : item.GetIndexs()) {
+      for (const auto &index : item.GetIndexs()) {
         str.append(QString::number(std::get<1>(index))).append(' ');
       }
 
@@ -520,7 +520,7 @@ void JsonGen::Visit(const Declaration* node) {
   result_ = root;
 }
 
-void JsonGen::Visit(const FuncDef* node) {
+void JsonGen::Visit(const FuncDef *node) {
   QJsonObject root;
   root["name"] = node->KindQString();
 
@@ -537,4 +537,4 @@ void JsonGen::Visit(const FuncDef* node) {
   result_ = root;
 }
 
-}  // namespace kcc
+} // namespace kcc

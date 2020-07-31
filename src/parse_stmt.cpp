@@ -11,50 +11,50 @@ namespace kcc {
 /*
  * Stmt
  */
-Stmt* Parser::ParseStmt() {
+Stmt *Parser::ParseStmt() {
   TryParseAttributeSpec();
 
   switch (Peek().GetTag()) {
-    case Tag::kIdentifier: {
-      Next();
-      if (Peek().TagIs(Tag::kColon)) {
-        PutBack();
-        return ParseLabelStmt();
-      } else {
-        PutBack();
-        return ParseExprStmt();
-      }
-    }
-    case Tag::kCase:
-      return ParseCaseStmt();
-    case Tag::kDefault:
-      return ParseDefaultStmt();
-    case Tag::kLeftBrace:
-      return ParseCompoundStmt();
-    case Tag::kIf:
-      return ParseIfStmt();
-    case Tag::kSwitch:
-      return ParseSwitchStmt();
-    case Tag::kWhile:
-      return ParseWhileStmt();
-    case Tag::kDo:
-      return ParseDoWhileStmt();
-    case Tag::kFor:
-      return ParseForStmt();
-    case Tag::kGoto:
-      return ParseGotoStmt();
-    case Tag::kContinue:
-      return ParseContinueStmt();
-    case Tag::kBreak:
-      return ParseBreakStmt();
-    case Tag::kReturn:
-      return ParseReturnStmt();
-    default:
+  case Tag::kIdentifier: {
+    Next();
+    if (Peek().TagIs(Tag::kColon)) {
+      PutBack();
+      return ParseLabelStmt();
+    } else {
+      PutBack();
       return ParseExprStmt();
+    }
+  }
+  case Tag::kCase:
+    return ParseCaseStmt();
+  case Tag::kDefault:
+    return ParseDefaultStmt();
+  case Tag::kLeftBrace:
+    return ParseCompoundStmt();
+  case Tag::kIf:
+    return ParseIfStmt();
+  case Tag::kSwitch:
+    return ParseSwitchStmt();
+  case Tag::kWhile:
+    return ParseWhileStmt();
+  case Tag::kDo:
+    return ParseDoWhileStmt();
+  case Tag::kFor:
+    return ParseForStmt();
+  case Tag::kGoto:
+    return ParseGotoStmt();
+  case Tag::kContinue:
+    return ParseContinueStmt();
+  case Tag::kBreak:
+    return ParseBreakStmt();
+  case Tag::kReturn:
+    return ParseReturnStmt();
+  default:
+    return ParseExprStmt();
   }
 }
 
-Stmt* Parser::ParseLabelStmt() {
+Stmt *Parser::ParseLabelStmt() {
   auto token{Expect(Tag::kIdentifier)};
   Expect(Tag::kColon);
 
@@ -71,7 +71,7 @@ Stmt* Parser::ParseLabelStmt() {
   return label;
 }
 
-Stmt* Parser::ParseCaseStmt() {
+Stmt *Parser::ParseCaseStmt() {
   auto token{Expect(Tag::kCase)};
 
   auto lhs{ParseInt64Constant()};
@@ -86,14 +86,14 @@ Stmt* Parser::ParseCaseStmt() {
   }
 }
 
-Stmt* Parser::ParseDefaultStmt() {
+Stmt *Parser::ParseDefaultStmt() {
   auto token{Expect(Tag::kDefault)};
   Expect(Tag::kColon);
 
   return MakeAstNode<DefaultStmt>(token, ParseStmt());
 }
 
-CompoundStmt* Parser::ParseCompoundStmt(Type* func_type) {
+CompoundStmt *Parser::ParseCompoundStmt(Type *func_type) {
   auto token{Expect(Tag::kLeftBrace)};
 
   EnterBlock(func_type);
@@ -115,7 +115,7 @@ CompoundStmt* Parser::ParseCompoundStmt(Type* func_type) {
   return stmts;
 }
 
-Stmt* Parser::ParseExprStmt() {
+Stmt *Parser::ParseExprStmt() {
   auto token{Peek()};
   if (Try(Tag::kSemicolon)) {
     return MakeAstNode<ExprStmt>(token);
@@ -126,7 +126,7 @@ Stmt* Parser::ParseExprStmt() {
   }
 }
 
-Stmt* Parser::ParseIfStmt() {
+Stmt *Parser::ParseIfStmt() {
   auto token{Expect(Tag::kIf)};
 
   Expect(Tag::kLeftParen);
@@ -141,7 +141,7 @@ Stmt* Parser::ParseIfStmt() {
   }
 }
 
-Stmt* Parser::ParseSwitchStmt() {
+Stmt *Parser::ParseSwitchStmt() {
   auto token{Expect(Tag::kSwitch)};
 
   Expect(Tag::kLeftParen);
@@ -151,7 +151,7 @@ Stmt* Parser::ParseSwitchStmt() {
   return MakeAstNode<SwitchStmt>(token, cond, ParseStmt());
 }
 
-Stmt* Parser::ParseWhileStmt() {
+Stmt *Parser::ParseWhileStmt() {
   auto token{Expect(Tag::kWhile)};
 
   Expect(Tag::kLeftParen);
@@ -161,7 +161,7 @@ Stmt* Parser::ParseWhileStmt() {
   return MakeAstNode<WhileStmt>(token, cond, ParseStmt());
 }
 
-Stmt* Parser::ParseDoWhileStmt() {
+Stmt *Parser::ParseDoWhileStmt() {
   auto token{Expect(Tag::kDo)};
 
   auto stmt{ParseStmt()};
@@ -175,13 +175,13 @@ Stmt* Parser::ParseDoWhileStmt() {
   return MakeAstNode<DoWhileStmt>(token, cond, stmt);
 }
 
-Stmt* Parser::ParseForStmt() {
+Stmt *Parser::ParseForStmt() {
   auto token{Expect(Tag::kFor)};
   Expect(Tag::kLeftParen);
 
   Expr *init{}, *cond{}, *inc{};
-  Stmt* block{};
-  Stmt* decl{};
+  Stmt *block{};
+  Stmt *decl{};
 
   EnterBlock();
   if (IsDecl(Peek())) {
@@ -207,7 +207,7 @@ Stmt* Parser::ParseForStmt() {
   return MakeAstNode<ForStmt>(token, init, cond, inc, block, decl);
 }
 
-Stmt* Parser::ParseGotoStmt() {
+Stmt *Parser::ParseGotoStmt() {
   Expect(Tag::kGoto);
   auto tok{Expect(Tag::kIdentifier)};
   Expect(Tag::kSemicolon);
@@ -218,21 +218,21 @@ Stmt* Parser::ParseGotoStmt() {
   return ret;
 }
 
-Stmt* Parser::ParseContinueStmt() {
+Stmt *Parser::ParseContinueStmt() {
   auto token{Expect(Tag::kContinue)};
   Expect(Tag::kSemicolon);
 
   return MakeAstNode<ContinueStmt>(token);
 }
 
-Stmt* Parser::ParseBreakStmt() {
+Stmt *Parser::ParseBreakStmt() {
   auto token{Expect(Tag::kBreak)};
   Expect(Tag::kSemicolon);
 
   return MakeAstNode<BreakStmt>(token);
 }
 
-Stmt* Parser::ParseReturnStmt() {
+Stmt *Parser::ParseReturnStmt() {
   auto token{Expect(Tag::kReturn)};
 
   if (Try(Tag::kSemicolon)) {
@@ -247,4 +247,4 @@ Stmt* Parser::ParseReturnStmt() {
   }
 }
 
-}  // namespace kcc
+} // namespace kcc

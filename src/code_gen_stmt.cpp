@@ -13,14 +13,14 @@
 
 namespace kcc {
 
-void CodeGen::Visit(const LabelStmt* node) {
+void CodeGen::Visit(const LabelStmt *node) {
   TryEmitLocation(node);
 
   EmitBlock(GetBasicBlockForLabel(node));
   EmitStmt(node->GetStmt());
 }
 
-void CodeGen::Visit(const CaseStmt* node) {
+void CodeGen::Visit(const CaseStmt *node) {
   TryEmitLocation(node);
 
   auto block{CreateBasicBlock("switch.case")};
@@ -43,7 +43,7 @@ void CodeGen::Visit(const CaseStmt* node) {
   EmitStmt(node->GetStmt());
 }
 
-void CodeGen::Visit(const DefaultStmt* node) {
+void CodeGen::Visit(const DefaultStmt *node) {
   TryEmitLocation(node);
 
   auto default_block{switch_inst_->getDefaultDest()};
@@ -53,13 +53,13 @@ void CodeGen::Visit(const DefaultStmt* node) {
   EmitStmt(node->GetStmt());
 }
 
-void CodeGen::Visit(const CompoundStmt* node) {
-  for (const auto& item : node->GetStmts()) {
+void CodeGen::Visit(const CompoundStmt *node) {
+  for (const auto &item : node->GetStmts()) {
     EmitStmt(item);
   }
 }
 
-void CodeGen::Visit(const ExprStmt* node) {
+void CodeGen::Visit(const ExprStmt *node) {
   TryEmitLocation(node);
 
   if (auto expr{node->GetExpr()}) {
@@ -69,7 +69,7 @@ void CodeGen::Visit(const ExprStmt* node) {
   }
 }
 
-void CodeGen::Visit(const IfStmt* node) {
+void CodeGen::Visit(const IfStmt *node) {
   TryEmitLocation(node);
 
   if (auto cond{CalcConstantExpr{}.Calc(node->GetCond())}) {
@@ -110,7 +110,7 @@ void CodeGen::Visit(const IfStmt* node) {
   EmitBlock(end_block, true);
 }
 
-void CodeGen::Visit(const SwitchStmt* node) {
+void CodeGen::Visit(const SwitchStmt *node) {
   TryEmitLocation(node);
 
   node->GetCond()->Accept(*this);
@@ -124,7 +124,7 @@ void CodeGen::Visit(const SwitchStmt* node) {
 
   Builder.ClearInsertionPoint();
 
-  llvm::BasicBlock* continue_block{};
+  llvm::BasicBlock *continue_block{};
   if (!std::empty(break_continue_stack_)) {
     continue_block = break_continue_stack_.top().continue_block;
   }
@@ -142,7 +142,7 @@ void CodeGen::Visit(const SwitchStmt* node) {
   switch_inst_ = switch_inst_backup;
 }
 
-void CodeGen::Visit(const WhileStmt* node) {
+void CodeGen::Visit(const WhileStmt *node) {
   TryEmitLocation(node);
 
   auto cond_block{CreateBasicBlock("while.cond")};
@@ -186,7 +186,7 @@ void CodeGen::Visit(const WhileStmt* node) {
   }
 }
 
-void CodeGen::Visit(const DoWhileStmt* node) {
+void CodeGen::Visit(const DoWhileStmt *node) {
   TryEmitLocation(node);
 
   auto body_block{CreateBasicBlock("do.while.body")};
@@ -219,7 +219,7 @@ void CodeGen::Visit(const DoWhileStmt* node) {
   }
 }
 
-void CodeGen::Visit(const ForStmt* node) {
+void CodeGen::Visit(const ForStmt *node) {
   TryEmitLocation(node);
 
   if (auto init{node->GetInit()}) {
@@ -239,7 +239,7 @@ void CodeGen::Visit(const ForStmt* node) {
     EmitBlock(body_block);
   }
 
-  llvm::BasicBlock* continue_block;
+  llvm::BasicBlock *continue_block;
   if (node->GetInc()) {
     continue_block = CreateBasicBlock("for.inc");
   } else {
@@ -260,12 +260,12 @@ void CodeGen::Visit(const ForStmt* node) {
   EmitBlock(end_block, true);
 }
 
-void CodeGen::Visit(const GotoStmt* node) {
+void CodeGen::Visit(const GotoStmt *node) {
   TryEmitLocation(node);
   EmitBranchThroughCleanup(GetBasicBlockForLabel(node->GetLabel()));
 }
 
-void CodeGen::Visit(const ContinueStmt* node) {
+void CodeGen::Visit(const ContinueStmt *node) {
   TryEmitLocation(node);
 
   if (std::empty(break_continue_stack_)) {
@@ -275,7 +275,7 @@ void CodeGen::Visit(const ContinueStmt* node) {
   }
 }
 
-void CodeGen::Visit(const BreakStmt* node) {
+void CodeGen::Visit(const BreakStmt *node) {
   TryEmitLocation(node);
 
   if (std::empty(break_continue_stack_)) {
@@ -285,7 +285,7 @@ void CodeGen::Visit(const BreakStmt* node) {
   }
 }
 
-void CodeGen::Visit(const ReturnStmt* node) {
+void CodeGen::Visit(const ReturnStmt *node) {
   TryEmitLocation(node);
 
   auto expr{node->GetExpr()};
@@ -308,4 +308,4 @@ void CodeGen::Visit(const ReturnStmt* node) {
   EmitBranchThroughCleanup(return_block_);
 }
 
-}  // namespace kcc
+} // namespace kcc

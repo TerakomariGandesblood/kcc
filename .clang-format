@@ -1,3 +1,2 @@
-BasedOnStyle: Google
+BasedOnStyle: LLVM
 Language: Cpp
-IncludeBlocks: Preserve

@@ -14,33 +14,32 @@
 
 namespace kcc {
 
-template <typename T, std::size_t block_size = 4096>
-class MemoryPool {
- public:
+template <typename T, std::size_t block_size = 4096> class MemoryPool {
+public:
   using ValueType = T;
-  using Pointer = T*;
-  using ConstPointer = const T*;
+  using Pointer = T *;
+  using ConstPointer = const T *;
   using SizeType = std::size_t;
 
   MemoryPool() noexcept = default;
   ~MemoryPool() noexcept;
 
-  MemoryPool(const MemoryPool&) = delete;
-  MemoryPool(MemoryPool&&) = delete;
-  MemoryPool& operator=(const MemoryPool&) = delete;
-  MemoryPool& operator=(MemoryPool&&) = delete;
+  MemoryPool(const MemoryPool &) = delete;
+  MemoryPool(MemoryPool &&) = delete;
+  MemoryPool &operator=(const MemoryPool &) = delete;
+  MemoryPool &operator=(MemoryPool &&) = delete;
 
   Pointer Allocate(SizeType n = 1, ConstPointer hint = 0);
 
- private:
+private:
   union Slot {
     ValueType element;
-    Slot* next;
+    Slot *next;
   };
 
-  using DataPointer = char*;
+  using DataPointer = char *;
   using SlotType = Slot;
-  using SlotPointer = Slot*;
+  using SlotPointer = Slot *;
 
   SlotPointer current_block_{};
   SlotPointer current_slot_{};
@@ -58,7 +57,7 @@ MemoryPool<T, block_size>::~MemoryPool() noexcept {
   auto curr{current_block_};
   while (curr != nullptr) {
     auto prev{curr->next};
-    operator delete(reinterpret_cast<void*>(curr));
+    operator delete(reinterpret_cast<void *>(curr));
     curr = prev;
   }
 }
@@ -139,4 +138,4 @@ inline MemoryPool<FunctionType> FunctionTypePool;
 
 inline MemoryPool<Scope> ScopePool;
 
-}  // namespace kcc
+} // namespace kcc

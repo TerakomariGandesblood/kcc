@@ -19,4 +19,4 @@ void ConvertToUtf32(std::string &s);
 
 void ConvertString(std::string &s, Encoding encoding);
 
-}  // namespace kcc
+} // namespace kcc

@@ -81,25 +81,25 @@ class QualType {
   friend bool operator==(QualType lhs, QualType rhs);
   friend bool operator!=(QualType lhs, QualType rhs);
 
- public:
+public:
   QualType() = default;
-  QualType(Type* type, std::uint32_t type_qual = 0);
+  QualType(Type *type, std::uint32_t type_qual = 0);
 
   std::string ToString() const;
 
-  Type* operator->();
-  const Type* operator->() const;
+  Type *operator->();
+  const Type *operator->() const;
 
-  Type* GetType();
-  const Type* GetType() const;
+  Type *GetType();
+  const Type *GetType() const;
 
   std::uint32_t GetTypeQual() const;
 
   bool IsConst() const;
   bool IsVolatile() const;
 
- private:
-  Type* type_{};
+private:
+  Type *type_{};
   std::uint32_t type_qual_{};
 };
 
@@ -107,7 +107,7 @@ bool operator==(QualType lhs, QualType rhs);
 bool operator!=(QualType lhs, QualType rhs);
 
 class Type {
- public:
+public:
   // 数组和函数隐式转换为指针
   static QualType MayCast(QualType type);
 
@@ -118,25 +118,25 @@ class Type {
   virtual std::int32_t GetAlign() const = 0;
   // 这里忽略了 cvr
   // 若涉及同一对象或函数的二个声明不使用兼容类型, 则程序的行为未定义
-  virtual bool Compatible(const Type* other) const = 0;
-  virtual bool Equal(const Type* other) const = 0;
+  virtual bool Compatible(const Type *other) const = 0;
+  virtual bool Equal(const Type *other) const = 0;
 
   std::string ToString() const;
-  llvm::Type* GetLLVMType() const;
+  llvm::Type *GetLLVMType() const;
 
-  VoidType* ToVoidType();
-  ArithmeticType* ToArithmeticType();
-  PointerType* ToPointerType();
-  ArrayType* ToArrayType();
-  StructType* ToStructType();
-  FunctionType* ToFunctionType();
+  VoidType *ToVoidType();
+  ArithmeticType *ToArithmeticType();
+  PointerType *ToPointerType();
+  ArrayType *ToArrayType();
+  StructType *ToStructType();
+  FunctionType *ToFunctionType();
 
-  const VoidType* ToVoidType() const;
-  const ArithmeticType* ToArithmeticType() const;
-  const PointerType* ToPointerType() const;
-  const ArrayType* ToArrayType() const;
-  const StructType* ToStructType() const;
-  const FunctionType* ToFunctionType() const;
+  const VoidType *ToVoidType() const;
+  const ArithmeticType *ToArithmeticType() const;
+  const PointerType *ToPointerType() const;
+  const ArrayType *ToArrayType() const;
+  const StructType *ToStructType() const;
+  const FunctionType *ToFunctionType() const;
 
   bool IsComplete() const;
   void SetComplete(bool complete);
@@ -171,7 +171,7 @@ class Type {
 
   bool IsIntegerOrBoolTy() const;
 
-  PointerType* GetPointerTo();
+  PointerType *GetPointerTo();
 
   std::int32_t ArithmeticRank() const;
   std::uint64_t ArithmeticMaxIntegerValue() const;
@@ -183,65 +183,65 @@ class Type {
   QualType ArrayGetElementType() const;
 
   bool StructHasName() const;
-  void StructSetName(const std::string& name);
-  const std::string& StructGetName() const;
-  std::vector<ObjectExpr*>& StructGetMembers();
-  const std::vector<ObjectExpr*>& StructGetMembers() const;
-  void StructSetMembers(std::vector<ObjectExpr*>& members);
-  ObjectExpr* StructGetMember(const std::string& name) const;
+  void StructSetName(const std::string &name);
+  const std::string &StructGetName() const;
+  std::vector<ObjectExpr *> &StructGetMembers();
+  const std::vector<ObjectExpr *> &StructGetMembers() const;
+  void StructSetMembers(std::vector<ObjectExpr *> &members);
+  ObjectExpr *StructGetMember(const std::string &name) const;
   QualType StructGetMemberType(std::int32_t i) const;
-  Scope* StructGetScope();
-  void StructAddMember(ObjectExpr* member);
-  void StructMergeAnonymous(ObjectExpr* anonymous);
+  Scope *StructGetScope();
+  void StructAddMember(ObjectExpr *member);
+  void StructMergeAnonymous(ObjectExpr *anonymous);
   std::int32_t StructGetOffset() const;
   void StructFinish();
 
   bool FuncIsVarArgs() const;
   QualType FuncGetReturnType() const;
-  std::vector<ObjectExpr*>& FuncGetParams();
-  const std::vector<ObjectExpr*>& FuncGetParams() const;
+  std::vector<ObjectExpr *> &FuncGetParams();
+  const std::vector<ObjectExpr *> &FuncGetParams() const;
   void FuncSetFuncSpec(std::uint32_t func_spec);
   bool FuncIsInline() const;
-  void FuncSetName(const std::string& name);
-  const std::string& FuncGetName() const;
+  void FuncSetName(const std::string &name);
+  const std::string &FuncGetName() const;
 
- protected:
+protected:
   explicit Type(bool complete);
 
-  llvm::Type* llvm_type_{};
+  llvm::Type *llvm_type_{};
 
- private:
+private:
   mutable bool complete_{false};
 };
 
 class VoidType : public Type {
- public:
-  static VoidType* Get();
+public:
+  static VoidType *Get();
 
   virtual std::int32_t GetWidth() const override;
   virtual std::int32_t GetAlign() const override;
-  virtual bool Compatible(const Type* other) const override;
-  virtual bool Equal(const Type* other) const override;
+  virtual bool Compatible(const Type *other) const override;
+  virtual bool Equal(const Type *other) const override;
 
- private:
+private:
   VoidType();
 };
 
 class ArithmeticType : public Type {
   friend class Type;
 
- public:
-  static ArithmeticType* Get(std::uint32_t type_spec);
+public:
+  static ArithmeticType *Get(std::uint32_t type_spec);
 
-  static Type* IntegerPromote(Type* type);
-  static Type* MaxType(Type* lhs, Type* rhs);
+  static Type *IntegerPromote(Type *type);
+  static Type *MaxType(Type *lhs, Type *rhs);
 
   virtual std::int32_t GetWidth() const override;
   virtual std::int32_t GetAlign() const override;
-  virtual bool Compatible(const Type* other) const override;
-  virtual bool Equal(const Type* other) const override;
+  virtual bool Compatible(const Type *other) const override;
+  virtual bool Equal(const Type *other) const override;
 
- private:
+private:
   explicit ArithmeticType(std::uint32_t type_spec);
 
   std::int32_t Rank() const;
@@ -253,37 +253,37 @@ class ArithmeticType : public Type {
 };
 
 class PointerType : public Type {
- public:
-  static PointerType* Get(QualType element_type);
+public:
+  static PointerType *Get(QualType element_type);
 
   virtual std::int32_t GetWidth() const override;
   virtual std::int32_t GetAlign() const override;
-  virtual bool Compatible(const Type* other) const override;
-  virtual bool Equal(const Type* type) const override;
+  virtual bool Compatible(const Type *other) const override;
+  virtual bool Equal(const Type *type) const override;
 
   QualType GetElementType() const;
 
- private:
+private:
   explicit PointerType(QualType element_type);
 
   QualType element_type_;
 };
 
 class ArrayType : public Type {
- public:
-  static ArrayType* Get(QualType contained_type,
+public:
+  static ArrayType *Get(QualType contained_type,
                         std::optional<std::size_t> num_elements = {});
 
   virtual std::int32_t GetWidth() const override;
   virtual std::int32_t GetAlign() const override;
-  virtual bool Compatible(const Type* other) const override;
-  virtual bool Equal(const Type* other) const override;
+  virtual bool Compatible(const Type *other) const override;
+  virtual bool Equal(const Type *other) const override;
 
   void SetNumElements(std::size_t num_elements);
   std::size_t GetNumElements() const;
   QualType GetElementType() const;
 
- private:
+private:
   ArrayType(QualType contained_type, std::optional<std::size_t> num_elements);
 
   QualType contained_type_;
@@ -293,53 +293,53 @@ class ArrayType : public Type {
 class StructType : public Type {
   friend class Type;
 
- public:
-  static StructType* Get(bool is_struct, const std::string& name,
-                         Scope* parent);
+public:
+  static StructType *Get(bool is_struct, const std::string &name,
+                         Scope *parent);
 
   virtual std::int32_t GetWidth() const override;
   virtual std::int32_t GetAlign() const override;
-  virtual bool Compatible(const Type* other) const override;
-  virtual bool Equal(const Type* other) const override;
+  virtual bool Compatible(const Type *other) const override;
+  virtual bool Equal(const Type *other) const override;
 
   bool IsStruct() const;
   bool HasName() const;
-  void SetName(const std::string& name);
-  const std::string& GetName() const;
+  void SetName(const std::string &name);
+  const std::string &GetName() const;
 
   std::int32_t GetNumMembers() const;
-  std::vector<ObjectExpr*>& GetMembers();
-  const std::vector<ObjectExpr*>& GetMembers() const;
-  void SetMembers(std::vector<ObjectExpr*>& members);
-  ObjectExpr* GetMember(const std::string& name) const;
+  std::vector<ObjectExpr *> &GetMembers();
+  const std::vector<ObjectExpr *> &GetMembers() const;
+  void SetMembers(std::vector<ObjectExpr *> &members);
+  ObjectExpr *GetMember(const std::string &name) const;
   QualType GetMemberType(std::int32_t i) const;
-  Scope* GetScope();
+  Scope *GetScope();
   std::int32_t GetOffset() const;
 
-  void AddMember(ObjectExpr* member);
-  void MergeAnonymous(ObjectExpr* anonymous);
-  void AddBitField(ObjectExpr* member);
+  void AddMember(ObjectExpr *member);
+  void MergeAnonymous(ObjectExpr *anonymous);
+  void AddBitField(ObjectExpr *member);
   void Finish();
 
   // 计算新成员的开始位置
   static std::int32_t MakeAlign(std::int32_t offset, std::int32_t align);
 
- private:
-  StructType(bool is_struct, const std::string& name, Scope* parent);
+private:
+  StructType(bool is_struct, const std::string &name, Scope *parent);
 
-  void AddLLVMType(Type* type);
+  void AddLLVMType(Type *type);
   void AddBitFieldBeforeMember();
   void AddSpace(std::int32_t width);
-  void UnionAddBitField(Type* type);
+  void UnionAddBitField(Type *type);
   void BitFieldPacked();
   void AddSpaceBetweenBitField();
 
-  std::vector<llvm::Type*> llvm_types_;
+  std::vector<llvm::Type *> llvm_types_;
 
   bool is_struct_{};
   std::string name_;
-  std::vector<ObjectExpr*> members_;
-  Scope* scope_{};
+  std::vector<ObjectExpr *> members_;
+  Scope *scope_{};
 
   std::int32_t offset_{};
   std::int32_t width_{};
@@ -354,32 +354,32 @@ class StructType : public Type {
 };
 
 class FunctionType : public Type {
- public:
-  static FunctionType* Get(QualType return_type,
-                           std::vector<ObjectExpr*> params,
+public:
+  static FunctionType *Get(QualType return_type,
+                           std::vector<ObjectExpr *> params,
                            bool is_var_args = false);
 
   virtual std::int32_t GetWidth() const override;
   virtual std::int32_t GetAlign() const override;
-  virtual bool Compatible(const Type* other) const override;
-  virtual bool Equal(const Type* other) const override;
+  virtual bool Compatible(const Type *other) const override;
+  virtual bool Equal(const Type *other) const override;
 
   bool IsVarArgs() const;
   QualType GetReturnType() const;
   std::int32_t GetNumParams() const;
-  std::vector<ObjectExpr*>& GetParams();
-  const std::vector<ObjectExpr*>& GetParams() const;
+  std::vector<ObjectExpr *> &GetParams();
+  const std::vector<ObjectExpr *> &GetParams() const;
   void SetFuncSpec(std::uint32_t func_spec);
   bool IsInline() const;
-  void SetName(const std::string& name);
-  const std::string& GetName() const;
+  void SetName(const std::string &name);
+  const std::string &GetName() const;
 
- private:
-  FunctionType(QualType return_type, std::vector<ObjectExpr*> param,
+private:
+  FunctionType(QualType return_type, std::vector<ObjectExpr *> param,
                bool is_var_args);
 
   QualType return_type_;
-  std::vector<ObjectExpr*> params_;
+  std::vector<ObjectExpr *> params_;
   bool is_var_args_;
 
   std::uint32_t func_spec_{};
@@ -387,4 +387,4 @@ class FunctionType : public Type {
   std::string name_;
 };
 
-}  // namespace kcc
+} // namespace kcc

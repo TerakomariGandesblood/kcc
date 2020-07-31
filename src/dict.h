@@ -13,12 +13,12 @@
 namespace kcc {
 
 class KeywordsDictionary {
- public:
+public:
   KeywordsDictionary();
-  Tag Find(const std::string& name) const;
+  Tag Find(const std::string &name) const;
 
- private:
+private:
   std::unordered_map<std::string_view, Tag> keywords_;
 };
 
-}  // namespace kcc
+} // namespace kcc

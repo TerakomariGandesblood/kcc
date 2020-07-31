@@ -14,7 +14,7 @@
 namespace kcc {
 
 class Preprocessor {
- public:
+public:
   Preprocessor();
 
   void AddIncludePaths(const std::vector<std::string> &include_paths);
@@ -23,7 +23,7 @@ class Preprocessor {
 
   std::string Cpp(const std::string &input_file);
 
- private:
+private:
   void AddIncludePath(const std::string &path, bool is_system);
 
   constexpr static std::size_t StrReserve{4096};
@@ -32,4 +32,4 @@ class Preprocessor {
   clang::HeaderSearch *header_search_;
 };
 
-}  // namespace kcc
+} // namespace kcc

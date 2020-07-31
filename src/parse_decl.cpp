@@ -15,7 +15,7 @@ namespace kcc {
 /*
  * Decl
  */
-CompoundStmt* Parser::ParseDecl(bool maybe_func_def) {
+CompoundStmt *Parser::ParseDecl(bool maybe_func_def) {
   if (Try(Tag::kStaticAssert)) {
     ParseStaticAssertDecl();
     return nullptr;
@@ -57,29 +57,29 @@ void Parser::ParseStaticAssertDecl() {
 /*
  * Decl Spec
  */
-QualType Parser::ParseDeclSpec(std::uint32_t* storage_class_spec,
-                               std::uint32_t* func_spec, std::int32_t* align) {
-#define CHECK_AND_SET_STORAGE_CLASS_SPEC(spec)                  \
-  if (*storage_class_spec != 0) {                               \
-    Error(tok, "duplicated storage class specifier");           \
-  } else if (!storage_class_spec) {                             \
-    Error(tok, "storage class specifier are not allowed here"); \
-  }                                                             \
+QualType Parser::ParseDeclSpec(std::uint32_t *storage_class_spec,
+                               std::uint32_t *func_spec, std::int32_t *align) {
+#define CHECK_AND_SET_STORAGE_CLASS_SPEC(spec)                                 \
+  if (*storage_class_spec != 0) {                                              \
+    Error(tok, "duplicated storage class specifier");                          \
+  } else if (!storage_class_spec) {                                            \
+    Error(tok, "storage class specifier are not allowed here");                \
+  }                                                                            \
   *storage_class_spec |= spec;
 
-#define CHECK_AND_SET_FUNC_SPEC(spec)                                   \
-  if (*func_spec & spec) {                                              \
-    Warning(tok, "duplicate function specifier declaration specifier"); \
-  } else if (!func_spec) {                                              \
-    Error(tok, "function specifiers are not allowed here");             \
-  }                                                                     \
+#define CHECK_AND_SET_FUNC_SPEC(spec)                                          \
+  if (*func_spec & spec) {                                                     \
+    Warning(tok, "duplicate function specifier declaration specifier");        \
+  } else if (!func_spec) {                                                     \
+    Error(tok, "function specifiers are not allowed here");                    \
+  }                                                                            \
   *func_spec |= spec;
 
 #define ERROR Error(tok, "two or more data types in declaration specifiers");
 
-#define TYPEOF_CHECK                                              \
-  if (has_typeof) {                                               \
-    Error(tok, "It is not allowed to use type specifiers here."); \
+#define TYPEOF_CHECK                                                           \
+  if (has_typeof) {                                                            \
+    Error(tok, "It is not allowed to use type specifiers here.");              \
   }
 
   std::uint32_t type_spec{}, type_qual{};
@@ -94,159 +94,159 @@ QualType Parser::ParseDeclSpec(std::uint32_t* storage_class_spec,
     tok = Next();
 
     switch (tok.GetTag()) {
-      // GNU 扩展
-      case Tag::kExtension:
-        break;
-      case Tag::kTypeof:
-        if (type_spec != 0) {
-          Error(tok, "It is not allowed to use typeof here.");
-        }
-        type = ParseTypeof();
-        has_typeof = true;
-        break;
-
-        // Storage Class Specifier, 至多有一个
-      case Tag::kTypedef:
-        CHECK_AND_SET_STORAGE_CLASS_SPEC(kTypedef) break;
-      case Tag::kExtern:
-        CHECK_AND_SET_STORAGE_CLASS_SPEC(kExtern) break;
-      case Tag::kStatic:
-        CHECK_AND_SET_STORAGE_CLASS_SPEC(kStatic) break;
-      case Tag::kAuto:
-        CHECK_AND_SET_STORAGE_CLASS_SPEC(kAuto) break;
-      case Tag::kRegister:
-        CHECK_AND_SET_STORAGE_CLASS_SPEC(kRegister) break;
-      case Tag::kThreadLocal:
-        Error(tok, "Does not support _Thread_local");
-
-        // Type specifier
-      case Tag::kVoid:
-        if (type_spec) {
-          ERROR
-        }
-        TYPEOF_CHECK type_spec |= kVoid;
-        break;
-      case Tag::kChar:
-        if (type_spec & ~kCompChar) {
-          ERROR
-        }
-        TYPEOF_CHECK type_spec |= kChar;
-        break;
-      case Tag::kShort:
-        if (type_spec & ~kCompShort) {
-          ERROR
-        }
-        TYPEOF_CHECK type_spec |= kShort;
-        break;
-      case Tag::kInt:
-        if (type_spec & ~kCompInt) {
-          ERROR
-        }
-        TYPEOF_CHECK type_spec |= kInt;
-        break;
-      case Tag::kLong:
-        if (type_spec & ~kCompLong) {
-          ERROR
-        }
-        TYPEOF_CHECK if (type_spec & kLong) {
-          type_spec &= ~kLong;
-          type_spec |= kLongLong;
-        }
-        else {
-          type_spec |= kLong;
-        }
-        break;
-      case Tag::kFloat:
-        if (type_spec) {
-          ERROR
-        }
-        TYPEOF_CHECK type_spec |= kFloat;
-        break;
-      case Tag::kDouble:
-        if (type_spec & ~kCompDouble) {
-          ERROR
-        }
-        TYPEOF_CHECK type_spec |= kDouble;
-        break;
-      case Tag::kSigned:
-        if (type_spec & ~kCompSigned) {
-          ERROR
-        }
-        TYPEOF_CHECK type_spec |= kSigned;
-        break;
-      case Tag::kUnsigned:
-        if (type_spec & ~kCompUnsigned) {
-          ERROR
-        }
-        TYPEOF_CHECK type_spec |= kUnsigned;
-        break;
-      case Tag::kBool:
-        if (type_spec) {
-          ERROR
-        }
-        TYPEOF_CHECK type_spec |= kBool;
-        break;
-      case Tag::kStruct:
-      case Tag::kUnion:
-        if (type_spec) {
-          ERROR
-        }
-        TYPEOF_CHECK type = ParseStructUnionSpec(tok.GetTag() == Tag::kStruct);
-        type_spec |= kStructUnionSpec;
-        break;
-      case Tag::kEnum:
-        if (type_spec) {
-          ERROR
-        }
-        TYPEOF_CHECK type = ParseEnumSpec();
-        type_spec |= kEnumSpec;
-        break;
-      case Tag::kComplex:
-        TYPEOF_CHECK Error(tok, "Does not support _Complex");
-      case Tag::kAtomic:
-        TYPEOF_CHECK Error(tok, "Does not support _Atomic");
-
-        // Type qualifier
-      case Tag::kConst:
-        type_qual |= kConst;
-        break;
-      case Tag::kRestrict:
-        type_qual |= kRestrict;
-        break;
-      case Tag::kVolatile:
-        type_qual |= kVolatile;
-        break;
-
-        // Function specifier
-      case Tag::kInline:
-        CHECK_AND_SET_FUNC_SPEC(kInline) break;
-      case Tag::kNoreturn:
-        CHECK_AND_SET_FUNC_SPEC(kNoreturn) break;
-
-      case Tag::kAlignas:
-        if (!align) {
-          Error(tok, "_Alignas are not allowed here");
-        }
-        *align = std::max(ParseAlignas(), *align);
-        break;
-
-      default: {
-        if (type_spec == 0 && IsTypeName(tok)) {
-          auto ident{scope_->FindUsual(tok.GetIdentifier())};
-          type = ident->GetQualType();
-          type_spec |= kTypedefName;
-
-          //  typedef int A[];
-          //  A a = {1, 2};
-          //  A b = {3, 4, 5};
-          // 防止类型被修改
-          if (type->IsArrayTy() && !type->IsComplete()) {
-            type = ArrayType::Get(type->ArrayGetElementType(), {});
-          }
-        } else {
-          goto finish;
-        }
+    // GNU 扩展
+    case Tag::kExtension:
+      break;
+    case Tag::kTypeof:
+      if (type_spec != 0) {
+        Error(tok, "It is not allowed to use typeof here.");
       }
+      type = ParseTypeof();
+      has_typeof = true;
+      break;
+
+      // Storage Class Specifier, 至多有一个
+    case Tag::kTypedef:
+      CHECK_AND_SET_STORAGE_CLASS_SPEC(kTypedef) break;
+    case Tag::kExtern:
+      CHECK_AND_SET_STORAGE_CLASS_SPEC(kExtern) break;
+    case Tag::kStatic:
+      CHECK_AND_SET_STORAGE_CLASS_SPEC(kStatic) break;
+    case Tag::kAuto:
+      CHECK_AND_SET_STORAGE_CLASS_SPEC(kAuto) break;
+    case Tag::kRegister:
+      CHECK_AND_SET_STORAGE_CLASS_SPEC(kRegister) break;
+    case Tag::kThreadLocal:
+      Error(tok, "Does not support _Thread_local");
+
+      // Type specifier
+    case Tag::kVoid:
+      if (type_spec) {
+        ERROR
+      }
+      TYPEOF_CHECK type_spec |= kVoid;
+      break;
+    case Tag::kChar:
+      if (type_spec & ~kCompChar) {
+        ERROR
+      }
+      TYPEOF_CHECK type_spec |= kChar;
+      break;
+    case Tag::kShort:
+      if (type_spec & ~kCompShort) {
+        ERROR
+      }
+      TYPEOF_CHECK type_spec |= kShort;
+      break;
+    case Tag::kInt:
+      if (type_spec & ~kCompInt) {
+        ERROR
+      }
+      TYPEOF_CHECK type_spec |= kInt;
+      break;
+    case Tag::kLong:
+      if (type_spec & ~kCompLong) {
+        ERROR
+      }
+      TYPEOF_CHECK if (type_spec & kLong) {
+        type_spec &= ~kLong;
+        type_spec |= kLongLong;
+      }
+      else {
+        type_spec |= kLong;
+      }
+      break;
+    case Tag::kFloat:
+      if (type_spec) {
+        ERROR
+      }
+      TYPEOF_CHECK type_spec |= kFloat;
+      break;
+    case Tag::kDouble:
+      if (type_spec & ~kCompDouble) {
+        ERROR
+      }
+      TYPEOF_CHECK type_spec |= kDouble;
+      break;
+    case Tag::kSigned:
+      if (type_spec & ~kCompSigned) {
+        ERROR
+      }
+      TYPEOF_CHECK type_spec |= kSigned;
+      break;
+    case Tag::kUnsigned:
+      if (type_spec & ~kCompUnsigned) {
+        ERROR
+      }
+      TYPEOF_CHECK type_spec |= kUnsigned;
+      break;
+    case Tag::kBool:
+      if (type_spec) {
+        ERROR
+      }
+      TYPEOF_CHECK type_spec |= kBool;
+      break;
+    case Tag::kStruct:
+    case Tag::kUnion:
+      if (type_spec) {
+        ERROR
+      }
+      TYPEOF_CHECK type = ParseStructUnionSpec(tok.GetTag() == Tag::kStruct);
+      type_spec |= kStructUnionSpec;
+      break;
+    case Tag::kEnum:
+      if (type_spec) {
+        ERROR
+      }
+      TYPEOF_CHECK type = ParseEnumSpec();
+      type_spec |= kEnumSpec;
+      break;
+    case Tag::kComplex:
+      TYPEOF_CHECK Error(tok, "Does not support _Complex");
+    case Tag::kAtomic:
+      TYPEOF_CHECK Error(tok, "Does not support _Atomic");
+
+      // Type qualifier
+    case Tag::kConst:
+      type_qual |= kConst;
+      break;
+    case Tag::kRestrict:
+      type_qual |= kRestrict;
+      break;
+    case Tag::kVolatile:
+      type_qual |= kVolatile;
+      break;
+
+      // Function specifier
+    case Tag::kInline:
+      CHECK_AND_SET_FUNC_SPEC(kInline) break;
+    case Tag::kNoreturn:
+      CHECK_AND_SET_FUNC_SPEC(kNoreturn) break;
+
+    case Tag::kAlignas:
+      if (!align) {
+        Error(tok, "_Alignas are not allowed here");
+      }
+      *align = std::max(ParseAlignas(), *align);
+      break;
+
+    default: {
+      if (type_spec == 0 && IsTypeName(tok)) {
+        auto ident{scope_->FindUsual(tok.GetIdentifier())};
+        type = ident->GetQualType();
+        type_spec |= kTypedefName;
+
+        //  typedef int A[];
+        //  A a = {1, 2};
+        //  A b = {3, 4, 5};
+        // 防止类型被修改
+        if (type->IsArrayTy() && !type->IsComplete()) {
+          type = ArrayType::Get(type->ArrayGetElementType(), {});
+        }
+      } else {
+        goto finish;
+      }
+    }
     }
   }
 
@@ -256,20 +256,20 @@ finish:
   TryParseAttributeSpec();
 
   switch (type_spec) {
-    case 0:
-      if (!has_typeof) {
-        Error(tok, "type specifier missing: {}", tok.GetStr());
-      }
-      break;
-    case kVoid:
-      type = VoidType::Get();
-      break;
-    case kStructUnionSpec:
-    case kEnumSpec:
-    case kTypedefName:
-      break;
-    default:
-      type = ArithmeticType::Get(type_spec);
+  case 0:
+    if (!has_typeof) {
+      Error(tok, "type specifier missing: {}", tok.GetStr());
+    }
+    break;
+  case kVoid:
+    type = VoidType::Get();
+    break;
+  case kStructUnionSpec:
+  case kEnumSpec:
+  case kTypedefName:
+    break;
+  default:
+    type = ArithmeticType::Get(type_spec);
   }
 
   return QualType{type.GetType(), type.GetTypeQual() | type_qual};
@@ -280,7 +280,7 @@ finish:
 #undef TYPEOF_CHECK
 }
 
-Type* Parser::ParseStructUnionSpec(bool is_struct) {
+Type *Parser::ParseStructUnionSpec(bool is_struct) {
   TryParseAttributeSpec();
 
   auto tok{Peek()};
@@ -304,7 +304,7 @@ Type* Parser::ParseStructUnionSpec(bool is_struct) {
         if (tag->GetType()->IsComplete()) {
           Error(tok, "redefinition struct or union :{}", tag_name);
         } else {
-          ParseStructDeclList(dynamic_cast<StructType*>(tag->GetType()));
+          ParseStructDeclList(dynamic_cast<StructType *>(tag->GetType()));
 
           Expect(Tag::kRightBrace);
           return tag->GetType();
@@ -335,7 +335,7 @@ Type* Parser::ParseStructUnionSpec(bool is_struct) {
   }
 }
 
-void Parser::ParseStructDeclList(StructType* type) {
+void Parser::ParseStructDeclList(StructType *type) {
   assert(!type->IsComplete());
 
   auto scope_backup{scope_};
@@ -421,7 +421,7 @@ finalize:
   type->SetComplete(true);
 
   // struct / union 中的 tag 的作用域与该 struct / union 所在的作用域相同
-  for (const auto& [name, tag] : scope_->AllTagInCurrScope()) {
+  for (const auto &[name, tag] : scope_->AllTagInCurrScope()) {
     if (scope_backup->FindTagInCurrScope(name)) {
       Error(tag->GetLoc(), "redefinition of tag {}", tag->GetName());
     } else {
@@ -432,7 +432,7 @@ finalize:
   scope_ = scope_backup;
 }
 
-void Parser::ParseBitField(StructType* type, const Token& tok,
+void Parser::ParseBitField(StructType *type, const Token &tok,
                            QualType member_type) {
   // 标准中定义位域可以下列拥有四种类型之一
   // int / signed int / unsigned int / _Bool
@@ -455,7 +455,7 @@ void Parser::ParseBitField(StructType* type, const Token& tok,
     Error(expr, "width exceeds its type");
   }
 
-  ObjectExpr* bit_field;
+  ObjectExpr *bit_field;
   if (std::empty(tok.GetStr())) {
     bit_field = MakeAstNode<ObjectExpr>(tok, "", member_type, 0, Linkage::kNone,
                                         true, width);
@@ -473,7 +473,7 @@ void Parser::ParseBitField(StructType* type, const Token& tok,
   type->AddBitField(bit_field);
 }
 
-Type* Parser::ParseEnumSpec() {
+Type *Parser::ParseEnumSpec() {
   TryParseAttributeSpec();
 
   std::string tag_name;
@@ -567,7 +567,7 @@ std::int32_t Parser::ParseAlignas() {
 /*
  * Declarator
  */
-CompoundStmt* Parser::ParseInitDeclaratorList(QualType& base_type,
+CompoundStmt *Parser::ParseInitDeclaratorList(QualType &base_type,
                                               std::uint32_t storage_class_spec,
                                               std::uint32_t func_spec,
                                               std::int32_t align) {
@@ -583,7 +583,7 @@ CompoundStmt* Parser::ParseInitDeclaratorList(QualType& base_type,
   return stmts;
 }
 
-Declaration* Parser::ParseInitDeclarator(QualType& base_type,
+Declaration *Parser::ParseInitDeclarator(QualType &base_type,
                                          std::uint32_t storage_class_spec,
                                          std::uint32_t func_spec,
                                          std::int32_t align) {
@@ -613,7 +613,7 @@ Declaration* Parser::ParseInitDeclarator(QualType& base_type,
   return decl;
 }
 
-void Parser::ParseInitDeclaratorSub(Declaration* decl) {
+void Parser::ParseInitDeclaratorSub(Declaration *decl) {
   auto ident{decl->GetIdent()};
 
   if (!scope_->IsFileScope() && ident->GetLinkage() == Linkage::kExternal) {
@@ -634,12 +634,12 @@ void Parser::ParseInitDeclaratorSub(Declaration* decl) {
   }
 }
 
-void Parser::ParseDeclarator(Token& tok, QualType& base_type) {
+void Parser::ParseDeclarator(Token &tok, QualType &base_type) {
   ParsePointer(base_type);
   ParseDirectDeclarator(tok, base_type);
 }
 
-void Parser::ParsePointer(QualType& type) {
+void Parser::ParsePointer(QualType &type) {
   while (Try(Tag::kStar)) {
     type = QualType{PointerType::Get(type), ParseTypeQualList()};
   }
@@ -667,7 +667,7 @@ std::uint32_t Parser::ParseTypeQualList() {
   return type_qual;
 }
 
-void Parser::ParseDirectDeclarator(Token& tok, QualType& base_type) {
+void Parser::ParseDirectDeclarator(Token &tok, QualType &base_type) {
   if (Test(Tag::kIdentifier)) {
     tok = Next();
     ParseDirectDeclaratorTail(base_type);
@@ -690,7 +690,7 @@ void Parser::ParseDirectDeclarator(Token& tok, QualType& base_type) {
   }
 }
 
-void Parser::ParseDirectDeclaratorTail(QualType& base_type) {
+void Parser::ParseDirectDeclaratorTail(QualType &base_type) {
   if (Try(Tag::kLeftSquare)) {
     if (base_type->IsFunctionTy()) {
       Error(Peek(), "the element of array cannot be a function");
@@ -758,7 +758,7 @@ std::optional<std::size_t> Parser::ParseArrayLength() {
   return *len;
 }
 
-std::pair<std::vector<ObjectExpr*>, bool> Parser::ParseParamTypeList() {
+std::pair<std::vector<ObjectExpr *>, bool> Parser::ParseParamTypeList() {
   if (Test(Tag::kRightParen)) {
     return {{}, false};
   }
@@ -768,7 +768,7 @@ std::pair<std::vector<ObjectExpr*>, bool> Parser::ParseParamTypeList() {
     return {{}, false};
   }
 
-  std::vector<ObjectExpr*> params;
+  std::vector<ObjectExpr *> params;
   params.push_back(param);
 
   while (Try(Tag::kComma)) {
@@ -787,7 +787,7 @@ std::pair<std::vector<ObjectExpr*>, bool> Parser::ParseParamTypeList() {
   return {params, false};
 }
 
-ObjectExpr* Parser::ParseParamDecl() {
+ObjectExpr *Parser::ParseParamDecl() {
   auto base_type{ParseDeclSpec(nullptr, nullptr, nullptr)};
 
   Token tok;
@@ -815,12 +815,12 @@ QualType Parser::ParseTypeName() {
   return base_type;
 }
 
-void Parser::ParseAbstractDeclarator(QualType& type) {
+void Parser::ParseAbstractDeclarator(QualType &type) {
   ParsePointer(type);
   ParseDirectAbstractDeclarator(type);
 }
 
-void Parser::ParseDirectAbstractDeclarator(QualType& type) {
+void Parser::ParseDirectAbstractDeclarator(QualType &type) {
   Token tok;
   ParseDirectDeclarator(tok, type);
 
@@ -829,4 +829,4 @@ void Parser::ParseDirectAbstractDeclarator(QualType& type) {
   }
 }
 
-}  // namespace kcc
+} // namespace kcc

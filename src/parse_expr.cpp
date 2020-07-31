@@ -18,7 +18,7 @@ namespace kcc {
 /*
  * Expr
  */
-Expr* Parser::ParseExpr() {
+Expr *Parser::ParseExpr() {
   // GNU 扩展, 当使用 -ansi 时避免警告
   Try(Tag::kExtension);
 
@@ -34,67 +34,67 @@ Expr* Parser::ParseExpr() {
   return lhs;
 }
 
-Expr* Parser::ParseAssignExpr() {
+Expr *Parser::ParseAssignExpr() {
   Try(Tag::kExtension);
 
   auto lhs{ParseConditionExpr()};
-  Expr* rhs;
+  Expr *rhs;
 
   auto token{Next()};
   switch (token.GetTag()) {
-    case Tag::kEqual:
-      rhs = ParseAssignExpr();
-      break;
-    case Tag::kStarEqual:
-      rhs = ParseAssignExpr();
-      rhs = MakeAstNode<BinaryOpExpr>(token, Tag::kStar, lhs, rhs);
-      break;
-    case Tag::kSlashEqual:
-      rhs = ParseAssignExpr();
-      rhs = MakeAstNode<BinaryOpExpr>(token, Tag::kSlash, lhs, rhs);
-      break;
-    case Tag::kPercentEqual:
-      rhs = ParseAssignExpr();
-      rhs = MakeAstNode<BinaryOpExpr>(token, Tag::kPercent, lhs, rhs);
-      break;
-    case Tag::kPlusEqual:
-      rhs = ParseAssignExpr();
-      rhs = MakeAstNode<BinaryOpExpr>(token, Tag::kPlus, lhs, rhs);
-      break;
-    case Tag::kMinusEqual:
-      rhs = ParseAssignExpr();
-      rhs = MakeAstNode<BinaryOpExpr>(token, Tag::kMinus, lhs, rhs);
-      break;
-    case Tag::kLessLessEqual:
-      rhs = ParseAssignExpr();
-      rhs = MakeAstNode<BinaryOpExpr>(token, Tag::kLessLess, lhs, rhs);
-      break;
-    case Tag::kGreaterGreaterEqual:
-      rhs = ParseAssignExpr();
-      rhs = MakeAstNode<BinaryOpExpr>(token, Tag::kGreaterGreater, lhs, rhs);
-      break;
-    case Tag::kAmpEqual:
-      rhs = ParseAssignExpr();
-      rhs = MakeAstNode<BinaryOpExpr>(token, Tag::kAmp, lhs, rhs);
-      break;
-    case Tag::kCaretEqual:
-      rhs = ParseAssignExpr();
-      rhs = MakeAstNode<BinaryOpExpr>(token, Tag::kCaret, lhs, rhs);
-      break;
-    case Tag::kPipeEqual:
-      rhs = ParseAssignExpr();
-      rhs = MakeAstNode<BinaryOpExpr>(token, Tag::kPipe, lhs, rhs);
-      break;
-    default: {
-      PutBack();
-      return lhs;
-    }
+  case Tag::kEqual:
+    rhs = ParseAssignExpr();
+    break;
+  case Tag::kStarEqual:
+    rhs = ParseAssignExpr();
+    rhs = MakeAstNode<BinaryOpExpr>(token, Tag::kStar, lhs, rhs);
+    break;
+  case Tag::kSlashEqual:
+    rhs = ParseAssignExpr();
+    rhs = MakeAstNode<BinaryOpExpr>(token, Tag::kSlash, lhs, rhs);
+    break;
+  case Tag::kPercentEqual:
+    rhs = ParseAssignExpr();
+    rhs = MakeAstNode<BinaryOpExpr>(token, Tag::kPercent, lhs, rhs);
+    break;
+  case Tag::kPlusEqual:
+    rhs = ParseAssignExpr();
+    rhs = MakeAstNode<BinaryOpExpr>(token, Tag::kPlus, lhs, rhs);
+    break;
+  case Tag::kMinusEqual:
+    rhs = ParseAssignExpr();
+    rhs = MakeAstNode<BinaryOpExpr>(token, Tag::kMinus, lhs, rhs);
+    break;
+  case Tag::kLessLessEqual:
+    rhs = ParseAssignExpr();
+    rhs = MakeAstNode<BinaryOpExpr>(token, Tag::kLessLess, lhs, rhs);
+    break;
+  case Tag::kGreaterGreaterEqual:
+    rhs = ParseAssignExpr();
+    rhs = MakeAstNode<BinaryOpExpr>(token, Tag::kGreaterGreater, lhs, rhs);
+    break;
+  case Tag::kAmpEqual:
+    rhs = ParseAssignExpr();
+    rhs = MakeAstNode<BinaryOpExpr>(token, Tag::kAmp, lhs, rhs);
+    break;
+  case Tag::kCaretEqual:
+    rhs = ParseAssignExpr();
+    rhs = MakeAstNode<BinaryOpExpr>(token, Tag::kCaret, lhs, rhs);
+    break;
+  case Tag::kPipeEqual:
+    rhs = ParseAssignExpr();
+    rhs = MakeAstNode<BinaryOpExpr>(token, Tag::kPipe, lhs, rhs);
+    break;
+  default: {
+    PutBack();
+    return lhs;
+  }
   }
 
   return MakeAstNode<BinaryOpExpr>(token, Tag::kEqual, lhs, rhs);
 }
 
-Expr* Parser::ParseConditionExpr() {
+Expr *Parser::ParseConditionExpr() {
   auto cond{ParseLogicalOrExpr()};
 
   auto token{Peek()};
@@ -111,7 +111,7 @@ Expr* Parser::ParseConditionExpr() {
   return cond;
 }
 
-Expr* Parser::ParseLogicalOrExpr() {
+Expr *Parser::ParseLogicalOrExpr() {
   auto lhs{ParseLogicalAndExpr()};
 
   auto token{Peek()};
@@ -124,7 +124,7 @@ Expr* Parser::ParseLogicalOrExpr() {
   return lhs;
 }
 
-Expr* Parser::ParseLogicalAndExpr() {
+Expr *Parser::ParseLogicalAndExpr() {
   auto lhs{ParseInclusiveOrExpr()};
 
   auto token{Peek()};
@@ -137,7 +137,7 @@ Expr* Parser::ParseLogicalAndExpr() {
   return lhs;
 }
 
-Expr* Parser::ParseInclusiveOrExpr() {
+Expr *Parser::ParseInclusiveOrExpr() {
   auto lhs{ParseExclusiveOrExpr()};
 
   auto token{Peek()};
@@ -150,7 +150,7 @@ Expr* Parser::ParseInclusiveOrExpr() {
   return lhs;
 }
 
-Expr* Parser::ParseExclusiveOrExpr() {
+Expr *Parser::ParseExclusiveOrExpr() {
   auto lhs{ParseAndExpr()};
 
   auto token{Peek()};
@@ -163,7 +163,7 @@ Expr* Parser::ParseExclusiveOrExpr() {
   return lhs;
 }
 
-Expr* Parser::ParseAndExpr() {
+Expr *Parser::ParseAndExpr() {
   auto lhs{ParseEqualityExpr()};
 
   auto token{Peek()};
@@ -176,7 +176,7 @@ Expr* Parser::ParseAndExpr() {
   return lhs;
 }
 
-Expr* Parser::ParseEqualityExpr() {
+Expr *Parser::ParseEqualityExpr() {
   auto lhs{ParseRelationExpr()};
 
   auto token{Peek()};
@@ -196,7 +196,7 @@ Expr* Parser::ParseEqualityExpr() {
   return lhs;
 }
 
-Expr* Parser::ParseRelationExpr() {
+Expr *Parser::ParseRelationExpr() {
   auto lhs{ParseShiftExpr()};
 
   auto token{Peek()};
@@ -222,7 +222,7 @@ Expr* Parser::ParseRelationExpr() {
   return lhs;
 }
 
-Expr* Parser::ParseShiftExpr() {
+Expr *Parser::ParseShiftExpr() {
   auto lhs{ParseAdditiveExpr()};
 
   auto token{Peek()};
@@ -242,7 +242,7 @@ Expr* Parser::ParseShiftExpr() {
   return lhs;
 }
 
-Expr* Parser::ParseAdditiveExpr() {
+Expr *Parser::ParseAdditiveExpr() {
   auto lhs{ParseMultiplicativeExpr()};
 
   auto token{Peek()};
@@ -262,7 +262,7 @@ Expr* Parser::ParseAdditiveExpr() {
   return lhs;
 }
 
-Expr* Parser::ParseMultiplicativeExpr() {
+Expr *Parser::ParseMultiplicativeExpr() {
   auto lhs{ParseCastExpr()};
 
   auto token{Peek()};
@@ -285,7 +285,7 @@ Expr* Parser::ParseMultiplicativeExpr() {
   return lhs;
 }
 
-Expr* Parser::ParseCastExpr() {
+Expr *Parser::ParseCastExpr() {
   if (Try(Tag::kLeftParen)) {
     if (IsTypeName(Peek())) {
       auto type{ParseTypeName()};
@@ -306,42 +306,41 @@ Expr* Parser::ParseCastExpr() {
   }
 }
 
-Expr* Parser::ParseUnaryExpr() {
+Expr *Parser::ParseUnaryExpr() {
   auto token{Next()};
   switch (token.GetTag()) {
-    // 默认为前缀
-    case Tag::kPlusPlus:
-      return MakeAstNode<UnaryOpExpr>(token, Tag::kPlusPlus, ParseUnaryExpr());
-    case Tag::kMinusMinus:
-      return MakeAstNode<UnaryOpExpr>(token, Tag::kMinusMinus,
-                                      ParseUnaryExpr());
-    case Tag::kAmp:
-      return MakeAstNode<UnaryOpExpr>(token, Tag::kAmp, ParseCastExpr());
-    case Tag::kStar:
-      return MakeAstNode<UnaryOpExpr>(token, Tag::kStar, ParseCastExpr());
-    case Tag::kPlus:
-      return MakeAstNode<UnaryOpExpr>(token, Tag::kPlus, ParseCastExpr());
-    case Tag::kMinus:
-      return MakeAstNode<UnaryOpExpr>(token, Tag::kMinus, ParseCastExpr());
-    case Tag::kTilde:
-      return MakeAstNode<UnaryOpExpr>(token, Tag::kTilde, ParseCastExpr());
-    case Tag::kExclaim:
-      return MakeAstNode<UnaryOpExpr>(token, Tag::kExclaim, ParseCastExpr());
-    case Tag::kSizeof:
-      return ParseSizeof();
-    case Tag::kAlignof:
-      return ParseAlignof();
-    case Tag::kOffsetof:
-      return ParseOffsetof();
-    case Tag::kTypeid:
-      return ParseTypeid();
-    default:
-      PutBack();
-      return ParsePostfixExpr();
+  // 默认为前缀
+  case Tag::kPlusPlus:
+    return MakeAstNode<UnaryOpExpr>(token, Tag::kPlusPlus, ParseUnaryExpr());
+  case Tag::kMinusMinus:
+    return MakeAstNode<UnaryOpExpr>(token, Tag::kMinusMinus, ParseUnaryExpr());
+  case Tag::kAmp:
+    return MakeAstNode<UnaryOpExpr>(token, Tag::kAmp, ParseCastExpr());
+  case Tag::kStar:
+    return MakeAstNode<UnaryOpExpr>(token, Tag::kStar, ParseCastExpr());
+  case Tag::kPlus:
+    return MakeAstNode<UnaryOpExpr>(token, Tag::kPlus, ParseCastExpr());
+  case Tag::kMinus:
+    return MakeAstNode<UnaryOpExpr>(token, Tag::kMinus, ParseCastExpr());
+  case Tag::kTilde:
+    return MakeAstNode<UnaryOpExpr>(token, Tag::kTilde, ParseCastExpr());
+  case Tag::kExclaim:
+    return MakeAstNode<UnaryOpExpr>(token, Tag::kExclaim, ParseCastExpr());
+  case Tag::kSizeof:
+    return ParseSizeof();
+  case Tag::kAlignof:
+    return ParseAlignof();
+  case Tag::kOffsetof:
+    return ParseOffsetof();
+  case Tag::kTypeid:
+    return ParseTypeid();
+  default:
+    PutBack();
+    return ParsePostfixExpr();
   }
 }
 
-Expr* Parser::ParseSizeof() {
+Expr *Parser::ParseSizeof() {
   QualType type;
 
   auto token{Peek()};
@@ -367,7 +366,7 @@ Expr* Parser::ParseSizeof() {
       static_cast<std::uint64_t>(type->GetWidth()));
 }
 
-Expr* Parser::ParseAlignof() {
+Expr *Parser::ParseAlignof() {
   QualType type;
 
   Expect(Tag::kLeftParen);
@@ -385,7 +384,7 @@ Expr* Parser::ParseAlignof() {
       static_cast<std::uint64_t>(type->GetAlign()));
 }
 
-Expr* Parser::ParsePostfixExpr() {
+Expr *Parser::ParsePostfixExpr() {
   auto expr{TryParseCompoundLiteral()};
 
   if (expr) {
@@ -395,7 +394,7 @@ Expr* Parser::ParsePostfixExpr() {
   }
 }
 
-Expr* Parser::TryParseCompoundLiteral() {
+Expr *Parser::TryParseCompoundLiteral() {
   auto begin{index_};
 
   if (Try(Tag::kLeftParen) && IsTypeName(Peek())) {
@@ -410,7 +409,7 @@ Expr* Parser::TryParseCompoundLiteral() {
   return nullptr;
 }
 
-Expr* Parser::ParseCompoundLiteral(QualType type) {
+Expr *Parser::ParseCompoundLiteral(QualType type) {
   if (scope_->IsFileScope()) {
     auto obj{
         MakeAstNode<ObjectExpr>(Peek(), "", type, 0, Linkage::kInternal, true)};
@@ -434,38 +433,38 @@ Expr* Parser::ParseCompoundLiteral(QualType type) {
   }
 }
 
-Expr* Parser::ParsePostfixExprTail(Expr* expr) {
+Expr *Parser::ParsePostfixExprTail(Expr *expr) {
   auto token{Peek()};
   while (true) {
     switch (Next().GetTag()) {
-      case Tag::kLeftSquare:
-        expr = ParseIndexExpr(expr);
-        break;
-      case Tag::kLeftParen:
-        expr = ParseFuncCallExpr(expr);
-        break;
-      case Tag::kArrow:
-        expr = MakeAstNode<UnaryOpExpr>(token, Tag::kStar, expr);
-        expr = ParseMemberRefExpr(expr);
-        break;
-      case Tag::kPeriod:
-        expr = ParseMemberRefExpr(expr);
-        break;
-      case Tag::kPlusPlus:
-        expr = MakeAstNode<UnaryOpExpr>(token, Tag::kPostfixPlusPlus, expr);
-        break;
-      case Tag::kMinusMinus:
-        expr = MakeAstNode<UnaryOpExpr>(token, Tag::kPostfixMinusMinus, expr);
-        break;
-      default:
-        PutBack();
-        return expr;
+    case Tag::kLeftSquare:
+      expr = ParseIndexExpr(expr);
+      break;
+    case Tag::kLeftParen:
+      expr = ParseFuncCallExpr(expr);
+      break;
+    case Tag::kArrow:
+      expr = MakeAstNode<UnaryOpExpr>(token, Tag::kStar, expr);
+      expr = ParseMemberRefExpr(expr);
+      break;
+    case Tag::kPeriod:
+      expr = ParseMemberRefExpr(expr);
+      break;
+    case Tag::kPlusPlus:
+      expr = MakeAstNode<UnaryOpExpr>(token, Tag::kPostfixPlusPlus, expr);
+      break;
+    case Tag::kMinusMinus:
+      expr = MakeAstNode<UnaryOpExpr>(token, Tag::kPostfixMinusMinus, expr);
+      break;
+    default:
+      PutBack();
+      return expr;
     }
     token = Peek();
   }
 }
 
-Expr* Parser::ParseIndexExpr(Expr* expr) {
+Expr *Parser::ParseIndexExpr(Expr *expr) {
   auto token{Peek()};
   auto rhs{ParseExpr()};
   Expect(Tag::kRightSquare);
@@ -475,8 +474,8 @@ Expr* Parser::ParseIndexExpr(Expr* expr) {
       MakeAstNode<BinaryOpExpr>(token, Tag::kPlus, expr, rhs));
 }
 
-Expr* Parser::ParseFuncCallExpr(Expr* expr) {
-  std::vector<Expr*> args;
+Expr *Parser::ParseFuncCallExpr(Expr *expr) {
+  std::vector<Expr *> args;
   auto loc{Peek().GetLoc()};
 
   if (expr->GetType()->IsFunctionTy() &&
@@ -501,7 +500,7 @@ Expr* Parser::ParseFuncCallExpr(Expr* expr) {
   return MakeAstNode<FuncCallExpr>(loc, expr, args);
 }
 
-Expr* Parser::ParseMemberRefExpr(Expr* expr) {
+Expr *Parser::ParseMemberRefExpr(Expr *expr) {
   auto token{Peek()};
 
   auto member{Expect(Tag::kIdentifier)};
@@ -528,7 +527,7 @@ Expr* Parser::ParseMemberRefExpr(Expr* expr) {
     inits.emplace_back(
         type.GetType(), expr,
         std::vector<
-            std::tuple<Type*, std::int32_t, std::int32_t, std::int32_t>>{});
+            std::tuple<Type *, std::int32_t, std::int32_t, std::int32_t>>{});
     decl->AddInits(inits);
 
     compound_stmt_.top()->AddStmt(decl);
@@ -539,7 +538,7 @@ Expr* Parser::ParseMemberRefExpr(Expr* expr) {
   return MakeAstNode<BinaryOpExpr>(token, Tag::kPeriod, expr, rhs);
 }
 
-Expr* Parser::ParsePrimaryExpr() {
+Expr *Parser::ParsePrimaryExpr() {
   auto token{Peek()};
 
   if (auto expr{TryParseStmtExpr()}) {
@@ -586,7 +585,7 @@ Expr* Parser::ParsePrimaryExpr() {
   }
 }
 
-Expr* Parser::ParseConstant() {
+Expr *Parser::ParseConstant() {
   if (Peek().IsCharacter()) {
     return ParseCharacter();
   } else if (Peek().IsInteger()) {
@@ -599,40 +598,40 @@ Expr* Parser::ParseConstant() {
   }
 }
 
-Expr* Parser::ParseCharacter() {
+Expr *Parser::ParseCharacter() {
   auto token{Next()};
   Scanner scanner{token.GetStr(), token.GetLoc()};
   auto [val, encoding]{scanner.HandleCharacter()};
 
   std::uint32_t type_spec{};
   switch (encoding) {
-    case Encoding::kNone:
-      val = static_cast<char>(val);
-      type_spec = kInt;
-      break;
-    case Encoding::kChar16:
-      val = static_cast<char16_t>(val);
-      type_spec = kShort | kUnsigned;
-      break;
-    case Encoding::kChar32:
-      val = static_cast<char32_t>(val);
-      type_spec = kInt | kUnsigned;
-      break;
-    case Encoding::kWchar:
-      val = static_cast<wchar_t>(val);
-      type_spec = kInt | kUnsigned;
-      break;
-    case Encoding::kUtf8:
-      Error(token, "Can't use u8 here");
-    default:
-      assert(false);
+  case Encoding::kNone:
+    val = static_cast<char>(val);
+    type_spec = kInt;
+    break;
+  case Encoding::kChar16:
+    val = static_cast<char16_t>(val);
+    type_spec = kShort | kUnsigned;
+    break;
+  case Encoding::kChar32:
+    val = static_cast<char32_t>(val);
+    type_spec = kInt | kUnsigned;
+    break;
+  case Encoding::kWchar:
+    val = static_cast<wchar_t>(val);
+    type_spec = kInt | kUnsigned;
+    break;
+  case Encoding::kUtf8:
+    Error(token, "Can't use u8 here");
+  default:
+    assert(false);
   }
 
   return MakeAstNode<ConstantExpr>(token, ArithmeticType::Get(type_spec),
                                    static_cast<std::uint64_t>(val));
 }
 
-Expr* Parser::ParseInteger() {
+Expr *Parser::ParseInteger() {
   auto token{Next()};
   auto str{token.GetStr()};
   std::uint64_t val;
@@ -648,7 +647,7 @@ Expr* Parser::ParseInteger() {
       // 当 base 为 0 时，自动检测进制
       val = std::stoull(str, &end, 0);
     }
-  } catch (const std::out_of_range& error) {
+  } catch (const std::out_of_range &error) {
     Error(token, "integer out of range");
   }
 
@@ -681,71 +680,71 @@ Expr* Parser::ParseInteger() {
 
   if (decimal) {
     switch (type_spec) {
-      case 0:
-        if ((val > static_cast<std::uint64_t>(
-                       std::numeric_limits<std::int32_t>::max()))) {
-          type_spec |= kLong;
-        } else {
-          type_spec |= kInt;
-        }
-        break;
-      case kUnsigned:
-        if (val > std::numeric_limits<std::uint32_t>::max()) {
-          type_spec |= (kLong | kUnsigned);
-        } else {
-          type_spec |= (kInt | kUnsigned);
-        }
-        break;
-      default:
-        break;
+    case 0:
+      if ((val > static_cast<std::uint64_t>(
+                     std::numeric_limits<std::int32_t>::max()))) {
+        type_spec |= kLong;
+      } else {
+        type_spec |= kInt;
+      }
+      break;
+    case kUnsigned:
+      if (val > std::numeric_limits<std::uint32_t>::max()) {
+        type_spec |= (kLong | kUnsigned);
+      } else {
+        type_spec |= (kInt | kUnsigned);
+      }
+      break;
+    default:
+      break;
     }
   } else {
     switch (type_spec) {
-      case 0:
-        if (val > static_cast<std::uint64_t>(
-                      std::numeric_limits<std::int64_t>::max())) {
-          type_spec |= (kLong | kUnsigned);
-        } else if (val > std::numeric_limits<std::uint32_t>::max()) {
-          type_spec |= kLong;
-        } else if (val > static_cast<std::uint64_t>(
-                             std::numeric_limits<std::int32_t>::max())) {
-          type_spec |= (kInt | kUnsigned);
-        } else {
-          type_spec |= kInt;
-        }
-        break;
-      case kUnsigned:
-        if (val > std::numeric_limits<std::uint32_t>::max()) {
-          type_spec |= (kLong | kUnsigned);
-        } else {
-          type_spec |= (kInt | kUnsigned);
-        }
-        break;
-      case kLong:
-        if (val > static_cast<std::uint64_t>(
-                      std::numeric_limits<std::int64_t>::max())) {
-          type_spec |= (kLong | kUnsigned);
-        } else {
-          type_spec |= kLong;
-        }
-        break;
-      case kLongLong:
-        if (val > static_cast<std::uint64_t>(
-                      std::numeric_limits<std::int64_t>::max())) {
-          type_spec |= (kLongLong | kUnsigned);
-        } else {
-          type_spec |= kLongLong;
-        }
-        break;
-      default:
-        break;
+    case 0:
+      if (val > static_cast<std::uint64_t>(
+                    std::numeric_limits<std::int64_t>::max())) {
+        type_spec |= (kLong | kUnsigned);
+      } else if (val > std::numeric_limits<std::uint32_t>::max()) {
+        type_spec |= kLong;
+      } else if (val > static_cast<std::uint64_t>(
+                           std::numeric_limits<std::int32_t>::max())) {
+        type_spec |= (kInt | kUnsigned);
+      } else {
+        type_spec |= kInt;
+      }
+      break;
+    case kUnsigned:
+      if (val > std::numeric_limits<std::uint32_t>::max()) {
+        type_spec |= (kLong | kUnsigned);
+      } else {
+        type_spec |= (kInt | kUnsigned);
+      }
+      break;
+    case kLong:
+      if (val > static_cast<std::uint64_t>(
+                    std::numeric_limits<std::int64_t>::max())) {
+        type_spec |= (kLong | kUnsigned);
+      } else {
+        type_spec |= kLong;
+      }
+      break;
+    case kLongLong:
+      if (val > static_cast<std::uint64_t>(
+                    std::numeric_limits<std::int64_t>::max())) {
+        type_spec |= (kLongLong | kUnsigned);
+      } else {
+        type_spec |= kLongLong;
+      }
+      break;
+    default:
+      break;
     }
   }
 
   return MakeAstNode<ConstantExpr>(token, ArithmeticType::Get(type_spec), val);
 }
 
-Expr* Parser::ParseFloat() {
+Expr *Parser::ParseFloat() {
   auto tok{Next()};
   auto str{tok.GetStr()};
   long double val;
@@ -753,7 +752,7 @@ Expr* Parser::ParseFloat() {
 
   try {
     val = std::stold(str, &end);
-  } catch (const std::out_of_range& err) {
+  } catch (const std::out_of_range &err) {
     std::istringstream iss{str};
     iss >> val;
     end = iss.tellg();
@@ -782,7 +781,7 @@ Expr* Parser::ParseFloat() {
                                    str.substr(0, backup));
 }
 
-StringLiteralExpr* Parser::ParseStringLiteral(bool handle_escape) {
+StringLiteralExpr *Parser::ParseStringLiteral(bool handle_escape) {
   auto loc{Peek().GetLoc()};
   // 如果一个没有指定编码而另一个指定了那么可以连接
   // 两个都指定了不能连接
@@ -816,33 +815,33 @@ StringLiteralExpr* Parser::ParseStringLiteral(bool handle_escape) {
   std::uint32_t type_spec{};
 
   switch (encoding) {
-    case Encoding::kUtf8:
-    case Encoding::kNone:
-      type_spec = kChar;
-      break;
-    case Encoding::kChar16:
-      type_spec = kShort | kUnsigned;
-      break;
-    case Encoding::kChar32:
-    case Encoding::kWchar:
-      type_spec = kInt | kUnsigned;
-      break;
-    default:
-      assert(false);
+  case Encoding::kUtf8:
+  case Encoding::kNone:
+    type_spec = kChar;
+    break;
+  case Encoding::kChar16:
+    type_spec = kShort | kUnsigned;
+    break;
+  case Encoding::kChar32:
+  case Encoding::kWchar:
+    type_spec = kInt | kUnsigned;
+    break;
+  default:
+    assert(false);
   }
 
   return MakeAstNode<StringLiteralExpr>(loc, ArithmeticType::Get(type_spec),
                                         str);
 }
 
-Expr* Parser::ParseGenericSelection() {
+Expr *Parser::ParseGenericSelection() {
   Expect(Tag::kLeftParen);
   auto control_expr{ParseAssignExpr()};
   control_expr = Expr::MayCast(control_expr);
   Expect(Tag::kComma);
 
-  Expr* ret{nullptr};
-  Expr* default_expr{nullptr};
+  Expr *ret{nullptr};
+  Expr *default_expr{nullptr};
 
   auto token{Peek()};
   while (true) {
@@ -884,6 +883,6 @@ Expr* Parser::ParseGenericSelection() {
   return ret ? ret : default_expr;
 }
 
-Expr* Parser::ParseConstantExpr() { return ParseConditionExpr(); }
+Expr *Parser::ParseConstantExpr() { return ParseConditionExpr(); }
 
-}  // namespace kcc
+} // namespace kcc

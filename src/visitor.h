@@ -9,7 +9,7 @@
 namespace kcc {
 
 class Visitor {
- public:
+public:
   virtual ~Visitor() = default;
 
   virtual void Visit(const UnaryOpExpr *node) = 0;
@@ -44,4 +44,4 @@ class Visitor {
   virtual void Visit(const FuncDef *node) = 0;
 };
 
-}  // namespace kcc
+} // namespace kcc

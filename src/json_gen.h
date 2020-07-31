@@ -15,43 +15,43 @@
 namespace kcc {
 
 class JsonGen : public Visitor {
- public:
-  explicit JsonGen(const std::string& filter = "");
-  void GenJson(const TranslationUnit* root, const std::string& file_name);
+public:
+  explicit JsonGen(const std::string &filter = "");
+  void GenJson(const TranslationUnit *root, const std::string &file_name);
 
- private:
-  bool CheckFileName(const AstNode* node) const;
+private:
+  bool CheckFileName(const AstNode *node) const;
 
-  virtual void Visit(const UnaryOpExpr* node) override;
-  virtual void Visit(const TypeCastExpr* node) override;
-  virtual void Visit(const BinaryOpExpr* node) override;
-  virtual void Visit(const ConditionOpExpr* node) override;
-  virtual void Visit(const FuncCallExpr* node) override;
-  virtual void Visit(const ConstantExpr* node) override;
-  virtual void Visit(const StringLiteralExpr* node) override;
-  virtual void Visit(const IdentifierExpr* node) override;
-  virtual void Visit(const EnumeratorExpr* node) override;
-  virtual void Visit(const ObjectExpr* node) override;
-  virtual void Visit(const StmtExpr* node) override;
+  virtual void Visit(const UnaryOpExpr *node) override;
+  virtual void Visit(const TypeCastExpr *node) override;
+  virtual void Visit(const BinaryOpExpr *node) override;
+  virtual void Visit(const ConditionOpExpr *node) override;
+  virtual void Visit(const FuncCallExpr *node) override;
+  virtual void Visit(const ConstantExpr *node) override;
+  virtual void Visit(const StringLiteralExpr *node) override;
+  virtual void Visit(const IdentifierExpr *node) override;
+  virtual void Visit(const EnumeratorExpr *node) override;
+  virtual void Visit(const ObjectExpr *node) override;
+  virtual void Visit(const StmtExpr *node) override;
 
-  virtual void Visit(const LabelStmt* node) override;
-  virtual void Visit(const CaseStmt* node) override;
-  virtual void Visit(const DefaultStmt* node) override;
-  virtual void Visit(const CompoundStmt* node) override;
-  virtual void Visit(const ExprStmt* node) override;
-  virtual void Visit(const IfStmt* node) override;
-  virtual void Visit(const SwitchStmt* node) override;
-  virtual void Visit(const WhileStmt* node) override;
-  virtual void Visit(const DoWhileStmt* node) override;
-  virtual void Visit(const ForStmt* node) override;
-  virtual void Visit(const GotoStmt* node) override;
-  virtual void Visit(const ContinueStmt* node) override;
-  virtual void Visit(const BreakStmt* node) override;
-  virtual void Visit(const ReturnStmt* node) override;
+  virtual void Visit(const LabelStmt *node) override;
+  virtual void Visit(const CaseStmt *node) override;
+  virtual void Visit(const DefaultStmt *node) override;
+  virtual void Visit(const CompoundStmt *node) override;
+  virtual void Visit(const ExprStmt *node) override;
+  virtual void Visit(const IfStmt *node) override;
+  virtual void Visit(const SwitchStmt *node) override;
+  virtual void Visit(const WhileStmt *node) override;
+  virtual void Visit(const DoWhileStmt *node) override;
+  virtual void Visit(const ForStmt *node) override;
+  virtual void Visit(const GotoStmt *node) override;
+  virtual void Visit(const ContinueStmt *node) override;
+  virtual void Visit(const BreakStmt *node) override;
+  virtual void Visit(const ReturnStmt *node) override;
 
-  virtual void Visit(const TranslationUnit* node) override;
-  virtual void Visit(const Declaration* node) override;
-  virtual void Visit(const FuncDef* node) override;
+  virtual void Visit(const TranslationUnit *node) override;
+  virtual void Visit(const Declaration *node) override;
+  virtual void Visit(const FuncDef *node) override;
 
   std::string filter_;
   QJsonObject result_;
@@ -282,4 +282,4 @@ class JsonGen : public Visitor {
       "</html>\n"};
 };
 
-}  // namespace kcc
+} // namespace kcc

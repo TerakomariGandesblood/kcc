@@ -34,7 +34,7 @@ Tag Token::GetTag() const { return tag_; }
 
 std::string Token::GetStr() const { return str_; }
 
-void Token::SetStr(const std::string& str) { str_ = str; }
+void Token::SetStr(const std::string &str) { str_ = str; }
 
 std::string Token::GetIdentifier() const {
   assert(IsIdentifier());
@@ -43,7 +43,7 @@ std::string Token::GetIdentifier() const {
 
 Location Token::GetLoc() const { return loc_; }
 
-void Token::SetLoc(const Location& loc) { loc_ = loc; }
+void Token::SetLoc(const Location &loc) { loc_ = loc; }
 
 std::string Token::ToString() const {
   return fmt::format("{:<25}str: {:<25}loc: <{}>", TokenTag::ToString(tag_),
@@ -86,4 +86,4 @@ bool Token::IsDeclSpec() const {
          tag_ == Tag::kRegister;
 }
 
-}  // namespace kcc
+} // namespace kcc

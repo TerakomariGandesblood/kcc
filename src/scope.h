@@ -32,42 +32,42 @@ enum ScopeType { kBlock, kFile, kFunc, kFuncProto };
 // 该类型由成员访问运算符左运算数确定
 // 所有其他标识符, 会在通常命名空间中查找
 class Scope {
- public:
-  static Scope* Get(Scope* parent, enum ScopeType type);
+public:
+  static Scope *Get(Scope *parent, enum ScopeType type);
 
   auto begin() { return std::begin(usual_); }
   auto end() { return std::end(usual_); }
   auto begin() const { return std::begin(usual_); }
   auto end() const { return std::end(usual_); }
 
-  void InsertTag(IdentifierExpr* ident);
-  void InsertUsual(IdentifierExpr* ident);
-  void InsertTag(const std::string& name, IdentifierExpr* ident);
-  void InsertUsual(const std::string& name, IdentifierExpr* ident);
+  void InsertTag(IdentifierExpr *ident);
+  void InsertUsual(IdentifierExpr *ident);
+  void InsertTag(const std::string &name, IdentifierExpr *ident);
+  void InsertUsual(const std::string &name, IdentifierExpr *ident);
 
-  IdentifierExpr* FindTag(const std::string& name);
-  IdentifierExpr* FindUsual(const std::string& name);
-  IdentifierExpr* FindTagInCurrScope(const std::string& name);
-  IdentifierExpr* FindUsualInCurrScope(const std::string& name);
+  IdentifierExpr *FindTag(const std::string &name);
+  IdentifierExpr *FindUsual(const std::string &name);
+  IdentifierExpr *FindTagInCurrScope(const std::string &name);
+  IdentifierExpr *FindUsualInCurrScope(const std::string &name);
 
-  IdentifierExpr* FindUsual(const Token& tok);
+  IdentifierExpr *FindUsual(const Token &tok);
 
-  std::unordered_map<std::string, IdentifierExpr*> AllTagInCurrScope() const;
-  Scope* GetParent();
+  std::unordered_map<std::string, IdentifierExpr *> AllTagInCurrScope() const;
+  Scope *GetParent();
 
   bool IsFileScope() const;
   bool IsBlockScope() const;
 
- private:
-  Scope(Scope* parent, enum ScopeType type);
+private:
+  Scope(Scope *parent, enum ScopeType type);
 
-  Scope* parent_;
+  Scope *parent_;
   enum ScopeType type_;
 
   // struct / union / enum 的名字
-  std::unordered_map<std::string, IdentifierExpr*> tags_;
+  std::unordered_map<std::string, IdentifierExpr *> tags_;
   // 函数 / 对象 / typedef名 / 枚举常量
-  std::unordered_map<std::string, IdentifierExpr*> usual_;
+  std::unordered_map<std::string, IdentifierExpr *> usual_;
 };
 
-}  // namespace kcc
+} // namespace kcc

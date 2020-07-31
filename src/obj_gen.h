@@ -14,4 +14,4 @@ void ObjGen(
     const std::string &obj_file,
     llvm::CodeGenFileType file_type = llvm::CodeGenFileType::CGFT_ObjectFile);
 
-}  // namespace kcc
+} // namespace kcc

@@ -95,4 +95,4 @@ void Warning(const Token &tok, std::string_view format_str,
   Warning(tok.GetLoc(), format_str, args...);
 }
 
-}  // namespace kcc
+} // namespace kcc

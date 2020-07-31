@@ -1,0 +1,17 @@
+{
+  "configurations": [
+    {
+      "name": "Linux",
+      "includePath": [
+        "${workspaceFolder}/include",
+        "/usr/lib/gcc/x86_64-pc-linux-gnu/10.1.0/../../../../include/c++/10.1.0",
+        "/usr/lib/gcc/x86_64-pc-linux-gnu/10.1.0/../../../../include/c++/10.1.0/x86_64-pc-linux-gnu",
+        "/usr/lib/gcc/x86_64-pc-linux-gnu/10.1.0/../../../../include/c++/10.1.0/backward",
+        "/usr/lib/gcc/x86_64-pc-linux-gnu/10.1.0/include",
+        "/usr/local/include",
+        "/usr/lib/gcc/x86_64-pc-linux-gnu/10.1.0/include-fixed",
+        "/usr/include"
+      ]
+    }
+  ]
+}

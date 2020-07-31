@@ -29,14 +29,14 @@ namespace kcc {
 /*
  * BreakContinue
  */
-CodeGen::BreakContinue::BreakContinue(llvm::BasicBlock* break_block,
-                                      llvm::BasicBlock* continue_block)
+CodeGen::BreakContinue::BreakContinue(llvm::BasicBlock *break_block,
+                                      llvm::BasicBlock *continue_block)
     : break_block(break_block), continue_block(continue_block) {}
 
 /*
  * CodeGen
  */
-void CodeGen::GenCode(const TranslationUnit* root) {
+void CodeGen::GenCode(const TranslationUnit *root) {
   if (Debug) {
     debug_info_ = std::make_unique<DebugInfo>();
   }
@@ -62,8 +62,8 @@ void CodeGen::GenCode(const TranslationUnit* root) {
   assert(!is_volatile_);
 }
 
-llvm::BasicBlock* CodeGen::CreateBasicBlock(const std::string& name,
-                                            llvm::Function* parent) {
+llvm::BasicBlock *CodeGen::CreateBasicBlock(const std::string &name,
+                                            llvm::Function *parent) {
   (void)name;
 #ifdef NDEBUG
   return llvm::BasicBlock::Create(Context, "", parent);
@@ -72,7 +72,7 @@ llvm::BasicBlock* CodeGen::CreateBasicBlock(const std::string& name,
 #endif
 }
 
-void CodeGen::EmitBlock(llvm::BasicBlock* bb, bool is_finished) {
+void CodeGen::EmitBlock(llvm::BasicBlock *bb, bool is_finished) {
   EmitBranch(bb);
 
   if (is_finished && bb->use_empty()) {
@@ -84,7 +84,7 @@ void CodeGen::EmitBlock(llvm::BasicBlock* bb, bool is_finished) {
   Builder.SetInsertPoint(bb);
 }
 
-void CodeGen::EmitBranch(llvm::BasicBlock* target) {
+void CodeGen::EmitBranch(llvm::BasicBlock *target) {
   auto curr{Builder.GetInsertBlock()};
 
   if (curr && !curr->getTerminator()) {
@@ -104,17 +104,17 @@ void CodeGen::EnsureInsertPoint() {
   }
 }
 
-llvm::Value* CodeGen::EvaluateExprAsBool(const Expr* expr) {
+llvm::Value *CodeGen::EvaluateExprAsBool(const Expr *expr) {
   assert(expr != nullptr);
   // Called C++ object pointer is null
   expr->Accept(*this);
   return CastToBool(result_);
 }
 
-void CodeGen::EmitBranchOnBoolExpr(const Expr* expr,
-                                   llvm::BasicBlock* true_block,
-                                   llvm::BasicBlock* false_block) {
-  if (auto cond_binary{dynamic_cast<const BinaryOpExpr*>(expr)}) {
+void CodeGen::EmitBranchOnBoolExpr(const Expr *expr,
+                                   llvm::BasicBlock *true_block,
+                                   llvm::BasicBlock *false_block) {
+  if (auto cond_binary{dynamic_cast<const BinaryOpExpr *>(expr)}) {
     if (cond_binary->GetOp() == Tag::kAmpAmp) {
       // (a && b) && c
       auto lhs_true_block{CreateBasicBlock("logic.and.lhs.true")};
@@ -130,12 +130,12 @@ void CodeGen::EmitBranchOnBoolExpr(const Expr* expr,
       EmitBranchOnBoolExpr(cond_binary->GetRHS(), true_block, false_block);
       return;
     }
-  } else if (auto cond_unary{dynamic_cast<const UnaryOpExpr*>(expr)}) {
+  } else if (auto cond_unary{dynamic_cast<const UnaryOpExpr *>(expr)}) {
     if (cond_unary->GetOp() == Tag::kExclaim) {
       EmitBranchOnBoolExpr(cond_unary->GetExpr(), false_block, true_block);
       return;
     }
-  } else if (auto cond_op{dynamic_cast<const ConditionOpExpr*>(expr)}) {
+  } else if (auto cond_op{dynamic_cast<const ConditionOpExpr *>(expr)}) {
     // (x ? a : b) ? c: d
     auto lhs_block{CreateBasicBlock("cond.true")};
     auto rhs_block{CreateBasicBlock("cond.false")};
@@ -150,7 +150,7 @@ void CodeGen::EmitBranchOnBoolExpr(const Expr* expr,
   Builder.CreateCondBr(EvaluateExprAsBool(expr), true_block, false_block);
 }
 
-void CodeGen::SimplifyForwardingBlocks(llvm::BasicBlock* bb) {
+void CodeGen::SimplifyForwardingBlocks(llvm::BasicBlock *bb) {
   auto bi{llvm::dyn_cast<llvm::BranchInst>(bb->getTerminator())};
 
   if (!bi || !bi->isUnconditional()) {
@@ -163,7 +163,7 @@ void CodeGen::SimplifyForwardingBlocks(llvm::BasicBlock* bb) {
   bb->eraseFromParent();
 }
 
-void CodeGen::EmitStmt(const Stmt* stmt) {
+void CodeGen::EmitStmt(const Stmt *stmt) {
   assert(stmt != nullptr);
 
   // 检查是否可以 emit 而不必考虑 insert point
@@ -187,24 +187,24 @@ void CodeGen::EmitStmt(const Stmt* stmt) {
   stmt->Accept(*this);
 }
 
-bool CodeGen::EmitSimpleStmt(const Stmt* stmt) {
+bool CodeGen::EmitSimpleStmt(const Stmt *stmt) {
   switch (stmt->Kind()) {
-    case AstNodeType::kLabelStmt:
-    case AstNodeType::kCaseStmt:
-    case AstNodeType::kDefaultStmt:
-    case AstNodeType::kCompoundStmt:
-    case AstNodeType::kGotoStmt:
-    case AstNodeType::kContinueStmt:
-    case AstNodeType::kBreakStmt:
-    case AstNodeType::kDeclaration:
-      stmt->Accept(*this);
-      return true;
-    default:
-      return false;
+  case AstNodeType::kLabelStmt:
+  case AstNodeType::kCaseStmt:
+  case AstNodeType::kDefaultStmt:
+  case AstNodeType::kCompoundStmt:
+  case AstNodeType::kGotoStmt:
+  case AstNodeType::kContinueStmt:
+  case AstNodeType::kBreakStmt:
+  case AstNodeType::kDeclaration:
+    stmt->Accept(*this);
+    return true;
+  default:
+    return false;
   }
 }
 
-bool CodeGen::ContainsLabel(const Stmt* stmt) {
+bool CodeGen::ContainsLabel(const Stmt *stmt) {
   if (stmt == nullptr) {
     return false;
   }
@@ -218,7 +218,7 @@ bool CodeGen::ContainsLabel(const Stmt* stmt) {
     return true;
   }
 
-  for (const auto& item : stmt->Children()) {
+  for (const auto &item : stmt->Children()) {
     if (ContainsLabel(item)) {
       return true;
     }
@@ -227,7 +227,7 @@ bool CodeGen::ContainsLabel(const Stmt* stmt) {
   return false;
 }
 
-void CodeGen::EmitBranchThroughCleanup(llvm::BasicBlock* dest) {
+void CodeGen::EmitBranchThroughCleanup(llvm::BasicBlock *dest) {
   if (!HaveInsertPoint()) {
     return;
   }
@@ -236,8 +236,8 @@ void CodeGen::EmitBranchThroughCleanup(llvm::BasicBlock* dest) {
   Builder.ClearInsertionPoint();
 }
 
-llvm::BasicBlock* CodeGen::GetBasicBlockForLabel(const LabelStmt* label) {
-  auto& bb{labels_[label]};
+llvm::BasicBlock *CodeGen::GetBasicBlockForLabel(const LabelStmt *label) {
+  auto &bb{labels_[label]};
   if (bb) {
     return bb;
   }
@@ -245,13 +245,13 @@ llvm::BasicBlock* CodeGen::GetBasicBlockForLabel(const LabelStmt* label) {
   return bb = CreateBasicBlock(label->GetName());
 }
 
-bool CodeGen::IsCheapEnoughToEvaluateUnconditionally(const Expr* expr) {
+bool CodeGen::IsCheapEnoughToEvaluateUnconditionally(const Expr *expr) {
   return expr->Kind() == AstNodeType::kConstantExpr;
 }
 
-llvm::AllocaInst* CodeGen::CreateEntryBlockAlloca(llvm::Type* type,
+llvm::AllocaInst *CodeGen::CreateEntryBlockAlloca(llvm::Type *type,
                                                   std::int32_t align,
-                                                  const std::string& name) {
+                                                  const std::string &name) {
   (void)name;
 #ifdef NDEBUG
   auto ptr{new llvm::AllocaInst{type, 0, "", alloc_insert_point_}};
@@ -263,9 +263,9 @@ llvm::AllocaInst* CodeGen::CreateEntryBlockAlloca(llvm::Type* type,
   return ptr;
 }
 
-llvm::Value* CodeGen::GetPtr(const AstNode* node) {
+llvm::Value *CodeGen::GetPtr(const AstNode *node) {
   if (node->Kind() == AstNodeType::kObjectExpr) {
-    auto obj{dynamic_cast<const ObjectExpr*>(node)};
+    auto obj{dynamic_cast<const ObjectExpr *>(node)};
     is_volatile_ = obj->GetQualType().IsVolatile();
 
     if (obj->IsGlobalVar() || obj->IsLocalStaticVar()) {
@@ -278,15 +278,15 @@ llvm::Value* CodeGen::GetPtr(const AstNode* node) {
     node->Accept(*this);
     return result_;
   } else if (node->Kind() == AstNodeType::kUnaryOpExpr) {
-    auto unary{dynamic_cast<const UnaryOpExpr*>(node)};
+    auto unary{dynamic_cast<const UnaryOpExpr *>(node)};
     assert(unary->GetOp() == Tag::kStar);
     unary->GetExpr()->Accept(*this);
     return result_;
   } else if (node->Kind() == AstNodeType::kBinaryOpExpr) {
-    auto binary{dynamic_cast<const BinaryOpExpr*>(node)};
+    auto binary{dynamic_cast<const BinaryOpExpr *>(node)};
     if (binary->GetOp() == Tag::kPeriod) {
       auto lhs_ptr{GetPtr(binary->GetLHS())};
-      auto obj{dynamic_cast<const ObjectExpr*>(binary->GetRHS())};
+      auto obj{dynamic_cast<const ObjectExpr *>(binary->GetRHS())};
       assert(obj != nullptr);
 
       // 注意, volatile 限定的结构体或联合体类型, 其成员
@@ -297,11 +297,11 @@ llvm::Value* CodeGen::GetPtr(const AstNode* node) {
 
       if (obj->GetBitFieldWidth()) {
         is_bit_field_ = true;
-        bit_field_ = const_cast<ObjectExpr*>(obj);
+        bit_field_ = const_cast<ObjectExpr *>(obj);
       }
 
       auto indexs{obj->GetIndexs()};
-      for (const auto& [type, index] : indexs) {
+      for (const auto &[type, index] : indexs) {
         if (type->IsStructTy()) {
           lhs_ptr = Builder.CreateStructGEP(lhs_ptr, index);
         } else {
@@ -333,8 +333,8 @@ llvm::Value* CodeGen::GetPtr(const AstNode* node) {
   return nullptr;
 }
 
-void CodeGen::PushBlock(llvm::BasicBlock* break_stack,
-                        llvm::BasicBlock* continue_block) {
+void CodeGen::PushBlock(llvm::BasicBlock *break_stack,
+                        llvm::BasicBlock *continue_block) {
   break_continue_stack_.push({break_stack, continue_block});
 }
 
@@ -348,13 +348,13 @@ bool CodeGen::TestAndClearIgnoreAssignResult() {
 
 void CodeGen::SetIgnoreAssignResult() { ignore_assign_result_ = true; }
 
-void CodeGen::TryEmitLocation(const AstNode* node) {
+void CodeGen::TryEmitLocation(const AstNode *node) {
   if (debug_info_) {
     debug_info_->EmitLocation(node);
   }
 }
 
-void CodeGen::TryEmitFuncStart(const FuncDef* node) {
+void CodeGen::TryEmitFuncStart(const FuncDef *node) {
   if (debug_info_) {
     debug_info_->EmitFuncStart(node);
   }
@@ -366,34 +366,34 @@ void CodeGen::TryEmitFuncEnd() {
   }
 }
 
-void CodeGen::TryEmitParamVar(const std::string& name, Type* type,
-                              llvm::AllocaInst* ptr, const Location& loc) {
+void CodeGen::TryEmitParamVar(const std::string &name, Type *type,
+                              llvm::AllocaInst *ptr, const Location &loc) {
   if (debug_info_) {
     debug_info_->EmitParamVar(name, type, ptr, loc);
   }
 }
 
-void CodeGen::TryEmitLocalVar(const Declaration* node) {
+void CodeGen::TryEmitLocalVar(const Declaration *node) {
   if (debug_info_) {
     debug_info_->EmitLocalVar(node);
   }
 }
 
-void CodeGen::TryEmitGlobalVar(const Declaration* node) {
+void CodeGen::TryEmitGlobalVar(const Declaration *node) {
   if (debug_info_) {
     debug_info_->EmitGlobalVar(node);
   }
 }
 
-void CodeGen::Visit(const TranslationUnit* node) {
+void CodeGen::Visit(const TranslationUnit *node) {
   TryEmitLocation(node);
 
-  for (const auto& item : node->GetExtDecl()) {
+  for (const auto &item : node->GetExtDecl()) {
     item->Accept(*this);
   }
 }
 
-void CodeGen::Visit(const Declaration* node) {
+void CodeGen::Visit(const Declaration *node) {
   TryEmitLocation(node);
 
   // 对于函数声明, 当函数调用或者定义时处理
@@ -416,14 +416,14 @@ void CodeGen::Visit(const Declaration* node) {
   }
 }
 
-void CodeGen::Visit(const FuncDef* node) {
+void CodeGen::Visit(const FuncDef *node) {
   StartFunction(node);
 
   TryEmitFuncStart(node);
   TryEmitLocation(nullptr);
 
   auto iter{std::begin(node->GetFuncType()->FuncGetParams())};
-  for (auto&& arg : func_->args()) {
+  for (auto &&arg : func_->args()) {
     auto obj{*iter};
     auto type{obj->GetType()};
     auto name{obj->GetName()};
@@ -450,7 +450,7 @@ void CodeGen::Visit(const FuncDef* node) {
   TryEmitFuncEnd();
 }
 
-void CodeGen::DealLocaleDecl(const Declaration* node) {
+void CodeGen::DealLocaleDecl(const Declaration *node) {
   auto obj{node->GetObject()};
   auto type{obj->GetType()};
   auto name{obj->GetName()};
@@ -487,7 +487,7 @@ void CodeGen::DealLocaleDecl(const Declaration* node) {
   }
 }
 
-void CodeGen::InitLocalAggregate(const Declaration* node) {
+void CodeGen::InitLocalAggregate(const Declaration *node) {
   EnsureInsertPoint();
 
   auto obj{node->GetObject()};
@@ -499,16 +499,16 @@ void CodeGen::InitLocalAggregate(const Declaration* node) {
       llvm::MaybeAlign{static_cast<std::uint64_t>(obj->GetAlign())},
       is_volatile_);
 
-  for (const auto& item : node->GetLocalInits()) {
+  for (const auto &item : node->GetLocalInits()) {
     Load_Struct_Obj();
     item.GetExpr()->Accept(*this);
     Finish_Load();
     auto value{result_};
 
-    llvm::Value* ptr{obj->GetLocalPtr()};
-    Type* member_type{};
+    llvm::Value *ptr{obj->GetLocalPtr()};
+    Type *member_type{};
     std::int8_t bit_field_begin{}, bit_field_width{};
-    for (const auto& [type, index, begin, width] : item.GetIndexs()) {
+    for (const auto &[type, index, begin, width] : item.GetIndexs()) {
       bit_field_begin = begin;
       bit_field_width = width;
 
@@ -553,7 +553,7 @@ void CodeGen::InitLocalAggregate(const Declaration* node) {
   is_volatile_ = false;
 }
 
-void CodeGen::StartFunction(const FuncDef* node) {
+void CodeGen::StartFunction(const FuncDef *node) {
   node->GetIdent()->Accept(*this);
   func_ = llvm::cast<llvm::Function>(result_);
 
@@ -591,7 +591,7 @@ void CodeGen::StartFunction(const FuncDef* node) {
   Builder.SetInsertPoint(entry);
 }
 
-void CodeGen::FinishFunction(const FuncDef* node) {
+void CodeGen::FinishFunction(const FuncDef *node) {
   auto func{Module->getFunction(node->GetName())};
 
   EmitReturnBlock();
@@ -628,7 +628,7 @@ void CodeGen::EmitReturnBlock() {
 }
 
 void CodeGen::EmitFunctionEpilog() {
-  llvm::Value* value{};
+  llvm::Value *value{};
 
   if (return_value_) {
     value = Builder.CreateLoad(return_value_);
@@ -641,4 +641,4 @@ void CodeGen::EmitFunctionEpilog() {
   }
 }
 
-}  // namespace kcc
+} // namespace kcc
