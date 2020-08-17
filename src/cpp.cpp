@@ -61,11 +61,12 @@ void Preprocessor::AddMacroDefinitions(
 
     if (pos == std::string::npos) {
       pp_->setPredefines(pp_->getPredefines() +
-                         fmt::format(fmt("#define {} 1\n"), name));
+                         fmt::format(FMT_STRING("#define {} 1\n"), name));
     } else {
       auto value{macro.substr(pos + 1)};
-      pp_->setPredefines(pp_->getPredefines() +
-                         fmt::format(fmt("#define {} {}\n"), name, value));
+      pp_->setPredefines(
+          pp_->getPredefines() +
+          fmt::format(FMT_STRING("#define {} {}\n"), name, value));
     }
   }
 }

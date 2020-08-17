@@ -59,7 +59,7 @@ std::string Location::GetFileName() const {
 
 std::string Location::ToLocStr() const {
   assert(!std::empty(file_name_));
-  return fmt::format(fmt("{}:{}:{}"), file_name_, row_, column_);
+  return fmt::format(FMT_STRING("{}:{}:{}"), file_name_, row_, column_);
 }
 
 std::string Location::GetLineContent() const {
@@ -79,7 +79,7 @@ std::string Location::GetLineContent() const {
 }
 
 std::string Location::GetPositionArrow() const {
-  return fmt::format(fmt("{}{}\n"), std::string(column_ - 1, ' '), "^");
+  return fmt::format(FMT_STRING("{}{}\n"), std::string(column_ - 1, ' '), "^");
 }
 
 std::int32_t Location::GetRow() const { return row_; }

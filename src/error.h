@@ -40,14 +40,14 @@ template <typename... Args>
 template <typename... Args>
 [[noreturn]] void Error(const Location &loc, std::string_view format_str,
                         const Args &... args) {
-  fmt::print(fmt::fg(fmt::terminal_color::red), fmt("{}: error: "),
+  fmt::print(fmt::fg(fmt::terminal_color::red), FMT_STRING("{}: error: "),
              loc.ToLocStr());
   fmt::print(fmt::fg(fmt::terminal_color::red), format_str, args...);
   fmt::print("\n");
 
-  fmt::print(fmt::fg(fmt::terminal_color::red), fmt("{}"),
+  fmt::print(fmt::fg(fmt::terminal_color::red), FMT_STRING("{}"),
              loc.GetLineContent());
-  fmt::print(fmt::fg(fmt::terminal_color::green), fmt("{}"),
+  fmt::print(fmt::fg(fmt::terminal_color::green), FMT_STRING("{}"),
              loc.GetPositionArrow());
 
   PrintWarnings();
@@ -81,7 +81,7 @@ void Warning(const Location &loc, std::string_view format_str,
              const Args &... args) {
   std::string str;
 
-  str += fmt::format(fmt("{}: warning: "), loc.ToLocStr());
+  str += fmt::format(FMT_STRING("{}: warning: "), loc.ToLocStr());
   str += fmt::format(format_str, args...);
   str += '\n';
   str += loc.GetLineContent();

@@ -1,9 +1,9 @@
 // Copyright 2012 Rui Ueyama. Released under the MIT license.
 
+#include "test.h"
 #include <float.h>
 #include <stdarg.h>
 #include <stdint.h>
-#include "test.h"
 
 float tf1(float a) { return a; }
 float tf2(double a) { return a; }
@@ -14,11 +14,12 @@ double td2(double a) { return a; }
 double td3(int a) { return a; }
 
 double recursive(double a) {
-  if (a < 10) return a;
+  if (a < 10)
+    return a;
   return recursive(3.33);
 }
 
-char *fmt(char *fmt, ...) {
+char *FMT_STRING(char *fmt, ...) {
   static char buf[128];
   va_list args;
   va_start(args, fmt);
@@ -27,9 +28,9 @@ char *fmt(char *fmt, ...) {
   return buf;
 }
 
-char *fmtint(int x) { return fmt("%d", x); }
-char *fmtdbl(double x) { return fmt("%a", x); }
-char *fmtldbl(long double x) { return fmt("%La", x); }
+char *fmtint(int x) { return FMT_STRING("%d", x); }
+char *fmtdbl(double x) { return FMT_STRING("%a", x); }
+char *fmtldbl(long double x) { return FMT_STRING("%La", x); }
 
 void std() {
   expect_string("21", fmtint(DECIMAL_DIG));

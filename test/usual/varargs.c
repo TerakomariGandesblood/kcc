@@ -1,8 +1,8 @@
 // Copyright 2012 Rui Ueyama. Released under the MIT license.
 
+#include "test.h"
 #include <limits.h>
 #include <stdarg.h>
-#include "test.h"
 
 static void test_int(int a, ...) {
   va_list ap;
@@ -36,7 +36,7 @@ static void test_mix(char *p, ...) {
   va_end(ap);
 }
 
-char *fmt(char *fmt, ...) {
+char *FMT_STRING(char *fmt, ...) {
   static char buf[100];
   va_list ap;
   va_start(ap, fmt);
@@ -46,17 +46,18 @@ char *fmt(char *fmt, ...) {
 }
 
 static void test_va_list() {
-  expect_string("", fmt(""));
-  expect_string("3", fmt("%d", 3));
+  expect_string("", FMT_STRING(""));
+  expect_string("3", FMT_STRING("%d", 3));
   expect_string("3,1.0,6,2.0,abc",
-                fmt("%d,%.1f,%d,%.1f,%s", 3, 1.0, 6, 2.0, "abc"));
+                FMT_STRING("%d,%.1f,%d,%.1f,%s", 3, 1.0, 6, 2.0, "abc"));
 }
 
 static int sumi(int a, ...) {
   va_list args;
   va_start(args, a);
   int acc = 0;
-  for (int i = 0; i < a; ++i) acc += va_arg(args, int);
+  for (int i = 0; i < a; ++i)
+    acc += va_arg(args, int);
   va_end(args);
   return acc;
 }
@@ -67,7 +68,8 @@ static int maxi(int n, ...) {
   int max = INT_MIN;
   for (int i = 0; i < n; ++i) {
     int x = va_arg(args, int);
-    if (x > max) max = x;
+    if (x > max)
+      max = x;
   }
   va_end(args);
   return max;
@@ -79,7 +81,8 @@ static float maxf(int n, ...) {
   float max = 0.0f;
   for (int i = 0; i < n; ++i) {
     float x = va_arg(args, double);
-    if (x > max) max = x;
+    if (x > max)
+      max = x;
   }
   va_end(args);
   return max;
