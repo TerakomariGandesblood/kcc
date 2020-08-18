@@ -13,9 +13,6 @@
 #include <utility>
 #include <vector>
 
-#include <QMetaEnum>
-#include <QObject>
-#include <QString>
 #include <llvm/ADT/APFloat.h>
 #include <llvm/ADT/APInt.h>
 #include <llvm/IR/Constants.h>
@@ -40,48 +37,38 @@ inline std::unordered_map<std::string,
 
 inline std::unordered_map<std::string, llvm::GlobalVariable *> GlobalVarMap;
 
-class AstNodeTypes : public QObject {
-  Q_OBJECT
-public:
-  enum Type {
-    kUnaryOpExpr,
-    kTypeCastExpr,
-    kBinaryOpExpr,
-    kConditionOpExpr,
-    kFuncCallExpr,
-    kConstantExpr,
-    kStringLiteralExpr,
-    kIdentifierExpr,
-    kEnumeratorExpr,
-    kObjectExpr,
-    kStmtExpr,
+enum class AstNodeType {
+  kUnaryOpExpr,
+  kTypeCastExpr,
+  kBinaryOpExpr,
+  kConditionOpExpr,
+  kFuncCallExpr,
+  kConstantExpr,
+  kStringLiteralExpr,
+  kIdentifierExpr,
+  kEnumeratorExpr,
+  kObjectExpr,
+  kStmtExpr,
 
-    kLabelStmt,
-    kCaseStmt,
-    kDefaultStmt,
-    kCompoundStmt,
-    kExprStmt,
-    kIfStmt,
-    kSwitchStmt,
-    kWhileStmt,
-    kDoWhileStmt,
-    kForStmt,
-    kGotoStmt,
-    kContinueStmt,
-    kBreakStmt,
-    kReturnStmt,
+  kLabelStmt,
+  kCaseStmt,
+  kDefaultStmt,
+  kCompoundStmt,
+  kExprStmt,
+  kIfStmt,
+  kSwitchStmt,
+  kWhileStmt,
+  kDoWhileStmt,
+  kForStmt,
+  kGotoStmt,
+  kContinueStmt,
+  kBreakStmt,
+  kReturnStmt,
 
-    kTranslationUnit,
-    kDeclaration,
-    kFuncDef,
-  };
-
-  Q_ENUM(Type)
-
-  static QString ToQString(Type type);
+  kTranslationUnit,
+  kDeclaration,
+  kFuncDef,
 };
-
-using AstNodeType = AstNodeTypes::Type;
 
 class AstNode {
 public:
@@ -91,7 +78,7 @@ public:
   virtual void Accept(Visitor &visitor) const = 0;
   virtual void Check() = 0;
 
-  QString KindQString() const;
+  std::string KindQString() const;
 
   const Location &GetLoc() const;
   void SetLoc(const Location &loc);

@@ -7,21 +7,11 @@
 #include <cassert>
 
 #include <fmt/format.h>
+#include <magic_enum.hpp>
 
 #include "lex.h"
 
 namespace kcc {
-
-/*
- * TokenTag
- */
-std::string TokenTag::ToString(TokenTag::Values value) {
-  return QMetaEnum::fromType<TokenTag::Values>().valueToKey(value) + 1;
-}
-
-QString TokenTag::ToQString(TokenTag::Values value) {
-  return QString::fromStdString(TokenTag::ToString(value));
-}
 
 /*
  * Token
@@ -46,7 +36,7 @@ Location Token::GetLoc() const { return loc_; }
 void Token::SetLoc(const Location &loc) { loc_ = loc; }
 
 std::string Token::ToString() const {
-  return fmt::format("{:<25}str: {:<25}loc: <{}>", TokenTag::ToString(tag_),
+  return fmt::format("{:<25}str: {:<25}loc: <{}>", magic_enum::enum_name(tag_),
                      str_, loc_.ToLocStr());
 }
 

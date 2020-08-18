@@ -4,6 +4,8 @@
 
 #include "error.h"
 
+#include <magic_enum.hpp>
+
 namespace kcc {
 
 [[noreturn]] void Error(Tag tag, const Token &actual) {
@@ -11,7 +13,8 @@ namespace kcc {
   fmt::print(fmt::fg(fmt::terminal_color::red), FMT_STRING("{}: error: "),
              loc.ToLocStr());
   fmt::print(fmt::fg(fmt::terminal_color::red), "expected {}, but got {}\n",
-             TokenTag::ToString(tag), TokenTag::ToString(actual.GetTag()));
+             magic_enum::enum_name(tag),
+             magic_enum::enum_name(actual.GetTag()));
 
   fmt::print(fmt::fg(fmt::terminal_color::red), FMT_STRING("{}"),
              loc.GetLineContent());
@@ -28,7 +31,7 @@ namespace kcc {
   fmt::print(fmt::fg(fmt::terminal_color::red), FMT_STRING("{}: error: "),
              loc.ToLocStr());
   fmt::print(fmt::fg(fmt::terminal_color::red),
-             "'{}': ", TokenTag::ToString(unary->GetOp()));
+             "'{}': ", magic_enum::enum_name(unary->GetOp()));
   fmt::print(fmt::fg(fmt::terminal_color::red), msg);
   fmt::print(fmt::fg(fmt::terminal_color::red), FMT_STRING(" (got '{}')\n"),
              unary->GetExpr()->GetQualType().ToString());
@@ -48,7 +51,7 @@ namespace kcc {
   fmt::print(fmt::fg(fmt::terminal_color::red), FMT_STRING("{}: error: "),
              loc.ToLocStr());
   fmt::print(fmt::fg(fmt::terminal_color::red),
-             "'{}': ", TokenTag::ToString(binary->GetOp()));
+             "'{}': ", magic_enum::enum_name(binary->GetOp()));
   fmt::print(fmt::fg(fmt::terminal_color::red), msg);
   fmt::print(fmt::fg(fmt::terminal_color::red),
              FMT_STRING(" (got '{}' and '{}')\n"),

@@ -7,8 +7,7 @@
 #include <cassert>
 #include <fstream>
 
-#include <QJsonArray>
-#include <QJsonDocument>
+#include <magic_enum.hpp>
 
 #include "llvm_common.h"
 
@@ -20,11 +19,8 @@ void JsonGen::GenJson(const TranslationUnit *root,
                       const std::string &file_name) {
   Visit(root);
 
-  QJsonDocument document{result_};
-
   std::ofstream ofs{file_name};
-  ofs << JsonGen::Before << document.toJson().toStdString() << JsonGen::After
-      << std::flush;
+  ofs << JsonGen::Before << result_ << JsonGen::After << std::flush;
 }
 
 bool JsonGen::CheckFileName(const AstNode *node) const {
@@ -36,13 +32,13 @@ bool JsonGen::CheckFileName(const AstNode *node) const {
 }
 
 void JsonGen::Visit(const UnaryOpExpr *node) {
-  QJsonObject root;
-  root["name"] = node->KindQString().append(' ').append(
-      TokenTag::ToQString(node->GetOp()));
+  nlohmann::json root;
+  auto str{node->KindQString()};
+  root["name"] = str.append(" ").append(magic_enum::enum_name(node->GetOp()));
 
-  QJsonArray children;
+  nlohmann::json children;
   node->GetExpr()->Accept(*this);
-  children.append(result_);
+  children.push_back(result_);
 
   root["children"] = children;
 
@@ -50,17 +46,16 @@ void JsonGen::Visit(const UnaryOpExpr *node) {
 }
 
 void JsonGen::Visit(const TypeCastExpr *node) {
-  QJsonObject root;
+  nlohmann::json root;
   root["name"] = node->KindQString();
 
-  QJsonArray children;
+  nlohmann::json children;
   node->GetExpr()->Accept(*this);
-  children.append(result_);
+  children.push_back(result_);
 
-  QJsonObject type;
-  type["name"] =
-      QString::fromStdString("cast to: " + node->GetCastToType()->ToString());
-  children.append(type);
+  nlohmann::json type;
+  type["name"] = "cast to: " + node->GetCastToType()->ToString();
+  children.push_back(type);
 
   root["children"] = children;
 
@@ -68,17 +63,17 @@ void JsonGen::Visit(const TypeCastExpr *node) {
 }
 
 void JsonGen::Visit(const BinaryOpExpr *node) {
-  QJsonObject root;
-  root["name"] = node->KindQString().append(' ').append(
-      TokenTag::ToQString(node->GetOp()));
+  nlohmann::json root;
+  auto str{node->KindQString()};
+  root["name"] = str.append(" ").append(magic_enum::enum_name(node->GetOp()));
 
-  QJsonArray children;
+  nlohmann::json children;
 
   node->GetLHS()->Accept(*this);
-  children.append(result_);
+  children.push_back(result_);
 
   node->GetRHS()->Accept(*this);
-  children.append(result_);
+  children.push_back(result_);
 
   root["children"] = children;
 
@@ -86,18 +81,18 @@ void JsonGen::Visit(const BinaryOpExpr *node) {
 }
 
 void JsonGen::Visit(const ConditionOpExpr *node) {
-  QJsonObject root;
+  nlohmann::json root;
   root["name"] = node->KindQString();
 
-  QJsonArray children;
+  nlohmann::json children;
   node->GetCond()->Accept(*this);
-  children.append(result_);
+  children.push_back(result_);
 
   node->GetLHS()->Accept(*this);
-  children.append(result_);
+  children.push_back(result_);
 
   node->GetRHS()->Accept(*this);
-  children.append(result_);
+  children.push_back(result_);
 
   root["children"] = children;
 
@@ -105,16 +100,16 @@ void JsonGen::Visit(const ConditionOpExpr *node) {
 }
 
 void JsonGen::Visit(const FuncCallExpr *node) {
-  QJsonObject root;
+  nlohmann::json root;
   root["name"] = node->KindQString();
 
-  QJsonArray children;
+  nlohmann::json children;
   node->GetCallee()->Accept(*this);
-  children.append(result_);
+  children.push_back(result_);
 
   for (const auto &arg : node->GetArgs()) {
     arg->Accept(*this);
-    children.append(result_);
+    children.push_back(result_);
   }
 
   root["children"] = children;
@@ -126,40 +121,39 @@ void JsonGen::Visit(const ConstantExpr *node) {
   auto str{node->KindQString().append(": ")};
 
   if (node->GetType()->IsIntegerTy()) {
-    str.append(QString::number(node->GetIntegerVal().getSExtValue()));
+    str.append(std::to_string(node->GetIntegerVal().getSExtValue()));
   } else if (node->GetType()->IsFloatPointTy()) {
-    str.append(QString::number(node->GetFloatPointVal().convertToDouble()));
+    str.append(std::to_string(node->GetFloatPointVal().convertToDouble()));
   } else {
     assert(false);
   }
 
-  QJsonObject root;
+  nlohmann::json root;
   root["name"] = str;
 
   result_ = root;
 }
 
 void JsonGen::Visit(const StringLiteralExpr *node) {
-  QJsonObject root;
-  root["name"] = node->KindQString().append(": ").append(
-      QString::fromStdString(node->GetStr()));
+  nlohmann::json root;
+  root["name"] = node->KindQString().append(": ").append(node->GetStr());
 
   result_ = root;
 }
 
 void JsonGen::Visit(const IdentifierExpr *node) {
-  QJsonObject root;
+  nlohmann::json root;
   root["name"] = node->KindQString();
 
-  QJsonArray children;
+  nlohmann::json children;
 
-  QJsonObject type;
-  type["name"] = QString::fromStdString("type: " + node->GetType()->ToString());
-  children.append(type);
+  nlohmann::json type;
+  type["name"] = "type: " + node->GetType()->ToString();
+  children.push_back(type);
 
-  QJsonObject name;
-  name["name"] = "name: " + QString::fromStdString(node->GetName());
-  children.append(name);
+  nlohmann::json name;
+  name["name"] = "name: " + node->GetName();
+  children.push_back(name);
 
   root["children"] = children;
 
@@ -167,18 +161,18 @@ void JsonGen::Visit(const IdentifierExpr *node) {
 }
 
 void JsonGen::Visit(const EnumeratorExpr *node) {
-  QJsonObject root;
+  nlohmann::json root;
   root["name"] = node->KindQString();
 
-  QJsonArray children;
+  nlohmann::json children;
 
-  QJsonObject name;
-  name["name"] = "name: " + QString::fromStdString(node->GetName());
-  children.append(name);
+  nlohmann::json name;
+  name["name"] = "name: " + node->GetName();
+  children.push_back(name);
 
-  QJsonObject value;
-  value["name"] = QString::number(node->GetVal());
-  children.append(value);
+  nlohmann::json value;
+  value["name"] = node->GetVal();
+  children.push_back(value);
 
   root["children"] = children;
 
@@ -186,18 +180,18 @@ void JsonGen::Visit(const EnumeratorExpr *node) {
 }
 
 void JsonGen::Visit(const ObjectExpr *node) {
-  QJsonObject root;
+  nlohmann::json root;
   root["name"] = node->KindQString();
 
-  QJsonArray children;
+  nlohmann::json children;
 
-  QJsonObject type;
-  type["name"] = QString::fromStdString("type: " + node->GetType()->ToString());
-  children.append(type);
+  nlohmann::json type;
+  type["name"] = "type: " + node->GetType()->ToString();
+  children.push_back(type);
 
-  QJsonObject name;
-  name["name"] = "name: " + QString::fromStdString(node->GetName());
-  children.append(name);
+  nlohmann::json name;
+  name["name"] = "name: " + node->GetName();
+  children.push_back(name);
 
   root["children"] = children;
 
@@ -205,12 +199,12 @@ void JsonGen::Visit(const ObjectExpr *node) {
 }
 
 void JsonGen::Visit(const StmtExpr *node) {
-  QJsonObject root;
+  nlohmann::json root;
   root["name"] = node->KindQString();
 
-  QJsonArray children;
+  nlohmann::json children;
   node->GetBlock()->Accept(*this);
-  children.append(result_);
+  children.push_back(result_);
 
   root["children"] = children;
 
@@ -218,17 +212,17 @@ void JsonGen::Visit(const StmtExpr *node) {
 }
 
 void JsonGen::Visit(const LabelStmt *node) {
-  QJsonObject root;
+  nlohmann::json root;
   root["name"] = node->KindQString();
 
-  QJsonArray children;
+  nlohmann::json children;
 
-  QJsonObject name;
-  name["name"] = QString::fromStdString("label: " + node->GetName());
-  children.append(name);
+  nlohmann::json name;
+  name["name"] = "label: " + node->GetName();
+  children.push_back(name);
 
   node->GetStmt()->Accept(*this);
-  children.append(result_);
+  children.push_back(result_);
 
   root["children"] = children;
 
@@ -236,24 +230,24 @@ void JsonGen::Visit(const LabelStmt *node) {
 }
 
 void JsonGen::Visit(const CaseStmt *node) {
-  QJsonObject root;
+  nlohmann::json root;
 
   auto rhs{node->GetRHS()};
   if (rhs) {
     root["name"] = node->KindQString()
-                       .append(' ')
-                       .append(QString::number(node->GetLHS()))
+                       .append(" ")
+                       .append(std::to_string(node->GetLHS()))
                        .append("to ")
-                       .append(QString::number(*rhs));
+                       .append(std::to_string(*rhs));
   } else {
     root["name"] =
-        node->KindQString().append(' ').append(QString::number(node->GetLHS()));
+        node->KindQString().append(" ").append(std::to_string(node->GetLHS()));
   }
 
-  QJsonArray children;
+  nlohmann::json children;
   if (node->GetStmt()) {
     node->GetStmt()->Accept(*this);
-    children.append(result_);
+    children.push_back(result_);
   }
 
   root["children"] = children;
@@ -262,13 +256,13 @@ void JsonGen::Visit(const CaseStmt *node) {
 }
 
 void JsonGen::Visit(const DefaultStmt *node) {
-  QJsonObject root;
+  nlohmann::json root;
   root["name"] = node->KindQString();
 
-  QJsonArray children;
+  nlohmann::json children;
   if (node->GetStmt()) {
     node->GetStmt()->Accept(*this);
-    children.append(result_);
+    children.push_back(result_);
   }
 
   root["children"] = children;
@@ -277,14 +271,14 @@ void JsonGen::Visit(const DefaultStmt *node) {
 }
 
 void JsonGen::Visit(const CompoundStmt *node) {
-  QJsonObject root;
+  nlohmann::json root;
   root["name"] = node->KindQString();
 
-  QJsonArray children;
+  nlohmann::json children;
 
   for (const auto &item : node->GetStmts()) {
     item->Accept(*this);
-    children.append(result_);
+    children.push_back(result_);
   }
 
   root["children"] = children;
@@ -293,17 +287,17 @@ void JsonGen::Visit(const CompoundStmt *node) {
 }
 
 void JsonGen::Visit(const ExprStmt *node) {
-  QJsonObject root;
+  nlohmann::json root;
   root["name"] = node->KindQString();
 
-  QJsonArray children;
+  nlohmann::json children;
   if (node->GetExpr()) {
     node->GetExpr()->Accept(*this);
-    children.append(result_);
+    children.push_back(result_);
   } else {
-    QJsonObject obj;
+    nlohmann::json obj;
     obj["name"] = "empty stmt";
-    children.append(obj);
+    children.push_back(obj);
   }
 
   root["children"] = children;
@@ -312,20 +306,20 @@ void JsonGen::Visit(const ExprStmt *node) {
 }
 
 void JsonGen::Visit(const IfStmt *node) {
-  QJsonObject root;
+  nlohmann::json root;
   root["name"] = node->KindQString();
 
-  QJsonArray children;
+  nlohmann::json children;
 
   node->GetCond()->Accept(*this);
-  children.append(result_);
+  children.push_back(result_);
 
   node->GetThen()->Accept(*this);
-  children.append(result_);
+  children.push_back(result_);
 
   if (auto else_block{node->GetElse()}) {
     else_block->Accept(*this);
-    children.append(result_);
+    children.push_back(result_);
   }
 
   root["children"] = children;
@@ -334,15 +328,15 @@ void JsonGen::Visit(const IfStmt *node) {
 }
 
 void JsonGen::Visit(const SwitchStmt *node) {
-  QJsonObject root;
+  nlohmann::json root;
   root["name"] = node->KindQString();
 
-  QJsonArray children;
+  nlohmann::json children;
   node->GetCond()->Accept(*this);
-  children.append(result_);
+  children.push_back(result_);
 
   node->GetStmt()->Accept(*this);
-  children.append(result_);
+  children.push_back(result_);
 
   root["children"] = children;
 
@@ -350,16 +344,16 @@ void JsonGen::Visit(const SwitchStmt *node) {
 }
 
 void JsonGen::Visit(const WhileStmt *node) {
-  QJsonObject root;
+  nlohmann::json root;
   root["name"] = node->KindQString();
 
-  QJsonArray children;
+  nlohmann::json children;
 
   node->GetCond()->Accept(*this);
-  children.append(result_);
+  children.push_back(result_);
 
   node->GetBlock()->Accept(*this);
-  children.append(result_);
+  children.push_back(result_);
 
   root["children"] = children;
 
@@ -367,16 +361,16 @@ void JsonGen::Visit(const WhileStmt *node) {
 }
 
 void JsonGen::Visit(const DoWhileStmt *node) {
-  QJsonObject root;
+  nlohmann::json root;
   root["name"] = node->KindQString();
 
-  QJsonArray children;
+  nlohmann::json children;
 
   node->GetCond()->Accept(*this);
-  children.append(result_);
+  children.push_back(result_);
 
   node->GetBlock()->Accept(*this);
-  children.append(result_);
+  children.push_back(result_);
 
   root["children"] = children;
 
@@ -384,30 +378,30 @@ void JsonGen::Visit(const DoWhileStmt *node) {
 }
 
 void JsonGen::Visit(const ForStmt *node) {
-  QJsonObject root;
+  nlohmann::json root;
   root["name"] = node->KindQString();
 
-  QJsonArray children;
+  nlohmann::json children;
 
   if (node->GetInit()) {
     node->GetInit()->Accept(*this);
-    children.append(result_);
+    children.push_back(result_);
   } else if (node->GetDecl()) {
     node->GetDecl()->Accept(*this);
-    children.append(result_);
+    children.push_back(result_);
   }
 
   if (node->GetCond()) {
     node->GetCond()->Accept(*this);
-    children.append(result_);
+    children.push_back(result_);
   }
   if (node->GetInc()) {
     node->GetInc()->Accept(*this);
-    children.append(result_);
+    children.push_back(result_);
   }
 
   node->GetBlock()->Accept(*this);
-  children.append(result_);
+  children.push_back(result_);
 
   root["children"] = children;
 
@@ -415,13 +409,13 @@ void JsonGen::Visit(const ForStmt *node) {
 }
 
 void JsonGen::Visit(const GotoStmt *node) {
-  QJsonObject root;
+  nlohmann::json root;
   root["name"] = node->KindQString();
 
-  QJsonArray children;
-  QJsonObject name;
-  name["name"] = QString::fromStdString("label: " + node->GetName());
-  children.append(name);
+  nlohmann::json children;
+  nlohmann::json name;
+  name["name"] = "label: " + node->GetName();
+  children.push_back(name);
 
   root["children"] = children;
 
@@ -429,29 +423,29 @@ void JsonGen::Visit(const GotoStmt *node) {
 }
 
 void JsonGen::Visit(const ContinueStmt *node) {
-  QJsonObject root;
+  nlohmann::json root;
   root["name"] = node->KindQString();
   result_ = root;
 }
 
 void JsonGen::Visit(const BreakStmt *node) {
-  QJsonObject root;
+  nlohmann::json root;
   root["name"] = node->KindQString();
   result_ = root;
 }
 
 void JsonGen::Visit(const ReturnStmt *node) {
-  QJsonObject root;
+  nlohmann::json root;
   root["name"] = node->KindQString();
 
-  QJsonArray children;
+  nlohmann::json children;
   if (node->GetExpr()) {
     node->GetExpr()->Accept(*this);
-    children.append(result_);
+    children.push_back(result_);
   } else {
-    QJsonObject obj;
+    nlohmann::json obj;
     obj["name"] = "void";
-    children.append(obj);
+    children.push_back(obj);
   }
 
   root["children"] = children;
@@ -460,16 +454,16 @@ void JsonGen::Visit(const ReturnStmt *node) {
 }
 
 void JsonGen::Visit(const TranslationUnit *node) {
-  QJsonObject root;
+  nlohmann::json root;
   root["name"] = node->KindQString();
 
-  QJsonArray children;
+  nlohmann::json children;
   for (const auto &item : node->GetExtDecl()) {
     if (!CheckFileName(item)) {
       continue;
     }
     item->Accept(*this);
-    children.append(result_);
+    children.push_back(result_);
   }
 
   root["children"] = children;
@@ -478,40 +472,39 @@ void JsonGen::Visit(const TranslationUnit *node) {
 }
 
 void JsonGen::Visit(const Declaration *node) {
-  QJsonObject root;
+  nlohmann::json root;
   root["name"] = node->KindQString();
 
-  QJsonArray children;
+  nlohmann::json children;
   node->GetIdent()->Accept(*this);
-  children.append(result_);
+  children.push_back(result_);
 
   if (node->HasConstantInit()) {
-    QJsonObject obj;
-    obj["name"] =
-        QString::fromStdString(LLVMConstantToStr(node->GetConstant()));
-    children.append(obj);
+    nlohmann::json obj;
+    obj["name"] = LLVMConstantToStr(node->GetConstant());
+    children.push_back(obj);
   } else if (node->ValueInit()) {
-    QJsonObject obj;
+    nlohmann::json obj;
     obj["name"] = "value init";
-    children.append(obj);
+    children.push_back(obj);
   } else if (node->HasLocalInit()) {
     for (const auto &item : node->GetLocalInits()) {
-      QJsonObject obj;
+      nlohmann::json obj;
 
-      QString str;
+      std::string str;
       for (const auto &index : item.GetIndexs()) {
-        str.append(QString::number(std::get<1>(index))).append(' ');
+        str.append(std::to_string(std::get<1>(index))).append(" ");
       }
 
       obj["name"] = str;
 
-      QJsonArray arr;
+      nlohmann::json arr;
       item.GetExpr()->Accept(*this);
-      arr.append(result_);
+      arr.push_back(result_);
 
       obj["children"] = arr;
 
-      children.append(obj);
+      children.push_back(obj);
     }
   }
 
@@ -521,16 +514,16 @@ void JsonGen::Visit(const Declaration *node) {
 }
 
 void JsonGen::Visit(const FuncDef *node) {
-  QJsonObject root;
+  nlohmann::json root;
   root["name"] = node->KindQString();
 
-  QJsonArray children;
+  nlohmann::json children;
 
   node->GetIdent()->Accept(*this);
-  children.append(result_);
+  children.push_back(result_);
 
   node->GetBody()->Accept(*this);
-  children.append(result_);
+  children.push_back(result_);
 
   root["children"] = children;
 

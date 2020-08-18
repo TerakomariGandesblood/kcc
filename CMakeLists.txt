@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.13)
 
 project(
   kcc
-  VERSION 0.4
+  VERSION 0.5
   LANGUAGES CXX)
 
 if((CMAKE_BUILD_TYPE STREQUAL "Debug") OR (CMAKE_BUILD_TYPE STREQUAL
@@ -19,16 +19,13 @@ include(ClangTidy)
 include(CompilerOptions)
 include(Sanitizers)
 
-set(CMAKE_AUTOMOC ON)
-
-find_package(fmt REQUIRED)
 find_package(Clang REQUIRED CONFIG)
 find_package(LLVM 10 REQUIRED CONFIG)
+find_package(fmt REQUIRED)
+find_package(nlohmann_json REQUIRED)
 find_package(Boost REQUIRED COMPONENTS locale)
-find_package(Qt5 REQUIRED COMPONENTS Core)
 
-add_definitions(-DKCC_VERSION="${PROJECT_VERSION}" -DFMT_STRING_ALIAS
-                ${LLVM_DEFINITIONS})
+add_definitions(-DKCC_VERSION="${PROJECT_VERSION}" ${LLVM_DEFINITIONS})
 
 set(PROGRAM_NAME ${PROJECT_NAME})
 set(RUN_ARGS "-h")
@@ -50,7 +47,7 @@ endif()
 target_link_libraries(
   ${PROJECT_NAME}
   ${Boost_LIBRARIES}
-  Qt5::Core
+  nlohmann_json::nlohmann_json
   fmt::fmt
   clang-cpp
   LLVM

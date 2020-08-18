@@ -18,11 +18,12 @@ A small C11 compiler
 
 #### Libraries:
 
-- fmt
 - LLVM 10
-- clang
-- lld
-- Qt
+- clang 10
+- lld 10
+- fmt
+- magic_enum
+- json
 - Boost
 
 #### Build

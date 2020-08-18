@@ -6,6 +6,8 @@
 
 #include <algorithm>
 
+#include <magic_enum.hpp>
+
 #include "error.h"
 #include "llvm_common.h"
 #include "memory_pool.h"
@@ -14,16 +16,12 @@
 namespace kcc {
 
 /*
- * AstNodeTypes
- */
-QString AstNodeTypes::ToQString(AstNodeTypes::Type type) {
-  return QMetaEnum::fromType<Type>().valueToKey(type) + 1;
-}
-
-/*
  * AstNode
  */
-QString AstNode::KindQString() const { return AstNodeTypes::ToQString(Kind()); }
+std::string AstNode::KindQString() const {
+  std::string str{magic_enum::enum_name(Kind())};
+  return str;
+}
 
 const Location &AstNode::GetLoc() const { return loc_; }
 
@@ -109,7 +107,7 @@ Expr::Expr(QualType type) : type_{type} {}
  */
 UnaryOpExpr *UnaryOpExpr::Get(Tag tag, Expr *expr) {
   assert(expr != nullptr);
-  return new (UnaryOpExprPool.Allocate()) UnaryOpExpr{tag, expr};
+  return new (UnaryOpExprPool.malloc()) UnaryOpExpr{tag, expr};
 }
 
 AstNodeType UnaryOpExpr::Kind() const { return AstNodeType::kUnaryOpExpr; }
@@ -228,7 +226,7 @@ void UnaryOpExpr::AddrOpCheck() {
  */
 TypeCastExpr *TypeCastExpr::Get(Expr *expr, QualType to) {
   assert(expr != nullptr);
-  return new (TypeCastExprPool.Allocate()) TypeCastExpr{expr, to};
+  return new (TypeCastExprPool.malloc()) TypeCastExpr{expr, to};
 }
 
 AstNodeType TypeCastExpr::Kind() const { return AstNodeType::kTypeCastExpr; }
@@ -258,7 +256,7 @@ TypeCastExpr::TypeCastExpr(Expr *expr, QualType to) : Expr(to), expr_{expr} {}
  */
 BinaryOpExpr *BinaryOpExpr::Get(Tag tag, Expr *lhs, Expr *rhs) {
   assert(lhs != nullptr && rhs != nullptr);
-  return new (BinaryOpExprPool.Allocate()) BinaryOpExpr{tag, lhs, rhs};
+  return new (BinaryOpExprPool.malloc()) BinaryOpExpr{tag, lhs, rhs};
 }
 
 AstNodeType BinaryOpExpr::Kind() const { return AstNodeType::kBinaryOpExpr; }
@@ -349,10 +347,10 @@ void BinaryOpExpr::AssignOpCheck() {
   if (lhs_->IsConst()) {
     Error(lhs_,
           "'{}': cannot assign to something with const-qualified type '{}'",
-          TokenTag::ToString(op_), lhs_type.ToString());
+          magic_enum::enum_name(op_), lhs_type.ToString());
   } else if (!lhs_->IsLValue()) {
     Error(lhs_, "'{}': lvalue expression expected (got '{}')",
-          TokenTag::ToString(op_), lhs_type.ToString());
+          magic_enum::enum_name(op_), lhs_type.ToString());
   }
 
   if (lhs_type->IsPointerTy() && rhs_type->IsIntegerTy()) {
@@ -511,7 +509,7 @@ void BinaryOpExpr::CommaOpCheck() { type_ = rhs_->GetQualType(); }
  */
 ConditionOpExpr *ConditionOpExpr::Get(Expr *cond, Expr *lhs, Expr *rhs) {
   assert(cond != nullptr && lhs != nullptr && rhs != nullptr);
-  return new (ConditionOpExprPool.Allocate()) ConditionOpExpr{cond, lhs, rhs};
+  return new (ConditionOpExprPool.malloc()) ConditionOpExpr{cond, lhs, rhs};
 }
 
 AstNodeType ConditionOpExpr::Kind() const {
@@ -587,8 +585,7 @@ ConditionOpExpr::ConditionOpExpr(Expr *cond, Expr *lhs, Expr *rhs)
  */
 FuncCallExpr *FuncCallExpr::Get(Expr *callee, std::vector<Expr *> args) {
   assert(callee != nullptr);
-  return new (FuncCallExprPool.Allocate())
-      FuncCallExpr{callee, std::move(args)};
+  return new (FuncCallExprPool.malloc()) FuncCallExpr{callee, std::move(args)};
 }
 
 AstNodeType FuncCallExpr::Kind() const { return AstNodeType::kFuncCallExpr; }
@@ -664,17 +661,17 @@ FuncCallExpr::FuncCallExpr(Expr *callee, std::vector<Expr *> args)
  * Constant
  */
 ConstantExpr *ConstantExpr::Get(std::int32_t val) {
-  return new (ConstantExprPool.Allocate()) ConstantExpr{val};
+  return new (ConstantExprPool.malloc()) ConstantExpr{val};
 }
 
 ConstantExpr *ConstantExpr::Get(Type *type, std::uint64_t val) {
   assert(type != nullptr);
-  return new (ConstantExprPool.Allocate()) ConstantExpr{type, val};
+  return new (ConstantExprPool.malloc()) ConstantExpr{type, val};
 }
 
 ConstantExpr *ConstantExpr::Get(Type *type, const std::string &str) {
   assert(type != nullptr);
-  return new (ConstantExprPool.Allocate()) ConstantExpr{type, str};
+  return new (ConstantExprPool.malloc()) ConstantExpr{type, str};
 }
 
 AstNodeType ConstantExpr::Kind() const { return AstNodeType::kConstantExpr; }
@@ -717,7 +714,7 @@ StringLiteralExpr *StringLiteralExpr::Get(const std::string &val) {
 
 StringLiteralExpr *StringLiteralExpr::Get(Type *type, const std::string &val) {
   assert(type != nullptr);
-  return new (StringLiteralExprPool.Allocate()) StringLiteralExpr{type, val};
+  return new (StringLiteralExprPool.malloc()) StringLiteralExpr{type, val};
 }
 
 AstNodeType StringLiteralExpr::Kind() const {
@@ -802,7 +799,7 @@ StringLiteralExpr::Create() const {
  */
 IdentifierExpr *IdentifierExpr::Get(const std::string &name, QualType type,
                                     enum Linkage linkage, bool is_type_name) {
-  return new (IdentifierExprPool.Allocate())
+  return new (IdentifierExprPool.malloc())
       IdentifierExpr{name, type, linkage, is_type_name};
 }
 
@@ -842,7 +839,7 @@ IdentifierExpr::IdentifierExpr(const std::string &name, QualType type,
  * Enumerator
  */
 EnumeratorExpr *EnumeratorExpr::Get(const std::string &name, std::int32_t val) {
-  return new (EnumeratorExprPool.Allocate()) EnumeratorExpr{name, val};
+  return new (EnumeratorExprPool.malloc()) EnumeratorExpr{name, val};
 }
 
 AstNodeType EnumeratorExpr::Kind() const {
@@ -868,7 +865,7 @@ ObjectExpr *ObjectExpr::Get(const std::string &name, QualType type,
                             std::uint32_t storage_class_spec,
                             enum Linkage linkage, bool anonymous,
                             std::int32_t bit_field_width) {
-  return new (ObjectExprPool.Allocate()) ObjectExpr{
+  return new (ObjectExprPool.malloc()) ObjectExpr{
       name, type, storage_class_spec, linkage, anonymous, bit_field_width};
 }
 
@@ -999,7 +996,7 @@ ObjectExpr::ObjectExpr(const std::string &name, QualType type,
  */
 StmtExpr *StmtExpr::Get(CompoundStmt *block) {
   assert(block != nullptr);
-  return new (StmtExprPool.Allocate()) StmtExpr{block};
+  return new (StmtExprPool.malloc()) StmtExpr{block};
 }
 
 AstNodeType StmtExpr::Kind() const { return AstNodeType::kStmtExpr; }
@@ -1037,7 +1034,7 @@ std::vector<Stmt *> Stmt::Children() const { return {}; }
  */
 LabelStmt *LabelStmt::Get(const std::string &name, Stmt *stmt) {
   assert(stmt != nullptr);
-  return new (LabelStmtPool.Allocate()) LabelStmt{name, stmt};
+  return new (LabelStmtPool.malloc()) LabelStmt{name, stmt};
 }
 
 AstNodeType LabelStmt::Kind() const { return AstNodeType::kLabelStmt; }
@@ -1060,12 +1057,12 @@ LabelStmt::LabelStmt(const std::string &name, Stmt *stmt)
  */
 CaseStmt *CaseStmt::Get(std::int64_t lhs, Stmt *stmt) {
   assert(stmt != nullptr);
-  return new (CaseStmtPool.Allocate()) CaseStmt{lhs, stmt};
+  return new (CaseStmtPool.malloc()) CaseStmt{lhs, stmt};
 }
 
 CaseStmt *CaseStmt::Get(std::int64_t lhs, std::int64_t rhs, Stmt *stmt) {
   assert(stmt != nullptr);
-  return new (CaseStmtPool.Allocate()) CaseStmt{lhs, rhs, stmt};
+  return new (CaseStmtPool.malloc()) CaseStmt{lhs, rhs, stmt};
 }
 
 AstNodeType CaseStmt::Kind() const { return AstNodeType::kCaseStmt; }
@@ -1092,7 +1089,7 @@ CaseStmt::CaseStmt(std::int64_t lhs, std::int64_t rhs, Stmt *stmt)
  */
 DefaultStmt *DefaultStmt::Get(Stmt *block) {
   assert(block != nullptr);
-  return new (DefaultStmtPool.Allocate()) DefaultStmt{block};
+  return new (DefaultStmtPool.malloc()) DefaultStmt{block};
 }
 
 AstNodeType DefaultStmt::Kind() const { return AstNodeType::kDefaultStmt; }
@@ -1111,11 +1108,11 @@ DefaultStmt::DefaultStmt(Stmt *block) : stmt_{block} {}
  * CompoundStmt
  */
 CompoundStmt *CompoundStmt::Get() {
-  return new (CompoundStmtPool.Allocate()) CompoundStmt{};
+  return new (CompoundStmtPool.malloc()) CompoundStmt{};
 }
 
 CompoundStmt *CompoundStmt::Get(std::vector<Stmt *> stmts) {
-  return new (CompoundStmtPool.Allocate()) CompoundStmt{std::move(stmts)};
+  return new (CompoundStmtPool.malloc()) CompoundStmt{std::move(stmts)};
 }
 
 AstNodeType CompoundStmt::Kind() const { return AstNodeType::kCompoundStmt; }
@@ -1142,7 +1139,7 @@ CompoundStmt::CompoundStmt(std::vector<Stmt *> stmts)
  * ExprStmt
  */
 ExprStmt *ExprStmt::Get(Expr *expr) {
-  return new (ExprStmtPool.Allocate()) ExprStmt{expr};
+  return new (ExprStmtPool.malloc()) ExprStmt{expr};
 }
 
 AstNodeType ExprStmt::Kind() const { return AstNodeType::kExprStmt; }
@@ -1160,7 +1157,7 @@ ExprStmt::ExprStmt(Expr *expr) : expr_{expr} {}
  */
 IfStmt *IfStmt::Get(Expr *cond, Stmt *then_block, Stmt *else_block) {
   assert(cond != nullptr && then_block != nullptr);
-  return new (IfStmtPool.Allocate()) IfStmt{cond, then_block, else_block};
+  return new (IfStmtPool.malloc()) IfStmt{cond, then_block, else_block};
 }
 
 AstNodeType IfStmt::Kind() const { return AstNodeType::kIfStmt; }
@@ -1193,7 +1190,7 @@ IfStmt::IfStmt(Expr *cond, Stmt *then_block, Stmt *else_block)
  */
 SwitchStmt *SwitchStmt::Get(Expr *cond, Stmt *block) {
   assert(cond != nullptr && block != nullptr);
-  return new (SwitchStmtPool.Allocate()) SwitchStmt{cond, block};
+  return new (SwitchStmtPool.malloc()) SwitchStmt{cond, block};
 }
 
 AstNodeType SwitchStmt::Kind() const { return AstNodeType::kSwitchStmt; }
@@ -1222,7 +1219,7 @@ SwitchStmt::SwitchStmt(Expr *cond, Stmt *block) : cond_{cond}, stmt_{block} {}
  */
 WhileStmt *WhileStmt::Get(Expr *cond, Stmt *block) {
   assert(cond != nullptr && block != nullptr);
-  return new (WhileStmtPool.Allocate()) WhileStmt{cond, block};
+  return new (WhileStmtPool.malloc()) WhileStmt{cond, block};
 }
 
 AstNodeType WhileStmt::Kind() const { return AstNodeType::kWhileStmt; }
@@ -1250,7 +1247,7 @@ WhileStmt::WhileStmt(Expr *cond, Stmt *block)
  */
 DoWhileStmt *DoWhileStmt::Get(Expr *cond, Stmt *block) {
   assert(cond != nullptr && block != nullptr);
-  return new (DoWhileStmtPool.Allocate()) DoWhileStmt{cond, block};
+  return new (DoWhileStmtPool.malloc()) DoWhileStmt{cond, block};
 }
 
 AstNodeType DoWhileStmt::Kind() const { return AstNodeType::kDoWhileStmt; }
@@ -1278,7 +1275,7 @@ DoWhileStmt::DoWhileStmt(Expr *cond, Stmt *block)
  */
 ForStmt *ForStmt::Get(Expr *init, Expr *cond, Expr *inc, Stmt *block,
                       Stmt *decl) {
-  return new (ForStmtPool.Allocate()) ForStmt{init, cond, inc, block, decl};
+  return new (ForStmtPool.malloc()) ForStmt{init, cond, inc, block, decl};
 }
 
 AstNodeType ForStmt::Kind() const { return AstNodeType::kForStmt; }
@@ -1311,12 +1308,12 @@ ForStmt::ForStmt(Expr *init, Expr *cond, Expr *inc, Stmt *block, Stmt *decl)
  * GotoStmt
  */
 GotoStmt *GotoStmt::Get(const std::string &name) {
-  return new (GotoStmtPool.Allocate()) GotoStmt{name};
+  return new (GotoStmtPool.malloc()) GotoStmt{name};
 }
 
 GotoStmt *GotoStmt::Get(LabelStmt *label) {
   assert(label != nullptr);
-  return new (GotoStmtPool.Allocate()) GotoStmt{label};
+  return new (GotoStmtPool.malloc()) GotoStmt{label};
 }
 
 AstNodeType GotoStmt::Kind() const { return AstNodeType::kGotoStmt; }
@@ -1339,7 +1336,7 @@ GotoStmt::GotoStmt(LabelStmt *label) : label_{label} {}
  * ContinueStmt
  */
 ContinueStmt *ContinueStmt::Get() {
-  return new (ContinueStmtPool.Allocate()) ContinueStmt{};
+  return new (ContinueStmtPool.malloc()) ContinueStmt{};
 }
 
 AstNodeType ContinueStmt::Kind() const { return AstNodeType::kContinueStmt; }
@@ -1351,9 +1348,7 @@ void ContinueStmt::Check() {}
 /*
  * BreakStmt
  */
-BreakStmt *BreakStmt::Get() {
-  return new (BreakStmtPool.Allocate()) BreakStmt{};
-}
+BreakStmt *BreakStmt::Get() { return new (BreakStmtPool.malloc()) BreakStmt{}; }
 
 AstNodeType BreakStmt::Kind() const { return AstNodeType::kBreakStmt; }
 
@@ -1365,7 +1360,7 @@ void BreakStmt::Check() {}
  * ReturnStmt
  */
 ReturnStmt *ReturnStmt::Get(Expr *expr) {
-  return new (ReturnStmtPool.Allocate()) ReturnStmt{expr};
+  return new (ReturnStmtPool.malloc()) ReturnStmt{expr};
 }
 
 AstNodeType ReturnStmt::Kind() const { return AstNodeType::kReturnStmt; }
@@ -1382,7 +1377,7 @@ ReturnStmt::ReturnStmt(Expr *expr) : expr_{expr} {}
  * TranslationUnit
  */
 TranslationUnit *TranslationUnit::Get() {
-  return new (TranslationUnitPool.Allocate()) TranslationUnit{};
+  return new (TranslationUnitPool.malloc()) TranslationUnit{};
 }
 
 AstNodeType TranslationUnit::Kind() const {
@@ -1440,7 +1435,7 @@ const std::vector<std::tuple<Type *, std::int32_t, std::int32_t, std::int32_t>>
  */
 Declaration *Declaration::Get(IdentifierExpr *ident) {
   assert(ident != nullptr);
-  return new (DeclarationPool.Allocate()) Declaration{ident};
+  return new (DeclarationPool.malloc()) Declaration{ident};
 }
 
 AstNodeType Declaration::Kind() const { return AstNodeType::kDeclaration; }
@@ -1525,7 +1520,7 @@ Declaration::Declaration(IdentifierExpr *ident) : ident_{ident} {}
  * FuncDef
  */
 FuncDef *FuncDef::Get(IdentifierExpr *ident) {
-  return new (FuncDefPool.Allocate()) FuncDef{ident};
+  return new (FuncDefPool.malloc()) FuncDef{ident};
 }
 
 AstNodeType FuncDef::Kind() const { return AstNodeType::kFuncDef; }

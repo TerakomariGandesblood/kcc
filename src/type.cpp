@@ -405,7 +405,7 @@ Type::Type(bool complete) : complete_{complete} {}
  * VoidType
  */
 VoidType *VoidType::Get() {
-  static auto type{new (VoidTypePool.Allocate()) VoidType{}};
+  static auto type{new (VoidTypePool.malloc()) VoidType{}};
   return type;
 }
 
@@ -426,33 +426,33 @@ VoidType::VoidType() : Type{false} { llvm_type_ = Builder.getVoidTy(); }
  * ArithmeticType
  */
 ArithmeticType *ArithmeticType::Get(std::uint32_t type_spec) {
-  static auto bool_type{new (ArithmeticTypePool.Allocate())
+  static auto bool_type{new (ArithmeticTypePool.malloc())
                             ArithmeticType{kBool}};
-  static auto char_type{new (ArithmeticTypePool.Allocate())
+  static auto char_type{new (ArithmeticTypePool.malloc())
                             ArithmeticType{kChar}};
-  static auto uchar_type{new (ArithmeticTypePool.Allocate())
+  static auto uchar_type{new (ArithmeticTypePool.malloc())
                              ArithmeticType{kChar | kUnsigned}};
-  static auto short_type{new (ArithmeticTypePool.Allocate())
+  static auto short_type{new (ArithmeticTypePool.malloc())
                              ArithmeticType{kShort}};
-  static auto ushort_type{new (ArithmeticTypePool.Allocate())
+  static auto ushort_type{new (ArithmeticTypePool.malloc())
                               ArithmeticType{kShort | kUnsigned}};
-  static auto int_type{new (ArithmeticTypePool.Allocate())
+  static auto int_type{new (ArithmeticTypePool.malloc())
                            ArithmeticType{kInt}};
-  static auto uint_type{new (ArithmeticTypePool.Allocate())
+  static auto uint_type{new (ArithmeticTypePool.malloc())
                             ArithmeticType{kInt | kUnsigned}};
-  static auto long_type{new (ArithmeticTypePool.Allocate())
+  static auto long_type{new (ArithmeticTypePool.malloc())
                             ArithmeticType{kLong}};
-  static auto ulong_type{new (ArithmeticTypePool.Allocate())
+  static auto ulong_type{new (ArithmeticTypePool.malloc())
                              ArithmeticType{kLong | kUnsigned}};
-  static auto long_long_type{new (ArithmeticTypePool.Allocate())
+  static auto long_long_type{new (ArithmeticTypePool.malloc())
                                  ArithmeticType{kLongLong}};
-  static auto ulong_long_type{new (ArithmeticTypePool.Allocate())
+  static auto ulong_long_type{new (ArithmeticTypePool.malloc())
                                   ArithmeticType{kLongLong | kUnsigned}};
-  static auto float_type{new (ArithmeticTypePool.Allocate())
+  static auto float_type{new (ArithmeticTypePool.malloc())
                              ArithmeticType{kFloat}};
-  static auto double_type{new (ArithmeticTypePool.Allocate())
+  static auto double_type{new (ArithmeticTypePool.malloc())
                               ArithmeticType{kDouble}};
-  static auto long_double_type{new (ArithmeticTypePool.Allocate())
+  static auto long_double_type{new (ArithmeticTypePool.malloc())
                                    ArithmeticType{kDouble | kLong}};
 
   type_spec = ArithmeticType::DealWithTypeSpec(type_spec);
@@ -689,7 +689,7 @@ std::int32_t ArithmeticType::Rank() const {
  * PointerType
  */
 PointerType *PointerType::Get(QualType element_type) {
-  return new (PointerTypePool.Allocate()) PointerType{element_type};
+  return new (PointerTypePool.malloc()) PointerType{element_type};
 }
 
 std::int32_t PointerType::GetWidth() const { return 8; }
@@ -735,7 +735,7 @@ PointerType::PointerType(QualType element_type)
  */
 ArrayType *ArrayType::Get(QualType contained_type,
                           std::optional<std::size_t> num_elements) {
-  return new (ArrayTypePool.Allocate()) ArrayType{contained_type, num_elements};
+  return new (ArrayTypePool.malloc()) ArrayType{contained_type, num_elements};
 }
 
 std::int32_t ArrayType::GetWidth() const {
@@ -820,7 +820,7 @@ ArrayType::ArrayType(QualType contained_type,
  */
 StructType *StructType::Get(bool is_struct, const std::string &name,
                             Scope *parent) {
-  return new (StructTypePool.Allocate()) StructType{is_struct, name, parent};
+  return new (StructTypePool.malloc()) StructType{is_struct, name, parent};
 }
 
 std::int32_t StructType::GetWidth() const {
@@ -1315,7 +1315,7 @@ void StructType::AddSpaceBetweenBitField() {
 FunctionType *FunctionType::Get(QualType return_type,
                                 std::vector<ObjectExpr *> params,
                                 bool is_var_args) {
-  return new (FunctionTypePool.Allocate())
+  return new (FunctionTypePool.malloc())
       FunctionType{return_type, params, is_var_args};
 }
 

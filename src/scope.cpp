@@ -9,7 +9,7 @@
 namespace kcc {
 
 Scope *Scope::Get(Scope *parent, enum ScopeType type) {
-  return new (ScopePool.Allocate()) Scope{parent, type};
+  return new (ScopePool.malloc()) Scope{parent, type};
 }
 
 void Scope::InsertTag(IdentifierExpr *ident) {

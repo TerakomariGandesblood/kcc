@@ -7,7 +7,7 @@
 #include <string>
 #include <string_view>
 
-#include <QJsonObject>
+#include <nlohmann/json.hpp>
 
 #include "ast.h"
 #include "visitor.h"
@@ -54,7 +54,7 @@ private:
   virtual void Visit(const FuncDef *node) override;
 
   std::string filter_;
-  QJsonObject result_;
+  nlohmann::json result_;
 
   constexpr static std::string_view Before{
       "<!DOCTYPE html>\n"

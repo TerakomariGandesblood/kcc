@@ -16,6 +16,8 @@ CheckOptions:
     value:           UPPER_CASE
   - key:             readability-identifier-naming.MemberCase
     value:           lower_case
+  - key:             readability-identifier-naming.MemberSuffix
+    value:           '_'
   - key:             readability-identifier-naming.MethodCase
     value:           lower_case
   - key:             readability-identifier-naming.NamespaceCase

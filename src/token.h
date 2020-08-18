@@ -6,151 +6,136 @@
 
 #include <string>
 
-#include <QMetaEnum>
-#include <QObject>
-#include <QString>
-
 #include "location.h"
 
 namespace kcc {
 
-class TokenTag : public QObject {
-  Q_OBJECT
-public:
-  enum Values {
-    kAuto,
-    kBreak,
-    kCase,
-    kChar,
-    kConst,
-    kContinue,
-    kDefault,
-    kDo,
-    kDouble,
-    kElse,
-    kEnum,
-    kExtern,
-    kFloat,
-    kFor,
-    kGoto,
-    kIf,
-    kInline, // C99
-    kInt,
-    kLong,
-    kRegister,
-    kRestrict, // C99
-    kReturn,
-    kShort,
-    kSigned,
-    kSizeof,
-    kStatic,
-    kStruct,
-    kSwitch,
-    kTypedef,
-    kUnion,
-    kUnsigned,
-    kVoid,
-    kVolatile,
-    kWhile,
-    kAlignas,      // C11
-    kAlignof,      // C11
-    kAtomic,       // C11
-    kBool,         // C99
-    kComplex,      // C99
-    kGeneric,      // C11
-    kImaginary,    // C99
-    kNoreturn,     // C11
-    kStaticAssert, // C11
-    kThreadLocal,  // C11
+enum class Tag {
+  kAuto,
+  kBreak,
+  kCase,
+  kChar,
+  kConst,
+  kContinue,
+  kDefault,
+  kDo,
+  kDouble,
+  kElse,
+  kEnum,
+  kExtern,
+  kFloat,
+  kFor,
+  kGoto,
+  kIf,
+  kInline, // C99
+  kInt,
+  kLong,
+  kRegister,
+  kRestrict, // C99
+  kReturn,
+  kShort,
+  kSigned,
+  kSizeof,
+  kStatic,
+  kStruct,
+  kSwitch,
+  kTypedef,
+  kUnion,
+  kUnsigned,
+  kVoid,
+  kVolatile,
+  kWhile,
+  kAlignas,      // C11
+  kAlignof,      // C11
+  kAtomic,       // C11
+  kBool,         // C99
+  kComplex,      // C99
+  kGeneric,      // C11
+  kImaginary,    // C99
+  kNoreturn,     // C11
+  kStaticAssert, // C11
+  kThreadLocal,  // C11
 
-    kLeftSquare,  // [
-    kRightSquare, // ]
-    kLeftParen,   // (
-    kRightParen,  // )
-    kLeftBrace,   // {
-    kRightBrace,  // }
-    kPeriod,      // .
-    kArrow,       // ->
+  kLeftSquare,  // [
+  kRightSquare, // ]
+  kLeftParen,   // (
+  kRightParen,  // )
+  kLeftBrace,   // {
+  kRightBrace,  // }
+  kPeriod,      // .
+  kArrow,       // ->
 
-    kPlusPlus,   // ++
-    kMinusMinus, // --
+  kPlusPlus,   // ++
+  kMinusMinus, // --
 
-    kPostfixPlusPlus,   // ++
-    kPostfixMinusMinus, // --
+  kPostfixPlusPlus,   // ++
+  kPostfixMinusMinus, // --
 
-    kAmp,     // &
-    kStar,    // *
-    kPlus,    // +
-    kMinus,   // -
-    kTilde,   // ~
-    kExclaim, // !
+  kAmp,     // &
+  kStar,    // *
+  kPlus,    // +
+  kMinus,   // -
+  kTilde,   // ~
+  kExclaim, // !
 
-    kSlash,          // /
-    kPercent,        // %
-    kLessLess,       // <<
-    kGreaterGreater, // >>
-    kLess,           // <
-    kGreater,        // >
-    kLessEqual,      // <=
-    kGreaterEqual,   // >=
-    kEqualEqual,     // ==
-    kExclaimEqual,   // !=
-    kCaret,          // ^
-    kPipe,           // |
-    kAmpAmp,         // &&
-    kPipePipe,       // ||
+  kSlash,          // /
+  kPercent,        // %
+  kLessLess,       // <<
+  kGreaterGreater, // >>
+  kLess,           // <
+  kGreater,        // >
+  kLessEqual,      // <=
+  kGreaterEqual,   // >=
+  kEqualEqual,     // ==
+  kExclaimEqual,   // !=
+  kCaret,          // ^
+  kPipe,           // |
+  kAmpAmp,         // &&
+  kPipePipe,       // ||
 
-    kQuestion,  // ?
-    kColon,     // :
-    kSemicolon, // ;
-    kEllipsis,  // ...
+  kQuestion,  // ?
+  kColon,     // :
+  kSemicolon, // ;
+  kEllipsis,  // ...
 
-    kEqual,               // =
-    kStarEqual,           // *=
-    kSlashEqual,          // /=
-    kPercentEqual,        // %=
-    kPlusEqual,           // +=
-    kMinusEqual,          // -=
-    kLessLessEqual,       // <<=
-    kGreaterGreaterEqual, // >>=
-    kAmpEqual,            // &=
-    kCaretEqual,          // ^=
-    kPipeEqual,           // |=
+  kEqual,               // =
+  kStarEqual,           // *=
+  kSlashEqual,          // /=
+  kPercentEqual,        // %=
+  kPlusEqual,           // +=
+  kMinusEqual,          // -=
+  kLessLessEqual,       // <<=
+  kGreaterGreaterEqual, // >>=
+  kAmpEqual,            // &=
+  kCaretEqual,          // ^=
+  kPipeEqual,           // |=
 
-    kComma,      // ,
-    kSharp,      // #
-    kSharpSharp, // ##
+  kComma,      // ,
+  kSharp,      // #
+  kSharpSharp, // ##
 
-    kIdentifier,
-    kInteger,
-    kFloatingPoint,
-    kCharacter,
-    kStringLiteral,
+  kIdentifier,
+  kInteger,
+  kFloatingPoint,
+  kCharacter,
+  kStringLiteral,
 
-    kOffsetof, // __builtin_offsetof
-    kHugeVal,  // __builtin_huge_val
-    kInff,     // __builtin_inff
+  kOffsetof, // __builtin_offsetof
+  kHugeVal,  // __builtin_huge_val
+  kInff,     // __builtin_inff
 
-    kFuncName,      // __func__ / __FUNCTION__
-    kAsm,           // asm
-    kAttribute,     // __attribute__
-    kFuncSignature, // __PRETTY_FUNCTION__
-    kExtension,     // __extension__
-    kTypeof,        // typeof
+  kFuncName,      // __func__ / __FUNCTION__
+  kAsm,           // asm
+  kAttribute,     // __attribute__
+  kFuncSignature, // __PRETTY_FUNCTION__
+  kExtension,     // __extension__
+  kTypeof,        // typeof
 
-    kTypeid, // typeid
+  kTypeid, // typeid
 
-    kNone,
-    kEof
-  };
-
-  Q_ENUM(Values)
-
-  static std::string ToString(TokenTag::Values value);
-  static QString ToQString(TokenTag::Values value);
+  kNone,
+  kEof
 };
-
-using Tag = TokenTag::Values;
 
 class Token {
 public:

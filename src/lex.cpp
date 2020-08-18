@@ -7,6 +7,8 @@
 #include <cassert>
 #include <cctype>
 
+#include <magic_enum.hpp>
+
 #include "error.h"
 
 namespace kcc {
@@ -315,7 +317,9 @@ const Token &Scanner::Scan() {
   case '?':
     return MakeToken(Tag::kQuestion);
   case ':':
-    return MakeToken(Try(Tag::kGreater) ? Tag::kRightSquare : Tag::kColon);
+    return MakeToken(Try(magic_enum::enum_integer(Tag::kGreater))
+                         ? Tag::kRightSquare
+                         : Tag::kColon);
   case ';':
     return MakeToken(Tag::kSemicolon);
   case ',':

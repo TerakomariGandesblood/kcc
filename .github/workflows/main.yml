@@ -21,12 +21,12 @@ jobs:
         run: |
           pacman -Syu --noconfirm
           pacman -S --noconfirm base-devel clang lld llvm cmake wget unzip git \
-          intel-tbb boost fmt nlohmann-json qt5-base
+          boost fmt nlohmann-json
           wget https://github.com/Neargye/magic_enum/archive/v0.6.6.zip
           unzip v0.6.6.zip
           cd magic_enum-0.6.6
-          mkdir build && cd build && cmake ..
-          cmake --build . -j4
+          mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Release ..
+          cmake --build . -j$(nproc)
           make install
           git clone https://github.com/linux-test-project/lcov
           cd lcov
@@ -35,12 +35,12 @@ jobs:
           tar -xzvf PerlIO-gzip-0.20.tar.gz
           cd PerlIO-gzip-0.20
           perl Makefile.PL
-          make -j4 && make install
+          make -j$(nproc) && make install
           wget http://www.cpan.org/authors/id/M/MA/MAKAMAKA/JSON-2.90.tar.gz
           tar -xzvf JSON-2.90.tar.gz
           cd JSON-2.90
           perl Makefile.PL
-          make -j4 && make install
+          make -j$(nproc) && make install
 
       - name: CMake
         env:
@@ -48,19 +48,19 @@ jobs:
         run: mkdir build && cd build && cmake -DCOVERAGE=TRUE -DCLANG_TIDY=TRUE ..
 
       - name: Build
-        run: cmake --build build -j4 --target all
+        run: cmake --build build -j$(nproc) --target all
 
       - name: Execute tests
         run: cd build && ctest -j1 --output-on-failure
 
       - name: Install
-        run: cmake --build build -j4 --target install
+        run: cmake --build build -j$(nproc) --target install
 
       - name: Uninstall
-        run: cmake --build build -j4 --target uninstall
+        run: cmake --build build -j$(nproc) --target uninstall
 
       - name: Gather coverage data
-        run: cmake --build build -j4 --target coverage
+        run: cmake --build build -j$(nproc) --target coverage
 
       - name: Codecov upload
         if: ${{ matrix.compiler == 'g++' }}
