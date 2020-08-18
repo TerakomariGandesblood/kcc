@@ -436,8 +436,7 @@ ArithmeticType *ArithmeticType::Get(std::uint32_t type_spec) {
                              ArithmeticType{kShort}};
   static auto ushort_type{new (ArithmeticTypePool.malloc())
                               ArithmeticType{kShort | kUnsigned}};
-  static auto int_type{new (ArithmeticTypePool.malloc())
-                           ArithmeticType{kInt}};
+  static auto int_type{new (ArithmeticTypePool.malloc()) ArithmeticType{kInt}};
   static auto uint_type{new (ArithmeticTypePool.malloc())
                             ArithmeticType{kInt | kUnsigned}};
   static auto long_type{new (ArithmeticTypePool.malloc())
