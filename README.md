@@ -32,19 +32,13 @@ A small C11 compiler
 ```bash
 mkdir build && cd build
 cmake ..
-cmake --build . -j8
+cmake --build . -j$(nproc)
 ```
 
 #### Install
 
 ```bash
 make install
-```
-
-#### Uninstall
-
-```bash
-make uninstall
 ```
 
 #### Use
