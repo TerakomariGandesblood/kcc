@@ -34,11 +34,13 @@ public:
     }
 
     try {
-      ucnv_setFromUCallBack(cvt_, UCNV_FROM_U_CALLBACK_STOP, 0, 0, 0, &err);
+      ucnv_setFromUCallBack(cvt_, UCNV_FROM_U_CALLBACK_STOP, nullptr, nullptr,
+                            nullptr, &err);
       check_and_throw_icu_error(err);
 
       err = U_ZERO_ERROR;
-      ucnv_setToUCallBack(cvt_, UCNV_TO_U_CALLBACK_STOP, 0, 0, 0, &err);
+      ucnv_setToUCallBack(cvt_, UCNV_TO_U_CALLBACK_STOP, nullptr, nullptr,
+                          nullptr, &err);
       check_and_throw_icu_error(err);
     } catch (...) {
       ucnv_close(cvt_);
