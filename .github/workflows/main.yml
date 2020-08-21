@@ -54,10 +54,7 @@ jobs:
         run: cd build && ctest -j1 --output-on-failure
 
       - name: Install
-        run: cmake --build build -j$(nproc) --target install
-
-      - name: Uninstall
-        run: cmake --build build -j$(nproc) --target uninstall
+        run: cmake --build build --target install
 
       - name: Gather coverage data
         run: cmake --build build -j$(nproc) --target coverage

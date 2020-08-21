@@ -25,6 +25,7 @@ A small C11 compiler
 - magic_enum
 - json
 - Boost
+- ICU
 
 #### Build
 
