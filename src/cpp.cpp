@@ -4,6 +4,8 @@
 
 #include "cpp.h"
 
+#include <filesystem>
+
 #include <clang/Basic/SourceLocation.h>
 #include <clang/Basic/SourceManager.h>
 #include <clang/Frontend/PreprocessorOutputOptions.h>
@@ -27,8 +29,8 @@ Preprocessor::Preprocessor() {
   /*
    * Platform Specific Code
    */
-  AddIncludePath("/usr/lib/gcc/x86_64-pc-linux-gnu/10.1.0/include", true);
-  AddIncludePath("/usr/lib/gcc/x86_64-pc-linux-gnu/10.1.0/include-fixed", true);
+  AddIncludePath("/usr/lib/gcc/x86_64-pc-linux-gnu/10.2.0/include", true);
+  AddIncludePath("/usr/lib/gcc/x86_64-pc-linux-gnu/10.2.0/include-fixed", true);
   /*
    * End of Platform Specific Code
    */
@@ -36,7 +38,7 @@ Preprocessor::Preprocessor() {
   pp_->setPredefines(pp_->getPredefines() +
                      "#define __KCC__ 1\n"
                      "#define __GNUC__ 10\n"
-                     "#define __GNUC_MINOR__ 1\n"
+                     "#define __GNUC_MINOR__ 2\n"
                      "#define __GNUC_PATCHLEVEL__ 0\n"
                      "#define __STDC_NO_ATOMICS__ 1\n"
                      "#define __STDC_NO_COMPLEX__ 1\n"
@@ -100,6 +102,10 @@ std::string Preprocessor::Cpp(const std::string &input_file) {
 }
 
 void Preprocessor::AddIncludePath(const std::string &path, bool is_system) {
+  if (!std::filesystem::exists(path)) {
+    Error("compiler internal error");
+  }
+
   if (is_system) {
     clang::DirectoryLookup directory{
         Ci.getFileManager().getDirectoryRef(path).get(),

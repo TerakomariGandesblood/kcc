@@ -13,7 +13,7 @@ A small C11 compiler
 #### Environment:
 
 - Linux(I use Manjaro)
-- gcc 10.1(For header files and link libraries)
+- gcc 10.2(For header files and link libraries)
 - gcc/clang(Request to support C++17)
 
 #### Libraries:
