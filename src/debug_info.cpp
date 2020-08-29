@@ -12,7 +12,6 @@
 #include <llvm/IR/DebugLoc.h>
 #include <llvm/IR/Module.h>
 
-#include "llvm_common.h"
 #include "scope.h"
 #include "util.h"
 
@@ -21,13 +20,11 @@ namespace kcc {
 DebugInfo::DebugInfo() {
   optimize_ = OptimizationLevel != OptLevel::kO0;
 
-  builder_ = new llvm::DIBuilder{*Module};
-
   std::filesystem::path path{Module->getSourceFileName()};
-  file_ = builder_->createFile(path.filename().string(),
-                               path.parent_path().string());
+  file_ = builder_.createFile(path.filename().string(),
+                              path.parent_path().string());
 
-  cu_ = builder_->createCompileUnit(
+  cu_ = builder_.createCompileUnit(
       llvm::dwarf::DW_LANG_C11, file_, "kcc " KCC_VERSION, optimize_, "", 0, "",
       llvm::DICompileUnit::DebugEmissionKind::FullDebug, 0, true, false,
       llvm::DICompileUnit::DebugNameTableKind::None);
@@ -43,7 +40,7 @@ void DebugInfo::Finalize() {
   assert(subprogram_ == nullptr);
   assert(arg_index_ == 0);
 
-  builder_->finalize();
+  builder_.finalize();
 }
 
 void DebugInfo::EmitLocation(const AstNode *node) {
@@ -64,10 +61,10 @@ void DebugInfo::EmitFuncStart(const FuncDef *node) {
 
   auto line_no{node->GetLoc().GetRow()};
 
-  subprogram_ = builder_->createFunction(file_, func_name, func_name, file_,
-                                         line_no, CreateFunctionType(func_type),
-                                         line_no, llvm::DINode::FlagPrototyped,
-                                         llvm::DISubprogram::SPFlagDefinition);
+  subprogram_ = builder_.createFunction(file_, func_name, func_name, file_,
+                                        line_no, CreateFunctionType(func_type),
+                                        line_no, llvm::DINode::FlagPrototyped,
+                                        llvm::DISubprogram::SPFlagDefinition);
 
   lexical_blocks_.push_back(subprogram_);
 
@@ -87,13 +84,13 @@ void DebugInfo::EmitParamVar(const std::string &name, Type *type,
   assert(subprogram_ != nullptr);
 
   auto line_no{loc.GetRow()};
-  auto param{builder_->createParameterVariable(subprogram_, name, arg_index_++,
-                                               file_, line_no,
-                                               GetOrCreateType(type), true)};
+  auto param{builder_.createParameterVariable(subprogram_, name, arg_index_++,
+                                              file_, line_no,
+                                              GetOrCreateType(type), true)};
 
-  builder_->insertDeclare(ptr, param, builder_->createExpression(),
-                          llvm::DebugLoc::get(line_no, 0, subprogram_),
-                          Builder.GetInsertBlock());
+  builder_.insertDeclare(ptr, param, builder_.createExpression(),
+                         llvm::DebugLoc::get(line_no, 0, subprogram_),
+                         Builder.GetInsertBlock());
 }
 
 void DebugInfo::EmitLocalVar(const Declaration *decl) {
@@ -108,12 +105,12 @@ void DebugInfo::EmitLocalVar(const Declaration *decl) {
   auto loc{decl->GetLoc()};
   auto ptr{decl->GetIdent()->ToObjectExpr()->GetLocalPtr()};
 
-  auto var{builder_->createAutoVariable(
+  auto var{builder_.createAutoVariable(
       scope, ident->GetName(), file_, loc.GetRow(),
       GetOrCreateType(ident->GetType()), optimize_)};
 
-  builder_->insertDeclare(
-      ptr, var, builder_->createExpression(),
+  builder_.insertDeclare(
+      ptr, var, builder_.createExpression(),
       llvm::DebugLoc::get(loc.GetRow(), loc.GetColumn(), scope),
       Builder.GetInsertBlock());
 }
@@ -126,7 +123,7 @@ void DebugInfo::EmitGlobalVar(const Declaration *decl) {
   auto name{ident->GetName()};
   auto loc{decl->GetLoc()};
 
-  auto info{builder_->createGlobalVariableExpression(
+  auto info{builder_.createGlobalVariableExpression(
       cu_, name, name, file_, loc.GetRow(),
       GetOrCreateType(ident->GetType(), loc), ptr->hasInternalLinkage())};
 
@@ -185,8 +182,8 @@ llvm::DIType *DebugInfo::CreateBuiltinType(Type *type) {
     assert(false);
   }
 
-  return builder_->createBasicType(type->ToString(), type->GetWidth() * 8,
-                                   encoding);
+  return builder_.createBasicType(type->ToString(), type->GetWidth() * 8,
+                                  encoding);
 }
 
 llvm::DIType *DebugInfo::CreatePointerType(Type *type) {
@@ -194,7 +191,7 @@ llvm::DIType *DebugInfo::CreatePointerType(Type *type) {
   auto size_in_bit{type->GetWidth() * 8};
   auto align_in_bit{type->GetAlign() * 8};
 
-  return builder_->createPointerType(pointee_type, size_in_bit, align_in_bit);
+  return builder_.createPointerType(pointee_type, size_in_bit, align_in_bit);
 }
 
 llvm::DIType *DebugInfo::CreateArrayType(Type *type) {
@@ -212,13 +209,13 @@ llvm::DIType *DebugInfo::CreateArrayType(Type *type) {
   QualType qual_type{type};
   while (qual_type->IsArrayTy()) {
     subscripts.push_back(
-        builder_->getOrCreateSubrange(0, type->ArrayGetNumElements()));
+        builder_.getOrCreateSubrange(0, type->ArrayGetNumElements()));
     qual_type = qual_type->ArrayGetElementType();
   }
 
-  return builder_->createArrayType(
+  return builder_.createArrayType(
       size, align * 8, GetOrCreateType(type->ArrayGetElementType().GetType()),
-      builder_->getOrCreateArray(subscripts));
+      builder_.getOrCreateArray(subscripts));
 }
 
 llvm::DIType *DebugInfo::CreateStructType(Type *type, const Location &loc) {
@@ -235,7 +232,7 @@ llvm::DIType *DebugInfo::CreateStructType(Type *type, const Location &loc) {
   auto scope{GetScope()};
 
   auto fwd_type{
-      builder_->createForwardDecl(tag, name, scope, file_, loc.GetRow())};
+      builder_.createForwardDecl(tag, name, scope, file_, loc.GetRow())};
   if (!type->IsComplete()) {
     return fwd_type;
   }
@@ -260,17 +257,17 @@ llvm::DIType *DebugInfo::CreateStructType(Type *type, const Location &loc) {
       align_in_bit = ident->GetType()->GetAlign() * 8;
     }
 
-    member_type = builder_->createMemberType(
+    member_type = builder_.createMemberType(
         scope, name, file_, line, size_in_bit, align_in_bit, offset_in_bit,
         llvm::DINode::DIFlags::FlagPublic, member_type);
 
     ele_types.push_back(member_type);
   }
 
-  auto real_type{builder_->createStructType(
+  auto real_type{builder_.createStructType(
       scope, name, file_, loc.GetRow(), type->GetWidth() * 8,
       type->GetAlign() * 8, llvm::DINode::DIFlags::FlagZero, nullptr,
-      builder_->getOrCreateArray(ele_types))};
+      builder_.getOrCreateArray(ele_types))};
 
   type_cache_[type] = real_type;
 
@@ -286,8 +283,8 @@ llvm::DISubroutineType *DebugInfo::CreateFunctionType(Type *type) {
     ele_types.push_back(GetOrCreateType(item->GetType()));
   }
 
-  return builder_->createSubroutineType(
-      builder_->getOrCreateTypeArray(ele_types));
+  return builder_.createSubroutineType(
+      builder_.getOrCreateTypeArray(ele_types));
 }
 
 } // namespace kcc

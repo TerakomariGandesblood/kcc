@@ -14,6 +14,7 @@
 #include <llvm/IR/Instructions.h>
 
 #include "ast.h"
+#include "llvm_common.h"
 #include "location.h"
 #include "type.h"
 
@@ -53,7 +54,8 @@ private:
   llvm::DICompileUnit *cu_;
   llvm::DIFile *file_;
   // 类似与 IRBuilder
-  llvm::DIBuilder *builder_;
+  llvm::DIBuilder builder_{*Module};
+
   std::vector<llvm::DIScope *> lexical_blocks_;
 
   llvm::DISubprogram *subprogram_{};
