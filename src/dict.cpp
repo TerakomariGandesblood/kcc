@@ -94,4 +94,4 @@ Tag KeywordsDictionary::Find(const std::string &name) const {
   }
 }
 
-} // namespace kcc
+}  // namespace kcc

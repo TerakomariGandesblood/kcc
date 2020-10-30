@@ -189,18 +189,18 @@ void CodeGen::EmitStmt(const Stmt *stmt) {
 
 bool CodeGen::EmitSimpleStmt(const Stmt *stmt) {
   switch (stmt->Kind()) {
-  case AstNodeType::kLabelStmt:
-  case AstNodeType::kCaseStmt:
-  case AstNodeType::kDefaultStmt:
-  case AstNodeType::kCompoundStmt:
-  case AstNodeType::kGotoStmt:
-  case AstNodeType::kContinueStmt:
-  case AstNodeType::kBreakStmt:
-  case AstNodeType::kDeclaration:
-    stmt->Accept(*this);
-    return true;
-  default:
-    return false;
+    case AstNodeType::kLabelStmt:
+    case AstNodeType::kCaseStmt:
+    case AstNodeType::kDefaultStmt:
+    case AstNodeType::kCompoundStmt:
+    case AstNodeType::kGotoStmt:
+    case AstNodeType::kContinueStmt:
+    case AstNodeType::kBreakStmt:
+    case AstNodeType::kDeclaration:
+      stmt->Accept(*this);
+      return true;
+    default:
+      return false;
   }
 }
 
@@ -259,7 +259,7 @@ llvm::AllocaInst *CodeGen::CreateEntryBlockAlloca(llvm::Type *type,
   auto ptr{new llvm::AllocaInst{type, 0, name, alloc_insert_point_}};
 #endif
 
-  ptr->setAlignment(llvm::MaybeAlign{static_cast<std::uint64_t>(align)});
+  ptr->setAlignment(llvm::Align{static_cast<std::uint64_t>(align)});
   return ptr;
 }
 
@@ -641,4 +641,4 @@ void CodeGen::EmitFunctionEpilog() {
   }
 }
 
-} // namespace kcc
+}  // namespace kcc

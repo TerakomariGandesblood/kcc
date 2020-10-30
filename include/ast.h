@@ -71,7 +71,7 @@ enum class AstNodeType {
 };
 
 class AstNode {
-public:
+ public:
   virtual ~AstNode() = default;
 
   virtual AstNodeType Kind() const = 0;
@@ -83,14 +83,14 @@ public:
   const Location &GetLoc() const;
   void SetLoc(const Location &loc);
 
-protected:
+ protected:
   AstNode() = default;
 
   Location loc_;
 };
 
 class Expr : public AstNode {
-public:
+ public:
   virtual bool IsLValue() const = 0;
 
   QualType GetQualType() const;
@@ -110,7 +110,7 @@ public:
   // 判断是否是 int 0
   static bool IsZero(const Expr *expr);
 
-protected:
+ protected:
   explicit Expr(QualType type = {});
 
   QualType type_;
@@ -123,7 +123,7 @@ protected:
  * * &
  */
 class UnaryOpExpr : public Expr {
-public:
+ public:
   static UnaryOpExpr *Get(Tag tag, Expr *expr);
 
   virtual AstNodeType Kind() const override;
@@ -134,7 +134,7 @@ public:
   Tag GetOp() const;
   const Expr *GetExpr() const;
 
-private:
+ private:
   UnaryOpExpr(Tag tag, Expr *expr);
 
   void IncDecOpCheck();
@@ -149,7 +149,7 @@ private:
 };
 
 class TypeCastExpr : public Expr {
-public:
+ public:
   static TypeCastExpr *Get(Expr *expr, QualType to);
 
   virtual AstNodeType Kind() const override;
@@ -160,7 +160,7 @@ public:
   const Expr *GetExpr() const;
   QualType GetCastToType() const;
 
-private:
+ private:
   TypeCastExpr(Expr *expr, QualType to);
 
   Expr *expr_;
@@ -176,7 +176,7 @@ private:
  */
 // 复合赋值运算符, [] , -> 均做了转换
 class BinaryOpExpr : public Expr {
-public:
+ public:
   static BinaryOpExpr *Get(Tag tag, Expr *lhs, Expr *rhs);
 
   virtual AstNodeType Kind() const override;
@@ -188,7 +188,7 @@ public:
   const Expr *GetLHS() const;
   const Expr *GetRHS() const;
 
-private:
+ private:
   BinaryOpExpr(Tag tag, Expr *lhs, Expr *rhs);
 
   void AssignOpCheck();
@@ -209,7 +209,7 @@ private:
 };
 
 class ConditionOpExpr : public Expr {
-public:
+ public:
   static ConditionOpExpr *Get(Expr *cond, Expr *lhs, Expr *rhs);
 
   virtual AstNodeType Kind() const override;
@@ -221,7 +221,7 @@ public:
   const Expr *GetLHS() const;
   const Expr *GetRHS() const;
 
-private:
+ private:
   ConditionOpExpr(Expr *cond, Expr *lhs, Expr *rhs);
 
   Expr *cond_;
@@ -230,7 +230,7 @@ private:
 };
 
 class FuncCallExpr : public Expr {
-public:
+ public:
   static FuncCallExpr *Get(Expr *callee, std::vector<Expr *> args = {});
 
   virtual AstNodeType Kind() const override;
@@ -246,7 +246,7 @@ public:
   void SetVaArgType(Type *va_arg_type);
   Type *GetVaArgType() const;
 
-private:
+ private:
   explicit FuncCallExpr(Expr *callee, std::vector<Expr *> args = {});
 
   Expr *callee_;
@@ -256,7 +256,7 @@ private:
 };
 
 class ConstantExpr : public Expr {
-public:
+ public:
   static ConstantExpr *Get(std::int32_t val);
   static ConstantExpr *Get(Type *type, std::uint64_t val);
   // for float point
@@ -270,7 +270,7 @@ public:
   const llvm::APInt &GetIntegerVal() const;
   const llvm::APFloat &GetFloatPointVal() const;
 
-private:
+ private:
   ConstantExpr(std::int32_t val);
   ConstantExpr(Type *type, std::uint64_t val);
   ConstantExpr(Type *type, const std::string &str);
@@ -280,7 +280,7 @@ private:
 };
 
 class StringLiteralExpr : public Expr {
-public:
+ public:
   static StringLiteralExpr *Get(const std::string &val);
   static StringLiteralExpr *Get(Type *type, const std::string &val);
 
@@ -293,7 +293,7 @@ public:
   llvm::Constant *GetArr() const;
   llvm::Constant *GetPtr() const;
 
-private:
+ private:
   StringLiteralExpr(Type *type, const std::string &val);
 
   std::pair<llvm::Constant *, llvm::Constant *> Create() const;
@@ -315,7 +315,7 @@ enum class Linkage { kNone, kInternal, kExternal };
 // 宏形参名
 // 宏名或宏形参名以外的每个标识符都拥有作用域，并且可以拥有链接
 class IdentifierExpr : public Expr {
-public:
+ public:
   static IdentifierExpr *Get(const std::string &name, QualType type,
                              enum Linkage linkage = Linkage::kNone,
                              bool is_type_name = false);
@@ -333,7 +333,7 @@ public:
   ObjectExpr *ToObjectExpr();
   const ObjectExpr *ToObjectExpr() const;
 
-protected:
+ protected:
   IdentifierExpr(const std::string &name, QualType type,
                  enum Linkage linkage = Linkage::kNone,
                  bool is_type_name = false);
@@ -344,7 +344,7 @@ protected:
 };
 
 class EnumeratorExpr : public IdentifierExpr {
-public:
+ public:
   static EnumeratorExpr *Get(const std::string &name, std::int32_t val);
 
   virtual AstNodeType Kind() const override;
@@ -354,7 +354,7 @@ public:
 
   std::int32_t GetVal() const;
 
-private:
+ private:
   EnumeratorExpr(const std::string &name, std::int32_t val);
 
   std::int32_t val_;
@@ -370,7 +370,7 @@ private:
 // 值
 // 可选项: 表示该对象的标识符
 class ObjectExpr : public IdentifierExpr {
-public:
+ public:
   static ObjectExpr *Get(const std::string &name, QualType type,
                          std::uint32_t storage_class_spec = 0,
                          enum Linkage linkage = Linkage::kNone,
@@ -414,7 +414,7 @@ public:
 
   void SetFuncName(const std::string &func_name);
 
-private:
+ private:
   ObjectExpr(const std::string &name, QualType type,
              std::uint32_t storage_class_spec = 0,
              enum Linkage linkage = Linkage::kNone, bool anonymous = false,
@@ -442,7 +442,7 @@ private:
 
 // GNU 扩展, 语句表达式, 它可以是常量表达式, 不是左值表达式
 class StmtExpr : public Expr {
-public:
+ public:
   static StmtExpr *Get(CompoundStmt *block);
 
   virtual AstNodeType Kind() const override;
@@ -452,19 +452,19 @@ public:
 
   const CompoundStmt *GetBlock() const;
 
-private:
+ private:
   StmtExpr(CompoundStmt *block);
 
   CompoundStmt *block_;
 };
 
 class Stmt : public AstNode {
-public:
+ public:
   virtual std::vector<Stmt *> Children() const;
 };
 
 class LabelStmt : public Stmt {
-public:
+ public:
   static LabelStmt *Get(const std::string &name, Stmt *stmt);
 
   virtual AstNodeType Kind() const override;
@@ -475,7 +475,7 @@ public:
   Stmt *GetStmt() const;
   const std::string &GetName() const;
 
-private:
+ private:
   explicit LabelStmt(const std::string &name, Stmt *stmt);
 
   std::string name_;
@@ -483,7 +483,7 @@ private:
 };
 
 class CaseStmt : public Stmt {
-public:
+ public:
   static CaseStmt *Get(std::int64_t lhs, Stmt *stmt);
   static CaseStmt *Get(std::int64_t lhs, std::int64_t rhs, Stmt *stmt);
 
@@ -496,7 +496,7 @@ public:
   std::optional<std::int64_t> GetRHS() const;
   const Stmt *GetStmt() const;
 
-private:
+ private:
   CaseStmt(std::int64_t lhs, Stmt *stmt);
   CaseStmt(std::int64_t lhs, std::int64_t rhs, Stmt *stmt);
 
@@ -507,7 +507,7 @@ private:
 };
 
 class DefaultStmt : public Stmt {
-public:
+ public:
   static DefaultStmt *Get(Stmt *stmt);
 
   virtual AstNodeType Kind() const override;
@@ -517,14 +517,14 @@ public:
 
   const Stmt *GetStmt() const;
 
-private:
+ private:
   DefaultStmt(Stmt *stmt);
 
   Stmt *stmt_;
 };
 
 class CompoundStmt : public Stmt {
-public:
+ public:
   static CompoundStmt *Get();
   static CompoundStmt *Get(std::vector<Stmt *> stmts);
 
@@ -536,7 +536,7 @@ public:
   const std::vector<Stmt *> &GetStmts() const;
   void AddStmt(Stmt *stmt);
 
-private:
+ private:
   CompoundStmt() = default;
   explicit CompoundStmt(std::vector<Stmt *> stmts);
 
@@ -544,7 +544,7 @@ private:
 };
 
 class ExprStmt : public Stmt {
-public:
+ public:
   static ExprStmt *Get(Expr *expr = nullptr);
 
   virtual AstNodeType Kind() const override;
@@ -553,14 +553,14 @@ public:
 
   Expr *GetExpr() const;
 
-private:
+ private:
   explicit ExprStmt(Expr *expr = nullptr);
 
   Expr *expr_;
 };
 
 class IfStmt : public Stmt {
-public:
+ public:
   static IfStmt *Get(Expr *cond, Stmt *then_block, Stmt *else_block = nullptr);
 
   virtual AstNodeType Kind() const override;
@@ -572,7 +572,7 @@ public:
   const Stmt *GetThen() const;
   const Stmt *GetElse() const;
 
-private:
+ private:
   IfStmt(Expr *cond, Stmt *then_block, Stmt *else_block = nullptr);
 
   Expr *cond_;
@@ -581,7 +581,7 @@ private:
 };
 
 class SwitchStmt : public Stmt {
-public:
+ public:
   static SwitchStmt *Get(Expr *cond, Stmt *stmt);
 
   virtual AstNodeType Kind() const override;
@@ -592,7 +592,7 @@ public:
   const Expr *GetCond() const;
   const Stmt *GetStmt() const;
 
-private:
+ private:
   SwitchStmt(Expr *cond, Stmt *stmt);
 
   Expr *cond_;
@@ -600,7 +600,7 @@ private:
 };
 
 class WhileStmt : public Stmt {
-public:
+ public:
   static WhileStmt *Get(Expr *cond, Stmt *block);
 
   virtual AstNodeType Kind() const override;
@@ -611,7 +611,7 @@ public:
   const Expr *GetCond() const;
   const Stmt *GetBlock() const;
 
-private:
+ private:
   WhileStmt(Expr *cond, Stmt *block);
 
   Expr *cond_;
@@ -619,7 +619,7 @@ private:
 };
 
 class DoWhileStmt : public Stmt {
-public:
+ public:
   static DoWhileStmt *Get(Expr *cond, Stmt *block);
 
   virtual AstNodeType Kind() const override;
@@ -630,7 +630,7 @@ public:
   const Expr *GetCond() const;
   const Stmt *GetBlock() const;
 
-private:
+ private:
   DoWhileStmt(Expr *cond, Stmt *block);
 
   Expr *cond_;
@@ -638,7 +638,7 @@ private:
 };
 
 class ForStmt : public Stmt {
-public:
+ public:
   static ForStmt *Get(Expr *init, Expr *cond, Expr *inc, Stmt *block,
                       Stmt *decl);
 
@@ -653,7 +653,7 @@ public:
   const Stmt *GetBlock() const;
   const Stmt *GetDecl() const;
 
-private:
+ private:
   ForStmt(Expr *init, Expr *cond, Expr *inc, Stmt *block, Stmt *decl);
 
   Expr *init_, *cond_, *inc_;
@@ -662,7 +662,7 @@ private:
 };
 
 class GotoStmt : public Stmt {
-public:
+ public:
   static GotoStmt *Get(const std::string &name);
   static GotoStmt *Get(LabelStmt *label);
 
@@ -674,7 +674,7 @@ public:
   void SetLabel(LabelStmt *label);
   const std::string &GetName() const;
 
-private:
+ private:
   explicit GotoStmt(const std::string &name);
   explicit GotoStmt(LabelStmt *ident);
 
@@ -683,31 +683,31 @@ private:
 };
 
 class ContinueStmt : public Stmt {
-public:
+ public:
   static ContinueStmt *Get();
 
   virtual AstNodeType Kind() const override;
   virtual void Accept(Visitor &visitor) const override;
   virtual void Check() override;
 
-private:
+ private:
   ContinueStmt() = default;
 };
 
 class BreakStmt : public Stmt {
-public:
+ public:
   static BreakStmt *Get();
 
   virtual AstNodeType Kind() const override;
   virtual void Accept(Visitor &visitor) const override;
   virtual void Check() override;
 
-private:
+ private:
   BreakStmt() = default;
 };
 
 class ReturnStmt : public Stmt {
-public:
+ public:
   static ReturnStmt *Get(Expr *expr = nullptr);
 
   virtual AstNodeType Kind() const override;
@@ -716,7 +716,7 @@ public:
 
   const Expr *GetExpr() const;
 
-private:
+ private:
   explicit ReturnStmt(Expr *expr = nullptr);
 
   Expr *expr_;
@@ -725,7 +725,7 @@ private:
 using ExtDecl = AstNode;
 
 class TranslationUnit : public AstNode {
-public:
+ public:
   static TranslationUnit *Get();
 
   virtual AstNodeType Kind() const override;
@@ -735,12 +735,12 @@ public:
   void AddExtDecl(ExtDecl *ext_decl);
   const std::vector<ExtDecl *> &GetExtDecl() const;
 
-private:
+ private:
   std::vector<ExtDecl *> ext_decls_;
 };
 
 class Initializer {
-public:
+ public:
   Initializer(
       Type *type, Expr *expr,
       std::vector<std::tuple<Type *, std::int32_t, std::int32_t, std::int32_t>>
@@ -752,10 +752,10 @@ public:
   const Expr *GetExpr() const;
 
   const std::vector<
-      std::tuple<Type *, std::int32_t, std::int32_t, std::int32_t>> &
-  GetIndexs() const;
+      std::tuple<Type *, std::int32_t, std::int32_t, std::int32_t>>
+      &GetIndexs() const;
 
-private:
+ private:
   Type *type_;
   Expr *expr_;
   std::vector<std::tuple<Type *, std::int32_t, std::int32_t, std::int32_t>>
@@ -763,7 +763,7 @@ private:
 };
 
 class Declaration : public Stmt {
-public:
+ public:
   static Declaration *Get(IdentifierExpr *ident);
 
   virtual AstNodeType Kind() const override;
@@ -787,7 +787,7 @@ public:
   ObjectExpr *GetObject() const;
   bool IsObjDeclInGlobalOrLocalStatic() const;
 
-private:
+ private:
   explicit Declaration(IdentifierExpr *ident);
 
   IdentifierExpr *ident_;
@@ -799,7 +799,7 @@ private:
 };
 
 class FuncDef : public ExtDecl {
-public:
+ public:
   static FuncDef *Get(IdentifierExpr *ident);
 
   virtual AstNodeType Kind() const override;
@@ -814,7 +814,7 @@ public:
   IdentifierExpr *GetIdent() const;
   const CompoundStmt *GetBody() const;
 
-private:
+ private:
   explicit FuncDef(IdentifierExpr *ident);
 
   IdentifierExpr *ident_;
@@ -822,7 +822,7 @@ private:
 };
 
 template <typename T, typename... Args>
-T *MakeAstNode(const Location &loc, Args &&... args) {
+T *MakeAstNode(const Location &loc, Args &&...args) {
   auto t{T::Get(std::forward<Args>(args)...)};
   t->SetLoc(loc);
   t->Check();
@@ -830,8 +830,8 @@ T *MakeAstNode(const Location &loc, Args &&... args) {
 }
 
 template <typename T, typename... Args>
-T *MakeAstNode(const Token &token, Args &&... args) {
+T *MakeAstNode(const Token &token, Args &&...args) {
   return MakeAstNode<T>(token.GetLoc(), std::forward<Args>(args)...);
 }
 
-} // namespace kcc
+}  // namespace kcc

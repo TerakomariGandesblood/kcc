@@ -29,8 +29,8 @@ Preprocessor::Preprocessor() {
   /*
    * Platform Specific Code
    */
-  AddIncludePath("/usr/lib/gcc/x86_64-pc-linux-gnu/10.2.0/include", true);
-  AddIncludePath("/usr/lib/gcc/x86_64-pc-linux-gnu/10.2.0/include-fixed", true);
+  AddIncludePath("/usr/lib/gcc/x86_64-linux-gnu/10/include", true);
+  AddIncludePath("/usr/include/x86_64-linux-gnu", true);
   /*
    * End of Platform Specific Code
    */
@@ -119,4 +119,4 @@ void Preprocessor::AddIncludePath(const std::string &path, bool is_system) {
   }
 }
 
-} // namespace kcc
+}  // namespace kcc

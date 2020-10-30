@@ -1,3 +1,7 @@
 {
-  "cmake.configureArgs": ["-DCOVERAGE=TRUE"]
+  "cmake.configureArgs": [
+    "-DKCC_BUILD_COVERAGE=ON",
+    "-DKCC_FORMAT=ON",
+    //"-DKCC_SANITIZER=Address;Undefined"
+  ]
 }

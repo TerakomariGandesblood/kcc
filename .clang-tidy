@@ -1,40 +1,57 @@
-Checks: '-*,boost-*,bugprone-*,clang-analyzer-*,cppcoreguidelines-*,
-        misc-*,modernize-*,performance-*,portability-*,readability-*,
-        -modernize-use-trailing-return-type,-readability-qualified-auto,
-        -readability-else-after-return'
-WarningsAsErrors: 'clang-analyzer-*,-clang-analyzer-core.CallAndMessage'
+Checks: "*,
+  -cert-oop54-cpp,
+  -fuchsia-default-arguments-calls,
+  -fuchsia-default-arguments-declarations,
+  -fuchsia-overloaded-operator,
+  -google-runtime-references,
+  -hicpp-avoid-goto,
+  -hicpp-explicit-conversions,
+  -hicpp-no-array-decay,
+  -hicpp-special-member-functions,
+  -hicpp-uppercase-literal-suffix,
+  -llvm-header-guard,
+  -llvm-include-order,
+  -llvm-qualified-auto,
+  -llvmlibc-*,
+  -modernize-use-trailing-return-type,
+  -readability-magic-numbers"
+
+WarningsAsErrors: "clang-analyzer-*,clang-diagnostic-*"
+
+HeaderFilterRegex: ".*"
+
 CheckOptions:
-  - key:             readability-identifier-naming.ClassCase
-    value:           CamelCase
-  - key:             readability-identifier-naming.EnumCase
-    value:           CamelCase
-  - key:             readability-identifier-naming.EnumConstantCase
-    value:           CamelCase
-  - key:             readability-identifier-naming.FunctionCase
-    value:           lower_case
-  - key:             readability-identifier-naming.MacroDefinitionCase
-    value:           UPPER_CASE
-  - key:             readability-identifier-naming.MemberCase
-    value:           lower_case
-  - key:             readability-identifier-naming.MemberSuffix
-    value:           '_'
-  - key:             readability-identifier-naming.MethodCase
-    value:           lower_case
-  - key:             readability-identifier-naming.NamespaceCase
-    value:           lower_case
-  - key:             readability-identifier-naming.ParameterCase
-    value:           lower_case
-  - key:             readability-identifier-naming.StructCase
-    value:           CamelCase
-  - key:             readability-identifier-naming.TypeAliasCase
-    value:           CamelCase
-  - key:             readability-identifier-naming.TypedefCase
-    value:           CamelCase
-  - key:             readability-identifier-naming.TypeTemplateParameterCase
-    value:           CamelCase
-  - key:             readability-identifier-naming.UnionCase
-    value:           CamelCase
-  - key:             readability-identifier-naming.ValueTemplateParameterCase
-    value:           lower_case
-  - key:             readability-identifier-naming.VariableCase
-    value:           lower_case
+  - key: readability-identifier-naming.ClassCase
+    value: CamelCase
+  - key: readability-identifier-naming.EnumCase
+    value: CamelCase
+  - key: readability-identifier-naming.EnumConstantCase
+    value: CamelCase
+  - key: readability-identifier-naming.FunctionCase
+    value: lower_case
+  - key: readability-identifier-naming.MacroDefinitionCase
+    value: UPPER_CASE
+  - key: readability-identifier-naming.MemberCase
+    value: lower_case
+  - key: readability-identifier-naming.MemberSuffix
+    value: "_"
+  - key: readability-identifier-naming.MethodCase
+    value: lower_case
+  - key: readability-identifier-naming.NamespaceCase
+    value: lower_case
+  - key: readability-identifier-naming.ParameterCase
+    value: lower_case
+  - key: readability-identifier-naming.StructCase
+    value: CamelCase
+  - key: readability-identifier-naming.TypeAliasCase
+    value: CamelCase
+  - key: readability-identifier-naming.TypedefCase
+    value: CamelCase
+  - key: readability-identifier-naming.TypeTemplateParameterCase
+    value: CamelCase
+  - key: readability-identifier-naming.UnionCase
+    value: CamelCase
+  - key: readability-identifier-naming.ValueTemplateParameterCase
+    value: lower_case
+  - key: readability-identifier-naming.VariableCase
+    value: lower_case

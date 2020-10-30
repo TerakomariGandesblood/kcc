@@ -530,4 +530,4 @@ void JsonGen::Visit(const FuncDef *node) {
   result_ = root;
 }
 
-} // namespace kcc
+}  // namespace kcc

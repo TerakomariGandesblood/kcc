@@ -11,7 +11,7 @@
 namespace kcc {
 
 class Location {
-public:
+ public:
   void SetFileName(const std::string &file_name);
   void SetContent(const char *content);
   void NextRow(std::size_t line_begin);
@@ -28,7 +28,7 @@ public:
   std::int32_t GetRow() const;
   std::int32_t GetColumn() const;
 
-private:
+ private:
   std::string file_name_;
   const char *content_;
 
@@ -40,4 +40,4 @@ private:
   std::int32_t column_backup_{};
 };
 
-} // namespace kcc
+}  // namespace kcc

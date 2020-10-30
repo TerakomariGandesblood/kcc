@@ -60,25 +60,25 @@ void CalcConstantExpr::Visit(const UnaryOpExpr *node) {
   auto expr{node->GetExpr()};
 
   switch (node->GetOp()) {
-  case Tag::kPlus:
-    val_ = Throw(CalcConstantExpr{node->GetLoc()}.Calc(expr));
-    break;
-  case Tag::kMinus:
-    val_ = NegOp(Throw(CalcConstantExpr{node->GetLoc()}.Calc(expr)),
-                 expr->GetType()->IsUnsigned());
-    break;
-  case Tag::kTilde:
-    val_ = llvm::ConstantExpr::getNot(
-        Throw(CalcConstantExpr{node->GetLoc()}.Calc(expr)));
-    break;
-  case Tag::kExclaim:
-    val_ = LogicNotOp(Throw(CalcConstantExpr{node->GetLoc()}.Calc(expr)));
-    break;
-  case Tag::kAmp:
-    val_ = Addr(node);
-    break;
-  default:
-    Throw();
+    case Tag::kPlus:
+      val_ = Throw(CalcConstantExpr{node->GetLoc()}.Calc(expr));
+      break;
+    case Tag::kMinus:
+      val_ = NegOp(Throw(CalcConstantExpr{node->GetLoc()}.Calc(expr)),
+                   expr->GetType()->IsUnsigned());
+      break;
+    case Tag::kTilde:
+      val_ = llvm::ConstantExpr::getNot(
+          Throw(CalcConstantExpr{node->GetLoc()}.Calc(expr)));
+      break;
+    case Tag::kExclaim:
+      val_ = LogicNotOp(Throw(CalcConstantExpr{node->GetLoc()}.Calc(expr)));
+      break;
+    case Tag::kAmp:
+      val_ = Addr(node);
+      break;
+    default:
+      Throw();
   }
 }
 
@@ -101,74 +101,74 @@ void CalcConstantExpr::Visit(const BinaryOpExpr *node) {
   auto is_unsigned{node->GetLHS()->GetType()->IsUnsigned()};
 
   switch (node->GetOp()) {
-  case Tag::kPlus:
-    val_ = AddOp(L, R, is_unsigned);
-    break;
-  case Tag::kMinus:
-    val_ = SubOp(L, R, is_unsigned);
-    break;
-  case Tag::kStar:
-    val_ = MulOp(L, R, is_unsigned);
-    break;
-  case Tag::kSlash: {
-    auto lhs{L};
-    auto rhs{R};
-    if (rhs->isZeroValue()) {
-      Error(node->GetRHS(), "division by zero");
+    case Tag::kPlus:
+      val_ = AddOp(L, R, is_unsigned);
+      break;
+    case Tag::kMinus:
+      val_ = SubOp(L, R, is_unsigned);
+      break;
+    case Tag::kStar:
+      val_ = MulOp(L, R, is_unsigned);
+      break;
+    case Tag::kSlash: {
+      auto lhs{L};
+      auto rhs{R};
+      if (rhs->isZeroValue()) {
+        Error(node->GetRHS(), "division by zero");
+      }
+      val_ = DivOp(lhs, rhs, is_unsigned);
+      break;
     }
-    val_ = DivOp(lhs, rhs, is_unsigned);
-    break;
-  }
-  case Tag::kPercent: {
-    auto lhs{L};
-    auto rhs{R};
-    if (rhs->isZeroValue()) {
-      Error(node->GetRHS(), "division by zero");
+    case Tag::kPercent: {
+      auto lhs{L};
+      auto rhs{R};
+      if (rhs->isZeroValue()) {
+        Error(node->GetRHS(), "division by zero");
+      }
+      val_ = ModOp(lhs, rhs, is_unsigned);
+      break;
     }
-    val_ = ModOp(lhs, rhs, is_unsigned);
-    break;
-  }
-  case Tag::kAmp:
-    val_ = AndOp(L, R);
-    break;
-  case Tag::kPipe:
-    val_ = OrOp(L, R);
-    break;
-  case Tag::kCaret:
-    val_ = XorOp(L, R);
-    break;
-  case Tag::kLessLess:
-    val_ = ShlOp(L, R);
-    break;
-  case Tag::kGreaterGreater:
-    val_ = ShrOp(L, R, is_unsigned);
-    break;
-  case Tag::kAmpAmp:
-    val_ = LogicAndOp(node);
-    break;
-  case Tag::kPipePipe:
-    val_ = LogicOrOp(node);
-    break;
-  case Tag::kEqualEqual:
-    val_ = EqualOp(L, R);
-    break;
-  case Tag::kExclaimEqual:
-    val_ = NotEqualOp(L, R);
-    break;
-  case Tag::kLess:
-    val_ = LessOp(L, R, is_unsigned);
-    break;
-  case Tag::kGreater:
-    val_ = GreaterOp(L, R, is_unsigned);
-    break;
-  case Tag::kLessEqual:
-    val_ = LessEqualOp(L, R, is_unsigned);
-    break;
-  case Tag::kGreaterEqual:
-    val_ = GreaterEqualOp(L, R, is_unsigned);
-    break;
-  default:
-    Throw();
+    case Tag::kAmp:
+      val_ = AndOp(L, R);
+      break;
+    case Tag::kPipe:
+      val_ = OrOp(L, R);
+      break;
+    case Tag::kCaret:
+      val_ = XorOp(L, R);
+      break;
+    case Tag::kLessLess:
+      val_ = ShlOp(L, R);
+      break;
+    case Tag::kGreaterGreater:
+      val_ = ShrOp(L, R, is_unsigned);
+      break;
+    case Tag::kAmpAmp:
+      val_ = LogicAndOp(node);
+      break;
+    case Tag::kPipePipe:
+      val_ = LogicOrOp(node);
+      break;
+    case Tag::kEqualEqual:
+      val_ = EqualOp(L, R);
+      break;
+    case Tag::kExclaimEqual:
+      val_ = NotEqualOp(L, R);
+      break;
+    case Tag::kLess:
+      val_ = LessOp(L, R, is_unsigned);
+      break;
+    case Tag::kGreater:
+      val_ = GreaterOp(L, R, is_unsigned);
+      break;
+    case Tag::kLessEqual:
+      val_ = LessEqualOp(L, R, is_unsigned);
+      break;
+    case Tag::kGreaterEqual:
+      val_ = GreaterEqualOp(L, R, is_unsigned);
+      break;
+    default:
+      Throw();
   }
 
 #undef L
@@ -620,4 +620,4 @@ llvm::Constant *CalcConstantExpr::LogicAndOp(const BinaryOpExpr *node) {
   }
 }
 
-} // namespace kcc
+}  // namespace kcc

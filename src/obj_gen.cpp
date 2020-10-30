@@ -34,4 +34,4 @@ void ObjGen(const std::string &obj_file, llvm::CodeGenFileType file_type) {
   dest.flush();
 }
 
-} // namespace kcc
+}  // namespace kcc

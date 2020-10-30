@@ -652,4 +652,4 @@ void Parser::AddBuiltin() {
       loc, "__builtin_bswap16", bswap16, Linkage::kExternal, false));
 }
 
-} // namespace kcc
+}  // namespace kcc

@@ -2,12 +2,23 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "type": "lldb",
+      "name": "(gdb) 启动",
+      "type": "cppdbg",
       "request": "launch",
-      "name": "Launch",
       "program": "${command:cmake.launchTargetPath}",
       "args": [],
-      "cwd": "${workspaceFolder}/build"
+      "stopAtEntry": false,
+      "cwd": "${command:cmake.launchTargetDirectory}",
+      "environment": [],
+      "externalConsole": false,
+      "MIMode": "gdb",
+      "setupCommands": [
+        {
+          "description": "为 gdb 启用整齐打印",
+          "text": "-enable-pretty-printing",
+          "ignoreFailures": false
+        }
+      ]
     }
   ]
 }

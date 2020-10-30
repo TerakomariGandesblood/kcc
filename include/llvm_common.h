@@ -90,4 +90,4 @@ llvm::Value *GetBitFieldValue(llvm::Value *value, std::int32_t size,
                               std::int32_t width, std::int32_t begin,
                               bool is_unsigned);
 
-} // namespace kcc
+}  // namespace kcc

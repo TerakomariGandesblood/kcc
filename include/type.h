@@ -81,7 +81,7 @@ class QualType {
   friend bool operator==(QualType lhs, QualType rhs);
   friend bool operator!=(QualType lhs, QualType rhs);
 
-public:
+ public:
   QualType() = default;
   QualType(Type *type, std::uint32_t type_qual = 0);
 
@@ -98,7 +98,7 @@ public:
   bool IsConst() const;
   bool IsVolatile() const;
 
-private:
+ private:
   Type *type_{};
   std::uint32_t type_qual_{};
 };
@@ -107,7 +107,7 @@ bool operator==(QualType lhs, QualType rhs);
 bool operator!=(QualType lhs, QualType rhs);
 
 class Type {
-public:
+ public:
   // 数组和函数隐式转换为指针
   static QualType MayCast(QualType type);
 
@@ -205,17 +205,17 @@ public:
   void FuncSetName(const std::string &name);
   const std::string &FuncGetName() const;
 
-protected:
+ protected:
   explicit Type(bool complete);
 
   llvm::Type *llvm_type_{};
 
-private:
+ private:
   mutable bool complete_{false};
 };
 
 class VoidType : public Type {
-public:
+ public:
   static VoidType *Get();
 
   virtual std::int32_t GetWidth() const override;
@@ -223,14 +223,14 @@ public:
   virtual bool Compatible(const Type *other) const override;
   virtual bool Equal(const Type *other) const override;
 
-private:
+ private:
   VoidType();
 };
 
 class ArithmeticType : public Type {
   friend class Type;
 
-public:
+ public:
   static ArithmeticType *Get(std::uint32_t type_spec);
 
   static Type *IntegerPromote(Type *type);
@@ -241,7 +241,7 @@ public:
   virtual bool Compatible(const Type *other) const override;
   virtual bool Equal(const Type *other) const override;
 
-private:
+ private:
   explicit ArithmeticType(std::uint32_t type_spec);
 
   std::int32_t Rank() const;
@@ -253,7 +253,7 @@ private:
 };
 
 class PointerType : public Type {
-public:
+ public:
   static PointerType *Get(QualType element_type);
 
   virtual std::int32_t GetWidth() const override;
@@ -263,14 +263,14 @@ public:
 
   QualType GetElementType() const;
 
-private:
+ private:
   explicit PointerType(QualType element_type);
 
   QualType element_type_;
 };
 
 class ArrayType : public Type {
-public:
+ public:
   static ArrayType *Get(QualType contained_type,
                         std::optional<std::size_t> num_elements = {});
 
@@ -283,7 +283,7 @@ public:
   std::size_t GetNumElements() const;
   QualType GetElementType() const;
 
-private:
+ private:
   ArrayType(QualType contained_type, std::optional<std::size_t> num_elements);
 
   QualType contained_type_;
@@ -293,7 +293,7 @@ private:
 class StructType : public Type {
   friend class Type;
 
-public:
+ public:
   static StructType *Get(bool is_struct, const std::string &name,
                          Scope *parent);
 
@@ -324,7 +324,7 @@ public:
   // 计算新成员的开始位置
   static std::int32_t MakeAlign(std::int32_t offset, std::int32_t align);
 
-private:
+ private:
   StructType(bool is_struct, const std::string &name, Scope *parent);
 
   void AddLLVMType(Type *type);
@@ -354,7 +354,7 @@ private:
 };
 
 class FunctionType : public Type {
-public:
+ public:
   static FunctionType *Get(QualType return_type,
                            std::vector<ObjectExpr *> params,
                            bool is_var_args = false);
@@ -374,7 +374,7 @@ public:
   void SetName(const std::string &name);
   const std::string &GetName() const;
 
-private:
+ private:
   FunctionType(QualType return_type, std::vector<ObjectExpr *> param,
                bool is_var_args);
 
@@ -387,4 +387,4 @@ private:
   std::string name_;
 };
 
-} // namespace kcc
+}  // namespace kcc

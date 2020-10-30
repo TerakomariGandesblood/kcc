@@ -27,7 +27,7 @@ inline std::vector<std::pair<std::string, std::string>> WarningStrings;
 void PrintWarnings();
 
 template <typename... Args>
-[[noreturn]] void Error(std::string_view format_str, const Args &... args) {
+[[noreturn]] void Error(std::string_view format_str, const Args &...args) {
   fmt::print(fmt::fg(fmt::terminal_color::red), "error: ");
   fmt::print(fmt::fg(fmt::terminal_color::red), format_str, args...);
   fmt::print("\n");
@@ -38,7 +38,7 @@ template <typename... Args>
 
 template <typename... Args>
 [[noreturn]] void Error(const Location &loc, std::string_view format_str,
-                        const Args &... args) {
+                        const Args &...args) {
   fmt::print(fmt::fg(fmt::terminal_color::red), FMT_STRING("{}: error: "),
              loc.ToLocStr());
   fmt::print(fmt::fg(fmt::terminal_color::red), format_str, args...);
@@ -55,18 +55,18 @@ template <typename... Args>
 
 template <typename... Args>
 [[noreturn]] void Error(const Token &tok, std::string_view format_str,
-                        const Args &... args) {
+                        const Args &...args) {
   Error(tok.GetLoc(), format_str, args...);
 }
 
 template <typename... Args>
 [[noreturn]] void Error(const Expr *expr, std::string_view format_str,
-                        const Args &... args) {
+                        const Args &...args) {
   Error(expr->GetLoc(), format_str, args...);
 }
 
 template <typename... Args>
-void Warning(std::string_view format_str, const Args &... args) {
+void Warning(std::string_view format_str, const Args &...args) {
   std::string str{"warning: "};
 
   str += fmt::format(format_str, args...);
@@ -77,7 +77,7 @@ void Warning(std::string_view format_str, const Args &... args) {
 
 template <typename... Args>
 void Warning(const Location &loc, std::string_view format_str,
-             const Args &... args) {
+             const Args &...args) {
   std::string str;
 
   str += fmt::format(FMT_STRING("{}: warning: "), loc.ToLocStr());
@@ -90,8 +90,8 @@ void Warning(const Location &loc, std::string_view format_str,
 
 template <typename... Args>
 void Warning(const Token &tok, std::string_view format_str,
-             const Args &... args) {
+             const Args &...args) {
   Warning(tok.GetLoc(), format_str, args...);
 }
 
-} // namespace kcc
+}  // namespace kcc

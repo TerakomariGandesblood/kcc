@@ -8,4 +8,4 @@ namespace kcc {
 
 bool Link();
 
-} // namespace kcc
+}  // namespace kcc

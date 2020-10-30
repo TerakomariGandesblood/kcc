@@ -22,7 +22,7 @@ void check_and_throw_icu_error(UErrorCode err) {
 }
 
 class Conv {
-public:
+ public:
   explicit Conv(const std::string &charset) {
     UErrorCode err{U_ZERO_ERROR};
     cvt_ = ucnv_open(charset.c_str(), &err);
@@ -67,7 +67,7 @@ public:
 
   std::size_t max_char_size() const { return ucnv_getMaxCharSize(cvt_); }
 
-private:
+ private:
   UConverter *cvt_;
 };
 
@@ -94,19 +94,19 @@ void ConvertToUtf32(std::string &s) { s = between(s, "UTF-8", "UTF-32LE"); }
 
 void ConvertString(std::string &s, Encoding encoding) {
   switch (encoding) {
-  case Encoding::kNone:
-  case Encoding::kUtf8:
-    break;
-  case Encoding::kChar16:
-    ConvertToUtf16(s);
-    break;
-  case Encoding::kChar32:
-  case Encoding::kWchar:
-    ConvertToUtf32(s);
-    break;
-  default:
-    assert(false);
+    case Encoding::kNone:
+    case Encoding::kUtf8:
+      break;
+    case Encoding::kChar16:
+      ConvertToUtf16(s);
+      break;
+    case Encoding::kChar32:
+    case Encoding::kWchar:
+      ConvertToUtf32(s);
+      break;
+    default:
+      assert(false);
   }
 }
 
-} // namespace kcc
+}  // namespace kcc

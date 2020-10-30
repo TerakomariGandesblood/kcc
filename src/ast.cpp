@@ -116,30 +116,30 @@ void UnaryOpExpr::Accept(Visitor &visitor) const { visitor.Visit(this); }
 
 void UnaryOpExpr::Check() {
   switch (op_) {
-  case Tag::kPlusPlus:
-  case Tag::kMinusMinus:
-  case Tag::kPostfixPlusPlus:
-  case Tag::kPostfixMinusMinus:
-    IncDecOpCheck();
-    break;
-  case Tag::kPlus:
-  case Tag::kMinus:
-    UnaryAddSubOpCheck();
-    break;
-  case Tag::kTilde:
-    NotOpCheck();
-    break;
-  case Tag::kExclaim:
-    LogicNotOpCheck();
-    break;
-  case Tag::kStar:
-    DerefOpCheck();
-    break;
-  case Tag::kAmp:
-    AddrOpCheck();
-    break;
-  default:
-    assert(false);
+    case Tag::kPlusPlus:
+    case Tag::kMinusMinus:
+    case Tag::kPostfixPlusPlus:
+    case Tag::kPostfixMinusMinus:
+      IncDecOpCheck();
+      break;
+    case Tag::kPlus:
+    case Tag::kMinus:
+      UnaryAddSubOpCheck();
+      break;
+    case Tag::kTilde:
+      NotOpCheck();
+      break;
+    case Tag::kExclaim:
+      LogicNotOpCheck();
+      break;
+    case Tag::kStar:
+      DerefOpCheck();
+      break;
+    case Tag::kAmp:
+      AddrOpCheck();
+      break;
+    default:
+      assert(false);
   }
 }
 
@@ -265,51 +265,51 @@ void BinaryOpExpr::Accept(Visitor &visitor) const { visitor.Visit(this); }
 
 void BinaryOpExpr::Check() {
   switch (op_) {
-  case Tag::kEqual:
-    AssignOpCheck();
-    break;
-  case Tag::kPlus:
-    AddOpCheck();
-    break;
-  case Tag::kMinus:
-    SubOpCheck();
-    break;
-  case Tag::kStar:
-  case Tag::kPercent:
-  case Tag::kSlash:
-    MultiOpCheck();
-    break;
-  case Tag::kAmp:
-  case Tag::kPipe:
-  case Tag::kCaret:
-    BitwiseOpCheck();
-    break;
-  case Tag::kLessLess:
-  case Tag::kGreaterGreater:
-    ShiftOpCheck();
-    break;
-  case Tag::kAmpAmp:
-  case Tag::kPipePipe:
-    LogicalOpCheck();
-    break;
-  case Tag::kExclaimEqual:
-  case Tag::kEqualEqual:
-    EqualityOpCheck();
-    break;
-  case Tag::kLess:
-  case Tag::kLessEqual:
-  case Tag::kGreater:
-  case Tag::kGreaterEqual:
-    RelationalOpCheck();
-    break;
-  case Tag::kPeriod:
-    MemberRefOpCheck();
-    break;
-  case Tag::kComma:
-    CommaOpCheck();
-    break;
-  default:
-    assert(false);
+    case Tag::kEqual:
+      AssignOpCheck();
+      break;
+    case Tag::kPlus:
+      AddOpCheck();
+      break;
+    case Tag::kMinus:
+      SubOpCheck();
+      break;
+    case Tag::kStar:
+    case Tag::kPercent:
+    case Tag::kSlash:
+      MultiOpCheck();
+      break;
+    case Tag::kAmp:
+    case Tag::kPipe:
+    case Tag::kCaret:
+      BitwiseOpCheck();
+      break;
+    case Tag::kLessLess:
+    case Tag::kGreaterGreater:
+      ShiftOpCheck();
+      break;
+    case Tag::kAmpAmp:
+    case Tag::kPipePipe:
+      LogicalOpCheck();
+      break;
+    case Tag::kExclaimEqual:
+    case Tag::kEqualEqual:
+      EqualityOpCheck();
+      break;
+    case Tag::kLess:
+    case Tag::kLessEqual:
+    case Tag::kGreater:
+    case Tag::kGreaterEqual:
+      RelationalOpCheck();
+      break;
+    case Tag::kPeriod:
+      MemberRefOpCheck();
+      break;
+    case Tag::kComma:
+      CommaOpCheck();
+      break;
+    default:
+      assert(false);
   }
 }
 
@@ -317,10 +317,10 @@ bool BinaryOpExpr::IsLValue() const {
   // 在 C++ 中赋值运算符表达式是左值表达式, 逗号运算符表达式可以是左值表达式
   // 而在 C 中两者都绝不是
   switch (op_) {
-  case Tag::kPeriod:
-    return lhs_->IsLValue();
-  default:
-    return false;
+    case Tag::kPeriod:
+      return lhs_->IsLValue();
+    default:
+      return false;
   }
 }
 
@@ -577,7 +577,8 @@ const Expr *ConditionOpExpr::GetLHS() const { return lhs_; }
 const Expr *ConditionOpExpr::GetRHS() const { return rhs_; }
 
 ConditionOpExpr::ConditionOpExpr(Expr *cond, Expr *lhs, Expr *rhs)
-    : cond_(Expr::MayCast(cond)), lhs_(Expr::MayCast(lhs)),
+    : cond_(Expr::MayCast(cond)),
+      lhs_(Expr::MayCast(lhs)),
       rhs_(Expr::MayCast(rhs)) {}
 
 /*
@@ -702,8 +703,9 @@ ConstantExpr::ConstantExpr(Type *type, std::uint64_t val)
 }
 
 ConstantExpr::ConstantExpr(Type *type, const std::string &str)
-    : Expr(type), float_point_val_{llvm::APFloat{
-                      GetFloatTypeSemantics(type->GetLLVMType()), str}} {}
+    : Expr(type),
+      float_point_val_{
+          llvm::APFloat{GetFloatTypeSemantics(type->GetLLVMType()), str}} {}
 
 /*
  * StringLiteral
@@ -737,8 +739,8 @@ StringLiteralExpr::StringLiteralExpr(Type *type, const std::string &val)
     : Expr{ArrayType::Get(type, std::size(val) / type->GetWidth() + 1)},
       str_{val} {}
 
-std::pair<llvm::Constant *, llvm::Constant *>
-StringLiteralExpr::Create() const {
+std::pair<llvm::Constant *, llvm::Constant *> StringLiteralExpr::Create()
+    const {
   auto iter{StringMap.find(str_)};
   if (iter != std::end(StringMap)) {
     return {iter->second.first, iter->second.second};
@@ -751,36 +753,36 @@ StringLiteralExpr::Create() const {
   auto str{str_.c_str()};
 
   switch (width) {
-  case 1: {
-    std::vector<std::uint8_t> values;
-    for (std::size_t i{}; i < size; ++i) {
-      values.push_back(*reinterpret_cast<const std::uint8_t *>(str));
-      str += 1;
-    }
-    // 空字符
-    values.push_back(0);
-    arr = llvm::ConstantDataArray::get(Context, values);
-  } break;
-  case 2: {
-    std::vector<std::uint16_t> values;
-    for (std::size_t i{}; i < size; ++i) {
-      values.push_back(*reinterpret_cast<const std::uint16_t *>(str));
-      str += 2;
-    }
-    values.push_back(0);
-    arr = llvm::ConstantDataArray::get(Context, values);
-  } break;
-  case 4: {
-    std::vector<std::uint32_t> values;
-    for (std::size_t i{}; i < size; ++i) {
-      values.push_back(*reinterpret_cast<const std::uint32_t *>(str));
-      str += 4;
-    }
-    values.push_back(0);
-    arr = llvm::ConstantDataArray::get(Context, values);
-  } break;
-  default:
-    assert(false);
+    case 1: {
+      std::vector<std::uint8_t> values;
+      for (std::size_t i{}; i < size; ++i) {
+        values.push_back(*reinterpret_cast<const std::uint8_t *>(str));
+        str += 1;
+      }
+      // 空字符
+      values.push_back(0);
+      arr = llvm::ConstantDataArray::get(Context, values);
+    } break;
+    case 2: {
+      std::vector<std::uint16_t> values;
+      for (std::size_t i{}; i < size; ++i) {
+        values.push_back(*reinterpret_cast<const std::uint16_t *>(str));
+        str += 2;
+      }
+      values.push_back(0);
+      arr = llvm::ConstantDataArray::get(Context, values);
+    } break;
+    case 4: {
+      std::vector<std::uint32_t> values;
+      for (std::size_t i{}; i < size; ++i) {
+        values.push_back(*reinterpret_cast<const std::uint32_t *>(str));
+        str += 4;
+      }
+      values.push_back(0);
+      arr = llvm::ConstantDataArray::get(Context, values);
+    } break;
+    default:
+      assert(false);
   }
 
   auto string{CreateGlobalString(arr, width)};
@@ -965,8 +967,8 @@ std::list<std::pair<Type *, std::int32_t>> &ObjectExpr::GetIndexs() {
   return indexs_;
 }
 
-const std::list<std::pair<Type *, std::int32_t>> &
-ObjectExpr::GetIndexs() const {
+const std::list<std::pair<Type *, std::int32_t>> &ObjectExpr::GetIndexs()
+    const {
   return indexs_;
 }
 
@@ -987,8 +989,10 @@ void ObjectExpr::SetFuncName(const std::string &func_name) {
 ObjectExpr::ObjectExpr(const std::string &name, QualType type,
                        std::uint32_t storage_class_spec, enum Linkage linkage,
                        bool anonymous, std::int32_t bit_field_width)
-    : IdentifierExpr{name, type, linkage, false}, anonymous_{anonymous},
-      storage_class_spec_{storage_class_spec}, align_{type->GetAlign()},
+    : IdentifierExpr{name, type, linkage, false},
+      anonymous_{anonymous},
+      storage_class_spec_{storage_class_spec},
+      align_{type->GetAlign()},
       bit_field_width_{bit_field_width} {}
 
 /*
@@ -1182,8 +1186,9 @@ const Stmt *IfStmt::GetThen() const { return then_block_; }
 const Stmt *IfStmt::GetElse() const { return else_block_; }
 
 IfStmt::IfStmt(Expr *cond, Stmt *then_block, Stmt *else_block)
-    : cond_{Expr::MayCast(cond)}, then_block_{then_block}, else_block_{
-                                                               else_block} {}
+    : cond_{Expr::MayCast(cond)},
+      then_block_{then_block},
+      else_block_{else_block} {}
 
 /*
  * SwitchStmt
@@ -1557,4 +1562,4 @@ const CompoundStmt *FuncDef::GetBody() const { return body_; }
 
 FuncDef::FuncDef(IdentifierExpr *ident) : ident_{ident} {}
 
-} // namespace kcc
+}  // namespace kcc

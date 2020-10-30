@@ -86,4 +86,4 @@ std::int32_t Location::GetRow() const { return row_; }
 
 std::int32_t Location::GetColumn() const { return column_; }
 
-} // namespace kcc
+}  // namespace kcc

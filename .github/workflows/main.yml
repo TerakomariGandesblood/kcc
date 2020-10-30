@@ -1,67 +1,54 @@
-name: CI
+# TODO
+name: Build
 
 on:
   push:
-    branches: [master]
   pull_request:
-    branches: [master]
+  schedule:
+    - cron: "0 0 1 * *"
 
 jobs:
-  ci:
-    runs-on: ubuntu-latest
-    container: archlinux
+  build:
+    # TODO Use ubuntu-latest
+    # https://docs.github.com/en/free-pro-team@latest/actions/reference/specifications-for-github-hosted-runners
+    runs-on: ubuntu-20.04
     strategy:
       matrix:
-        compiler: [g++, clang++]
+        build_type:
+          - { name: "Release" }
+          - { name: "Debug" }
+        config:
+          - { cc: "gcc-10", cxx: "g++-10" }
+          - { cc: "clang-10", cxx: "clang++-10" }
 
     steps:
       - uses: actions/checkout@v2
 
-      - name: Install libraries and tools
-        run: |
-          pacman -Syu --noconfirm
-          pacman -S --noconfirm base-devel clang lld llvm cmake wget unzip git \
-          boost fmt nlohmann-json
-          wget https://github.com/Neargye/magic_enum/archive/v0.6.6.zip
-          unzip v0.6.6.zip
-          cd magic_enum-0.6.6
-          mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Release ..
-          cmake --build . -j$(nproc)
-          make install
-          git clone https://github.com/linux-test-project/lcov
-          cd lcov
-          make install
-          wget http://search.cpan.org/CPAN/authors/id/N/NW/NWCLARK/PerlIO-gzip-0.20.tar.gz
-          tar -xzvf PerlIO-gzip-0.20.tar.gz
-          cd PerlIO-gzip-0.20
-          perl Makefile.PL
-          make -j$(nproc) && make install
-          wget http://www.cpan.org/authors/id/M/MA/MAKAMAKA/JSON-2.90.tar.gz
-          tar -xzvf JSON-2.90.tar.gz
-          cd JSON-2.90
-          perl Makefile.PL
-          make -j$(nproc) && make install
+      - name: Cache dependencies
+        id: cache-dependencies
+        uses: actions/cache@v2
+        with:
+          path: dependencies
+          key: ${{ runner.os }}-dependencies-20201031
 
-      - name: CMake
+      - name: Build and install dependencies
+        if: steps.cache-dependencies.outputs.cache-hit != 'true'
+        run: sudo bash ./scripts/build-install.sh
+
+      - name: Install dependencies
+        if: steps.cache-dependencies.outputs.cache-hit == 'true'
+        run: sudo bash ./scripts/install.sh
+
+      - name: Configure
+        run: |
+          cmake -S . -B build -DCMAKE_BUILD_TYPE=${{ matrix.build_type.name }} \
+          -DKLIB_BUILD_TESTS=ON
         env:
-          CXX: ${{ matrix.compiler }}
-        run: mkdir build && cd build && cmake -DCOVERAGE=TRUE -DCLANG_TIDY=TRUE ..
+          CC: ${{ matrix.config.cc }}
+          CXX: ${{ matrix.config.cxx }}
 
       - name: Build
-        run: cmake --build build -j$(nproc) --target all
+        run: cmake --build build --config ${{ matrix.build_type.name }} -j$(nproc)
 
-      - name: Execute tests
-        run: cd build && ctest -j1 --output-on-failure
-
-      - name: Install
-        run: cmake --build build --target install
-
-      - name: Gather coverage data
-        run: cmake --build build -j$(nproc) --target coverage
-
-      - name: Codecov upload
-        if: ${{ matrix.compiler == 'g++' }}
-        uses: codecov/codecov-action@v1
-        with:
-          file: build/coverage.info
-          fail_ci_if_error: true
+      - name: Test
+        run: cd build ; ctest -C ${{ matrix.build_type.name }} -j1 --output-on-failure

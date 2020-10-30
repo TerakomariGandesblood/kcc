@@ -172,4 +172,4 @@ bool CommandSuccess(std::int32_t status);
 
 bool DoNotLink();
 
-} // namespace kcc
+}  // namespace kcc

@@ -457,37 +457,37 @@ ArithmeticType *ArithmeticType::Get(std::uint32_t type_spec) {
   type_spec = ArithmeticType::DealWithTypeSpec(type_spec);
 
   switch (type_spec) {
-  case kBool:
-    return bool_type;
-  case kChar:
-    return char_type;
-  case kChar | kUnsigned:
-    return uchar_type;
-  case kShort:
-    return short_type;
-  case kShort | kUnsigned:
-    return ushort_type;
-  case kInt:
-    return int_type;
-  case kInt | kUnsigned:
-    return uint_type;
-  case kLong:
-    return long_type;
-  case kLong | kUnsigned:
-    return ulong_type;
-  case kLongLong:
-    return long_long_type;
-  case kLongLong | kUnsigned:
-    return ulong_long_type;
-  case kFloat:
-    return float_type;
-  case kDouble:
-    return double_type;
-  case kDouble | kLong:
-    return long_double_type;
-  default:
-    assert(false);
-    return nullptr;
+    case kBool:
+      return bool_type;
+    case kChar:
+      return char_type;
+    case kChar | kUnsigned:
+      return uchar_type;
+    case kShort:
+      return short_type;
+    case kShort | kUnsigned:
+      return ushort_type;
+    case kInt:
+      return int_type;
+    case kInt | kUnsigned:
+      return uint_type;
+    case kLong:
+      return long_type;
+    case kLong | kUnsigned:
+      return ulong_type;
+    case kLongLong:
+      return long_long_type;
+    case kLongLong | kUnsigned:
+      return ulong_long_type;
+    case kFloat:
+      return float_type;
+    case kDouble:
+      return double_type;
+    case kDouble | kLong:
+      return long_double_type;
+    default:
+      assert(false);
+      return nullptr;
   }
 }
 
@@ -540,31 +540,31 @@ Type *ArithmeticType::MaxType(Type *lhs, Type *rhs) {
 
 std::int32_t ArithmeticType::GetWidth() const {
   switch (type_spec_) {
-  case kBool:
-    return 1;
-  case kChar:
-  case kChar | kUnsigned:
-    return 1;
-  case kShort:
-  case kShort | kUnsigned:
-    return 2;
-  case kInt:
-  case kInt | kUnsigned:
-    return 4;
-  case kLong:
-  case kLong | kUnsigned:
-  case kLongLong:
-  case kLongLong | kUnsigned:
-    return 8;
-  case kFloat:
-    return 4;
-  case kDouble:
-    return 8;
-  case kDouble | kLong:
-    return 16;
-  default:
-    assert(false);
-    return 0;
+    case kBool:
+      return 1;
+    case kChar:
+    case kChar | kUnsigned:
+      return 1;
+    case kShort:
+    case kShort | kUnsigned:
+      return 2;
+    case kInt:
+    case kInt | kUnsigned:
+      return 4;
+    case kLong:
+    case kLong | kUnsigned:
+    case kLongLong:
+    case kLongLong | kUnsigned:
+      return 8;
+    case kFloat:
+      return 4;
+    case kDouble:
+      return 8;
+    case kDouble | kLong:
+      return 16;
+    default:
+      assert(false);
+      return 0;
   }
 }
 
@@ -589,27 +589,27 @@ bool ArithmeticType::Equal(const Type *other) const {
 
 std::uint64_t ArithmeticType::MaxIntegerValue() const {
   switch (type_spec_) {
-  case kChar:
-    return std::numeric_limits<std::int8_t>::max();
-  case kChar | kUnsigned:
-    return std::numeric_limits<std::uint8_t>::max();
-  case kShort:
-    return std::numeric_limits<std::int16_t>::max();
-  case kShort | kUnsigned:
-    return std::numeric_limits<std::uint16_t>::max();
-  case kInt:
-    return std::numeric_limits<std::int32_t>::max();
-  case kInt | kUnsigned:
-    return std::numeric_limits<std::uint32_t>::max();
-  case kLong:
-  case kLongLong:
-    return std::numeric_limits<std::int64_t>::max();
-  case kLong | kUnsigned:
-  case kLongLong | kUnsigned:
-    return std::numeric_limits<std::uint64_t>::max();
-  default:
-    assert(false);
-    return 0;
+    case kChar:
+      return std::numeric_limits<std::int8_t>::max();
+    case kChar | kUnsigned:
+      return std::numeric_limits<std::uint8_t>::max();
+    case kShort:
+      return std::numeric_limits<std::int16_t>::max();
+    case kShort | kUnsigned:
+      return std::numeric_limits<std::uint16_t>::max();
+    case kInt:
+      return std::numeric_limits<std::int32_t>::max();
+    case kInt | kUnsigned:
+      return std::numeric_limits<std::uint32_t>::max();
+    case kLong:
+    case kLongLong:
+      return std::numeric_limits<std::int64_t>::max();
+    case kLong | kUnsigned:
+    case kLongLong | kUnsigned:
+      return std::numeric_limits<std::uint64_t>::max();
+    default:
+      assert(false);
+      return 0;
   }
 }
 
@@ -655,32 +655,32 @@ std::uint32_t ArithmeticType::DealWithTypeSpec(std::uint32_t type_spec) {
 
 std::int32_t ArithmeticType::Rank() const {
   switch (type_spec_) {
-  case kBool:
-    return 0;
-  case kChar:
-  case kChar | kUnsigned:
-    return 1;
-  case kShort:
-  case kShort | kUnsigned:
-    return 2;
-  case kInt:
-  case kInt | kUnsigned:
-    return 3;
-  case kLong:
-  case kLong | kUnsigned:
-    return 4;
-  case kLongLong:
-  case kLongLong | kUnsigned:
-    return 5;
-  case kFloat:
-    return 6;
-  case kDouble:
-    return 7;
-  case kDouble | kLong:
-    return 8;
-  default:
-    assert(false);
-    return 0;
+    case kBool:
+      return 0;
+    case kChar:
+    case kChar | kUnsigned:
+      return 1;
+    case kShort:
+    case kShort | kUnsigned:
+      return 2;
+    case kInt:
+    case kInt | kUnsigned:
+      return 3;
+    case kLong:
+    case kLong | kUnsigned:
+      return 4;
+    case kLongLong:
+    case kLongLong | kUnsigned:
+      return 5;
+    case kFloat:
+      return 6;
+    case kDouble:
+      return 7;
+    case kDouble | kLong:
+      return 8;
+    default:
+      assert(false);
+      return 0;
   }
 }
 
@@ -804,7 +804,8 @@ QualType ArrayType::GetElementType() const { return contained_type_; }
 
 ArrayType::ArrayType(QualType contained_type,
                      std::optional<std::size_t> num_elements)
-    : Type{num_elements.has_value()}, contained_type_{contained_type},
+    : Type{num_elements.has_value()},
+      contained_type_{contained_type},
       num_elements_{num_elements} {
   if (num_elements.has_value()) {
     llvm_type_ =
@@ -1168,8 +1169,10 @@ std::int32_t StructType::MakeAlign(std::int32_t offset, std::int32_t align) {
 }
 
 StructType::StructType(bool is_struct, const std::string &name, Scope *parent)
-    : Type{false}, is_struct_{is_struct}, name_{name}, scope_{Scope::Get(
-                                                           parent, kBlock)} {
+    : Type{false},
+      is_struct_{is_struct},
+      name_{name},
+      scope_{Scope::Get(parent, kBlock)} {
   std::string prefix{is_struct ? "struct." : "union."};
 
   if (HasName()) {
@@ -1403,8 +1406,10 @@ const std::string &FunctionType::GetName() const { return name_; }
 
 FunctionType::FunctionType(QualType return_type,
                            std::vector<ObjectExpr *> param, bool is_var_args)
-    : Type{false}, return_type_{return_type}, params_{param}, is_var_args_{
-                                                                  is_var_args} {
+    : Type{false},
+      return_type_{return_type},
+      params_{param},
+      is_var_args_{is_var_args} {
   std::vector<llvm::Type *> params;
   for (const auto &item : params_) {
     params.push_back(item->GetType()->GetLLVMType());
@@ -1414,4 +1419,4 @@ FunctionType::FunctionType(QualType return_type,
                                        is_var_args_);
 }
 
-} // namespace kcc
+}  // namespace kcc

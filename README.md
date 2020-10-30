@@ -1,10 +1,12 @@
 # kcc
 
-[![CI](https://github.com/KaiserLancelot/kcc/workflows/CI/badge.svg)](https://github.com/KaiserLancelot/kcc/actions)
-[![Coverage Status](https://codecov.io/gh/KaiserLancelot/kcc/branch/master/graph/badge.svg)](https://codecov.io/gh/KaiserLancelot/kcc)
-[![License](https://img.shields.io/github/license/KaiserLancelot/kcc)](LICENSE)
-[![Badge](https://img.shields.io/badge/link-996.icu-%23FF4D5B.svg?style=flat-square)](https://996.icu/#/en_US)
-[![Lines](https://tokei.rs/b1/github/KaiserLancelot/kcc)](https://github.com/Aaronepower/tokei)
+[![Build](https://github.com/KaiserLancelot/kcc/workflows/Build/badge.svg)](https://github.com/KaiserLancelot/kcc/actions?query=workflow%3ABuild)
+[![Coverage Status](https://coveralls.io/repos/github/KaiserLancelot/kcc/badge.svg)](https://coveralls.io/github/KaiserLancelot/kcc)
+[![GitHub License](https://img.shields.io/github/license/KaiserLancelot/kcc)](https://raw.githubusercontent.com/KaiserLancelot/kcc/master/LICENSE)
+[![996.icu](https://img.shields.io/badge/link-996.icu-red.svg)](https://996.icu)
+[![GitHub Releases](https://img.shields.io/github/release/KaiserLancelot/kcc)](https://github.com/KaiserLancelot/kcc/releases/latest)
+[![GitHub Downloads](https://img.shields.io/github/downloads/KaiserLancelot/kcc/total)](https://github.com/KaiserLancelot/kcc/releases)
+[![Bugs](https://img.shields.io/github/issues/KaiserLancelot/kcc/bug)](https://github.com/KaiserLancelot/kcc/issues?q=is%3Aopen+is%3Aissue+label%3Abug)
 
 A small C11 compiler
 
@@ -12,15 +14,16 @@ A small C11 compiler
 
 #### Environment:
 
-- Linux(I use Manjaro)
-- gcc 10.2(For header files and link libraries)
+- Linux
+- gcc 10.2
 - gcc/clang(Request to support C++17)
+- libreadline-dev
 
 #### Libraries:
 
-- LLVM 10
-- clang 10
-- lld 10
+- LLVM 11
+- clang 11
+- lld 11
 - fmt
 - magic_enum
 - json

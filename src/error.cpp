@@ -76,4 +76,4 @@ void PrintWarnings() {
   }
 }
 
-} // namespace kcc
+}  // namespace kcc

@@ -25,11 +25,11 @@
 namespace kcc {
 
 class Parser {
-public:
+ public:
   explicit Parser(std::vector<Token> tokens);
   TranslationUnit *ParseTranslationUnit();
 
-private:
+ private:
   bool HasNext();
   const Token &Peek();
   const Token &Next();
@@ -221,4 +221,4 @@ private:
       indexs_;
 };
 
-} // namespace kcc
+}  // namespace kcc

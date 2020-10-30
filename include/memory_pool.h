@@ -52,4 +52,4 @@ inline boost::object_pool<FunctionType> FunctionTypePool;
 
 inline boost::object_pool<Scope> ScopePool;
 
-} // namespace kcc
+}  // namespace kcc

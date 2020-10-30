@@ -68,8 +68,8 @@ IdentifierExpr *Scope::FindUsual(const Token &tok) {
   return FindUsual(tok.GetIdentifier());
 }
 
-std::unordered_map<std::string, IdentifierExpr *>
-Scope::AllTagInCurrScope() const {
+std::unordered_map<std::string, IdentifierExpr *> Scope::AllTagInCurrScope()
+    const {
   return tags_;
 }
 
@@ -82,4 +82,4 @@ bool Scope::IsBlockScope() const { return type_ == kBlock; }
 Scope::Scope(Scope *parent, enum ScopeType type)
     : parent_{parent}, type_{type} {}
 
-} // namespace kcc
+}  // namespace kcc

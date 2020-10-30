@@ -287,4 +287,4 @@ llvm::DISubroutineType *DebugInfo::CreateFunctionType(Type *type) {
       builder_.getOrCreateTypeArray(ele_types));
 }
 
-} // namespace kcc
+}  // namespace kcc

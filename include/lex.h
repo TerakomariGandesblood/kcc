@@ -18,7 +18,7 @@
 namespace kcc {
 
 class Scanner {
-public:
+ public:
   explicit Scanner(std::string preprocessed_code);
   // for parser
   Scanner(std::string code, const Location &loc);
@@ -29,7 +29,7 @@ public:
   std::pair<std::int32_t, Encoding> HandleCharacter();
   std::pair<std::string, Encoding> HandleStringLiteral(bool handle_escape);
 
-private:
+ private:
   bool HasNext();
   std::int32_t Peek();
   std::int32_t Next(bool push = true);
@@ -70,4 +70,4 @@ private:
   inline static KeywordsDictionary Keywords;
 };
 
-} // namespace kcc
+}  // namespace kcc

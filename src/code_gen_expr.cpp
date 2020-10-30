@@ -4,8 +4,8 @@
 
 #include "code_gen.h"
 
-#include <algorithm>
 #include <assert.h>
+#include <algorithm>
 #include <vector>
 
 #include <llvm/IR/CFG.h>
@@ -22,44 +22,44 @@ void CodeGen::Visit(const UnaryOpExpr *node) {
   auto is_unsigned{node->GetExpr()->GetType()->IsUnsigned()};
 
   switch (node->GetOp()) {
-  case Tag::kPlusPlus:
-    result_ = IncOrDec(node->GetExpr(), true, false);
-    break;
-  case Tag::kPostfixPlusPlus:
-    result_ = IncOrDec(node->GetExpr(), true, true);
-    break;
-  case Tag::kMinusMinus:
-    result_ = IncOrDec(node->GetExpr(), false, false);
-    break;
-  case Tag::kPostfixMinusMinus:
-    result_ = IncOrDec(node->GetExpr(), false, true);
-    break;
-  case Tag::kPlus:
-    node->GetExpr()->Accept(*this);
-    break;
-  case Tag::kMinus:
-    node->GetExpr()->Accept(*this);
-    TryEmitLocation(node);
-    result_ = NegOp(result_, is_unsigned);
-    break;
-  case Tag::kTilde:
-    node->GetExpr()->Accept(*this);
-    TryEmitLocation(node);
-    result_ = Builder.CreateNot(result_);
-    break;
-  case Tag::kExclaim:
-    node->GetExpr()->Accept(*this);
-    TryEmitLocation(node);
-    result_ = LogicNotOp(result_);
-    break;
-  case Tag::kStar:
-    result_ = Deref(node);
-    break;
-  case Tag::kAmp:
-    result_ = GetPtr(node->GetExpr());
-    break;
-  default:
-    assert(false);
+    case Tag::kPlusPlus:
+      result_ = IncOrDec(node->GetExpr(), true, false);
+      break;
+    case Tag::kPostfixPlusPlus:
+      result_ = IncOrDec(node->GetExpr(), true, true);
+      break;
+    case Tag::kMinusMinus:
+      result_ = IncOrDec(node->GetExpr(), false, false);
+      break;
+    case Tag::kPostfixMinusMinus:
+      result_ = IncOrDec(node->GetExpr(), false, true);
+      break;
+    case Tag::kPlus:
+      node->GetExpr()->Accept(*this);
+      break;
+    case Tag::kMinus:
+      node->GetExpr()->Accept(*this);
+      TryEmitLocation(node);
+      result_ = NegOp(result_, is_unsigned);
+      break;
+    case Tag::kTilde:
+      node->GetExpr()->Accept(*this);
+      TryEmitLocation(node);
+      result_ = Builder.CreateNot(result_);
+      break;
+    case Tag::kExclaim:
+      node->GetExpr()->Accept(*this);
+      TryEmitLocation(node);
+      result_ = LogicNotOp(result_);
+      break;
+    case Tag::kStar:
+      result_ = Deref(node);
+      break;
+    case Tag::kAmp:
+      result_ = GetPtr(node->GetExpr());
+      break;
+    default:
+      assert(false);
   }
 }
 
@@ -72,20 +72,20 @@ void CodeGen::Visit(const TypeCastExpr *node) {
 
 void CodeGen::Visit(const BinaryOpExpr *node) {
   switch (node->GetOp()) {
-  case Tag::kPipePipe:
-    result_ = LogicOrOp(node);
-    return;
-  case Tag::kAmpAmp:
-    result_ = LogicAndOp(node);
-    return;
-  case Tag::kEqual:
-    result_ = AssignOp(node);
-    return;
-  case Tag::kPeriod:
-    result_ = MemberRef(node);
-    return;
-  default:
-    break;
+    case Tag::kPipePipe:
+      result_ = LogicOrOp(node);
+      return;
+    case Tag::kAmpAmp:
+      result_ = LogicAndOp(node);
+      return;
+    case Tag::kEqual:
+      result_ = AssignOp(node);
+      return;
+    case Tag::kPeriod:
+      result_ = MemberRef(node);
+      return;
+    default:
+      break;
   }
 
   node->GetLHS()->Accept(*this);
@@ -98,59 +98,59 @@ void CodeGen::Visit(const BinaryOpExpr *node) {
   bool is_unsigned{node->GetLHS()->GetType()->IsUnsigned()};
 
   switch (node->GetOp()) {
-  case Tag::kPlus:
-    result_ = AddOp(lhs, rhs, is_unsigned);
-    break;
-  case Tag::kMinus:
-    result_ = SubOp(lhs, rhs, is_unsigned);
-    break;
-  case Tag::kStar:
-    result_ = MulOp(lhs, rhs, is_unsigned);
-    break;
-  case Tag::kSlash:
-    result_ = DivOp(lhs, rhs, is_unsigned);
-    break;
-  case Tag::kPercent:
-    result_ = ModOp(lhs, rhs, is_unsigned);
-    break;
-  case Tag::kPipe:
-    result_ = OrOp(lhs, rhs);
-    break;
-  case Tag::kAmp:
-    result_ = AndOp(lhs, rhs);
-    break;
-  case Tag::kCaret:
-    result_ = XorOp(lhs, rhs);
-    break;
-  case Tag::kLessLess:
-    result_ = ShlOp(lhs, rhs);
-    break;
-  case Tag::kGreaterGreater:
-    result_ = ShrOp(lhs, rhs, is_unsigned);
-    break;
-  case Tag::kEqualEqual:
-    result_ = EqualOp(lhs, rhs);
-    break;
-  case Tag::kExclaimEqual:
-    result_ = NotEqualOp(lhs, rhs);
-    break;
-  case Tag::kLess:
-    result_ = LessOp(lhs, rhs, is_unsigned);
-    break;
-  case Tag::kLessEqual:
-    result_ = LessEqualOp(lhs, rhs, is_unsigned);
-    break;
-  case Tag::kGreater:
-    result_ = GreaterOp(lhs, rhs, is_unsigned);
-    break;
-  case Tag::kGreaterEqual:
-    result_ = GreaterEqualOp(lhs, rhs, is_unsigned);
-    break;
-  case Tag::kComma:
-    result_ = rhs;
-    break;
-  default:
-    assert(false);
+    case Tag::kPlus:
+      result_ = AddOp(lhs, rhs, is_unsigned);
+      break;
+    case Tag::kMinus:
+      result_ = SubOp(lhs, rhs, is_unsigned);
+      break;
+    case Tag::kStar:
+      result_ = MulOp(lhs, rhs, is_unsigned);
+      break;
+    case Tag::kSlash:
+      result_ = DivOp(lhs, rhs, is_unsigned);
+      break;
+    case Tag::kPercent:
+      result_ = ModOp(lhs, rhs, is_unsigned);
+      break;
+    case Tag::kPipe:
+      result_ = OrOp(lhs, rhs);
+      break;
+    case Tag::kAmp:
+      result_ = AndOp(lhs, rhs);
+      break;
+    case Tag::kCaret:
+      result_ = XorOp(lhs, rhs);
+      break;
+    case Tag::kLessLess:
+      result_ = ShlOp(lhs, rhs);
+      break;
+    case Tag::kGreaterGreater:
+      result_ = ShrOp(lhs, rhs, is_unsigned);
+      break;
+    case Tag::kEqualEqual:
+      result_ = EqualOp(lhs, rhs);
+      break;
+    case Tag::kExclaimEqual:
+      result_ = NotEqualOp(lhs, rhs);
+      break;
+    case Tag::kLess:
+      result_ = LessOp(lhs, rhs, is_unsigned);
+      break;
+    case Tag::kLessEqual:
+      result_ = LessEqualOp(lhs, rhs, is_unsigned);
+      break;
+    case Tag::kGreater:
+      result_ = GreaterOp(lhs, rhs, is_unsigned);
+      break;
+    case Tag::kGreaterEqual:
+      result_ = GreaterEqualOp(lhs, rhs, is_unsigned);
+      break;
+    case Tag::kComma:
+      result_ = rhs;
+      break;
+    default:
+      assert(false);
   }
 }
 
@@ -231,7 +231,16 @@ void CodeGen::Visit(const FuncCallExpr *node) {
   Finish_Load();
 
   TryEmitLocation(node);
-  result_ = Builder.CreateCall(callee, args);
+
+  if (callee->getType()->isPointerTy()) {
+    result_ =
+        Builder.CreateCall(llvm::cast<llvm::FunctionType>(
+                               callee->getType()->getPointerElementType()),
+                           callee, args);
+  } else {
+    result_ = Builder.CreateCall(
+        llvm::cast<llvm::Function>(callee)->getFunctionType(), callee, args);
+  }
 }
 
 // 常量用 ConstantFP / ConstantInt 类表示
@@ -1076,4 +1085,4 @@ llvm::Value *CodeGen::Bswap64(Expr *arg) {
   return Builder.CreateCall(bswap_i64, {result_});
 }
 
-} // namespace kcc
+}  // namespace kcc

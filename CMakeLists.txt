@@ -1,28 +1,26 @@
-cmake_minimum_required(VERSION 3.13)
+cmake_minimum_required(VERSION 3.12)
 
 project(
   kcc
-  VERSION 0.5.0
+  VERSION 0.6.0
   LANGUAGES CXX)
 
-if((CMAKE_BUILD_TYPE STREQUAL "Debug") OR (CMAKE_BUILD_TYPE STREQUAL
-                                           "RelWithDebInfo"))
-  # Address Memory Thread None
-  set(SANITIZER "Address")
-else()
-  set(SANITIZER "None")
-endif()
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+list(APPEND CMAKE_PREFIX_PATH "/usr/lib/llvm-11/lib/cmake/lld")
 
-set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
+include(CTest)
+include(Options)
 include(Check)
 include(ClangTidy)
 include(CompilerOptions)
-include(Sanitizers)
+include(Format)
+include(LTO)
 
 set(THREADS_PREFER_PTHREAD_FLAG TRUE)
 
 find_package(Clang REQUIRED CONFIG)
-find_package(LLVM 10 REQUIRED CONFIG)
+find_package(LLVM 11 REQUIRED CONFIG)
+find_package(LLD REQUIRED CONFIG)
 find_package(fmt REQUIRED)
 find_package(nlohmann_json REQUIRED)
 find_package(Boost REQUIRED)
@@ -30,7 +28,7 @@ find_package(ICU REQUIRED COMPONENTS uc)
 find_package(Threads REQUIRED)
 
 add_definitions(-DKCC_VERSION="${PROJECT_VERSION}" ${LLVM_DEFINITIONS})
-include_directories(include)
+include_directories(include ${LLVM_INCLUDE_DIRS})
 
 set(PROGRAM_NAME ${PROJECT_NAME})
 set(RUN_ARGS "-h")
@@ -46,7 +44,6 @@ include(Coverage)
 if((CMAKE_BUILD_TYPE MATCHES "Debug") OR (CMAKE_BUILD_TYPE MATCHES
                                           "RelWithDebInfo"))
   add_definitions(-DDEV)
-  include(Format)
 endif()
 
 target_link_libraries(

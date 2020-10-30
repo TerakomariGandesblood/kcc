@@ -30,7 +30,7 @@ std::int32_t CharToDigit(std::int32_t ch) {
   }
 }
 
-} // namespace
+}  // namespace
 
 Scanner::Scanner(std::string preprocessed_code)
     : source_{std::move(preprocessed_code)} {
@@ -104,8 +104,8 @@ std::pair<std::int32_t, Encoding> Scanner::HandleCharacter() {
   return {val, encoding};
 }
 
-std::pair<std::string, Encoding>
-Scanner::HandleStringLiteral(bool handle_escape) {
+std::pair<std::string, Encoding> Scanner::HandleStringLiteral(
+    bool handle_escape) {
   auto encoding{HandleEncoding()};
   std::string str;
   // eat "
@@ -199,184 +199,184 @@ const Token &Scanner::Scan() {
   MarkLocation();
 
   switch (auto ch{Next()}; ch) {
-  case '[':
-    return MakeToken(Tag::kLeftSquare);
-  case ']':
-    return MakeToken(Tag::kRightSquare);
-  case '(':
-    return MakeToken(Tag::kLeftParen);
-  case ')':
-    return MakeToken(Tag::kRightParen);
-  case '{':
-    return MakeToken(Tag::kLeftBrace);
-  case '}':
-    return MakeToken(Tag::kRightBrace);
-  case '.':
-    if (std::isdigit(Peek())) {
-      return SkipNumber();
-    }
-
-    if (Try('.')) {
-      if (Try('.')) {
-        return MakeToken(Tag::kEllipsis);
-      } else {
-        PutBack();
-      }
-    }
-
-    return MakeToken(Tag::kPeriod);
-  case '+':
-    if (Try('+')) {
-      return MakeToken(Tag::kPlusPlus);
-    } else if (Try('=')) {
-      return MakeToken(Tag::kPlusEqual);
-    } else {
-      return MakeToken(Tag::kPlus);
-    }
-  case '-':
-    if (Try('>')) {
-      return MakeToken(Tag::kArrow);
-    } else if (Try('-')) {
-      return MakeToken(Tag::kMinusMinus);
-    } else if (Try('=')) {
-      return MakeToken(Tag::kMinusEqual);
-    } else {
-      return MakeToken(Tag::kMinus);
-    }
-  case '&':
-    if (Try('&')) {
-      return MakeToken(Tag::kAmpAmp);
-    } else if (Try('=')) {
-      return MakeToken(Tag::kAmpEqual);
-    } else {
-      return MakeToken(Tag::kAmp);
-    }
-  case '*':
-    return MakeToken(Try('=') ? Tag::kStarEqual : Tag::kStar);
-  case '~':
-    return MakeToken(Tag::kTilde);
-  case '!':
-    return MakeToken(Try('=') ? Tag::kExclaimEqual : Tag::kExclaim);
-  case '/':
-    return MakeToken(Try('=') ? Tag::kSlashEqual : Tag::kSlash);
-    // 替用记号
-    // {	<%
-    // }	%>
-    // [	<:
-    // ]	:>
-    // #	%:
-    // ##	%:%:
-  case '%':
-    if (Try('=')) {
-      return MakeToken(Tag::kPercentEqual);
-    } else if (Try('>')) {
+    case '[':
+      return MakeToken(Tag::kLeftSquare);
+    case ']':
+      return MakeToken(Tag::kRightSquare);
+    case '(':
+      return MakeToken(Tag::kLeftParen);
+    case ')':
+      return MakeToken(Tag::kRightParen);
+    case '{':
+      return MakeToken(Tag::kLeftBrace);
+    case '}':
       return MakeToken(Tag::kRightBrace);
-    } else if (Try(':')) {
-      if (Try('%')) {
-        if (Try(':')) {
-          return MakeToken(Tag::kSharpSharp);
+    case '.':
+      if (std::isdigit(Peek())) {
+        return SkipNumber();
+      }
+
+      if (Try('.')) {
+        if (Try('.')) {
+          return MakeToken(Tag::kEllipsis);
         } else {
           PutBack();
         }
       }
-      return MakeToken(Tag::kSharp);
-    } else {
-      return MakeToken(Tag::kPercent);
-    }
-  case '<':
-    if (Try('<')) {
-      return MakeToken(Try('=') ? Tag::kLessLessEqual : Tag::kLessLess);
-    } else if (Try('=')) {
-      return MakeToken(Tag::kLessEqual);
-    } else if (Try(':')) {
-      return MakeToken(Tag::kLeftSquare);
-    } else if (Try('%')) {
-      return MakeToken(Tag::kLeftBrace);
-    } else {
-      return MakeToken(Tag::kLess);
-    }
-  case '>':
-    if (Try('>')) {
-      return MakeToken(Try('=') ? Tag::kGreaterGreaterEqual
-                                : Tag::kGreaterGreater);
-    } else {
-      return MakeToken(Try('=') ? Tag::kGreaterEqual : Tag::kGreater);
-    }
-  case '=':
-    return MakeToken(Try('=') ? Tag::kEqualEqual : Tag::kEqual);
-  case '^':
-    return MakeToken(Try('=') ? Tag::kCaretEqual : Tag::kCaret);
-  case '|':
-    if (Try('|')) {
-      return MakeToken(Tag::kPipePipe);
-    } else if (Try('=')) {
-      return MakeToken(Tag::kPipeEqual);
-    } else {
-      return MakeToken(Tag::kPipe);
-    }
-  case '?':
-    return MakeToken(Tag::kQuestion);
-  case ':':
-    return MakeToken(Try(magic_enum::enum_integer(Tag::kGreater))
-                         ? Tag::kRightSquare
-                         : Tag::kColon);
-  case ';':
-    return MakeToken(Tag::kSemicolon);
-  case ',':
-    return MakeToken(Tag::kComma);
-  case '#':
-    SkipLineDirectives();
-    return Scan();
-  case '0':
-  case '1':
-  case '2':
-  case '3':
-  case '4':
-  case '5':
-  case '6':
-  case '7':
-  case '8':
-  case '9':
-    return SkipNumber();
-  case '\'':
-    return SkipCharacter();
-  case '"':
-    return SkipStringLiteral();
-  case 'u':
-  case 'U':
-  case 'L':
-    PutBack();
-    HandleEncoding();
 
-    if (Try('\'')) {
+      return MakeToken(Tag::kPeriod);
+    case '+':
+      if (Try('+')) {
+        return MakeToken(Tag::kPlusPlus);
+      } else if (Try('=')) {
+        return MakeToken(Tag::kPlusEqual);
+      } else {
+        return MakeToken(Tag::kPlus);
+      }
+    case '-':
+      if (Try('>')) {
+        return MakeToken(Tag::kArrow);
+      } else if (Try('-')) {
+        return MakeToken(Tag::kMinusMinus);
+      } else if (Try('=')) {
+        return MakeToken(Tag::kMinusEqual);
+      } else {
+        return MakeToken(Tag::kMinus);
+      }
+    case '&':
+      if (Try('&')) {
+        return MakeToken(Tag::kAmpAmp);
+      } else if (Try('=')) {
+        return MakeToken(Tag::kAmpEqual);
+      } else {
+        return MakeToken(Tag::kAmp);
+      }
+    case '*':
+      return MakeToken(Try('=') ? Tag::kStarEqual : Tag::kStar);
+    case '~':
+      return MakeToken(Tag::kTilde);
+    case '!':
+      return MakeToken(Try('=') ? Tag::kExclaimEqual : Tag::kExclaim);
+    case '/':
+      return MakeToken(Try('=') ? Tag::kSlashEqual : Tag::kSlash);
+      // 替用记号
+      // {	<%
+      // }	%>
+      // [	<:
+      // ]	:>
+      // #	%:
+      // ##	%:%:
+    case '%':
+      if (Try('=')) {
+        return MakeToken(Tag::kPercentEqual);
+      } else if (Try('>')) {
+        return MakeToken(Tag::kRightBrace);
+      } else if (Try(':')) {
+        if (Try('%')) {
+          if (Try(':')) {
+            return MakeToken(Tag::kSharpSharp);
+          } else {
+            PutBack();
+          }
+        }
+        return MakeToken(Tag::kSharp);
+      } else {
+        return MakeToken(Tag::kPercent);
+      }
+    case '<':
+      if (Try('<')) {
+        return MakeToken(Try('=') ? Tag::kLessLessEqual : Tag::kLessLess);
+      } else if (Try('=')) {
+        return MakeToken(Tag::kLessEqual);
+      } else if (Try(':')) {
+        return MakeToken(Tag::kLeftSquare);
+      } else if (Try('%')) {
+        return MakeToken(Tag::kLeftBrace);
+      } else {
+        return MakeToken(Tag::kLess);
+      }
+    case '>':
+      if (Try('>')) {
+        return MakeToken(Try('=') ? Tag::kGreaterGreaterEqual
+                                  : Tag::kGreaterGreater);
+      } else {
+        return MakeToken(Try('=') ? Tag::kGreaterEqual : Tag::kGreater);
+      }
+    case '=':
+      return MakeToken(Try('=') ? Tag::kEqualEqual : Tag::kEqual);
+    case '^':
+      return MakeToken(Try('=') ? Tag::kCaretEqual : Tag::kCaret);
+    case '|':
+      if (Try('|')) {
+        return MakeToken(Tag::kPipePipe);
+      } else if (Try('=')) {
+        return MakeToken(Tag::kPipeEqual);
+      } else {
+        return MakeToken(Tag::kPipe);
+      }
+    case '?':
+      return MakeToken(Tag::kQuestion);
+    case ':':
+      return MakeToken(Try(magic_enum::enum_integer(Tag::kGreater))
+                           ? Tag::kRightSquare
+                           : Tag::kColon);
+    case ';':
+      return MakeToken(Tag::kSemicolon);
+    case ',':
+      return MakeToken(Tag::kComma);
+    case '#':
+      SkipLineDirectives();
+      return Scan();
+    case '0':
+    case '1':
+    case '2':
+    case '3':
+    case '4':
+    case '5':
+    case '6':
+    case '7':
+    case '8':
+    case '9':
+      return SkipNumber();
+    case '\'':
       return SkipCharacter();
-    } else if (Try('"')) {
+    case '"':
       return SkipStringLiteral();
-    } else {
-      Next();
+    case 'u':
+    case 'U':
+    case 'L':
+      PutBack();
+      HandleEncoding();
+
+      if (Try('\'')) {
+        return SkipCharacter();
+      } else if (Try('"')) {
+        return SkipStringLiteral();
+      } else {
+        Next();
+        return SkipIdentifier();
+      }
+    case '\\':
+      if (Test('u') || Test('U')) {
+        return SkipIdentifier();
+      } else {
+        Error(loc_, "Invalid input: '{}'", static_cast<char>(ch));
+      }
+    case '_':
+      // 扩展
+    case '$':
       return SkipIdentifier();
+    case '\0':
+      buffer_.clear();
+      return MakeToken(Tag::kEof);
+    default: {
+      // 字节 0xFE 和 0xFF 在 UTF-8 编码中从未用到
+      if (std::isalpha(ch) || (ch >= 0x80 && ch <= 0xfd)) {
+        return SkipIdentifier();
+      } else {
+        Error(loc_, "Invalid input: '{}'", static_cast<char>(ch));
+      }
     }
-  case '\\':
-    if (Test('u') || Test('U')) {
-      return SkipIdentifier();
-    } else {
-      Error(loc_, "Invalid input: '{}'", static_cast<char>(ch));
-    }
-  case '_':
-    // 扩展
-  case '$':
-    return SkipIdentifier();
-  case '\0':
-    buffer_.clear();
-    return MakeToken(Tag::kEof);
-  default: {
-    // 字节 0xFE 和 0xFF 在 UTF-8 编码中从未用到
-    if (std::isalpha(ch) || (ch >= 0x80 && ch <= 0xfd)) {
-      return SkipIdentifier();
-    } else {
-      Error(loc_, "Invalid input: '{}'", static_cast<char>(ch));
-    }
-  }
   }
 }
 
@@ -570,47 +570,47 @@ Encoding Scanner::HandleEncoding() {
 std::int32_t Scanner::HandleEscape() {
   auto ch{Next()};
   switch (ch) {
-  case '\'':
-  case '\"':
-  case '\?':
-  case '\\':
-    return ch;
-  case 'a':
-    return '\a';
-  case 'b':
-    return '\b';
-  case 'f':
-    return '\f';
-  case 'n':
-    return '\n';
-  case 'r':
-    return '\r';
-  case 't':
-    return '\t';
-  case 'v':
-    return '\v';
-    // GNU 扩展
-  case 'e':
-    return '\033';
-  case 'X':
-  case 'x':
-    return HandleHexEscape();
-  case '0':
-  case '1':
-  case '2':
-  case '3':
-  case '4':
-  case '5':
-  case '6':
-  case '7':
-    return HandleOctEscape(ch);
-  case 'u':
-    return HandleUCN(4);
-  case 'U':
-    return HandleUCN(8);
-  default: {
-    Error(loc_, "unknown escape sequence '\\{}'", ch);
-  }
+    case '\'':
+    case '\"':
+    case '\?':
+    case '\\':
+      return ch;
+    case 'a':
+      return '\a';
+    case 'b':
+      return '\b';
+    case 'f':
+      return '\f';
+    case 'n':
+      return '\n';
+    case 'r':
+      return '\r';
+    case 't':
+      return '\t';
+    case 'v':
+      return '\v';
+      // GNU 扩展
+    case 'e':
+      return '\033';
+    case 'X':
+    case 'x':
+      return HandleHexEscape();
+    case '0':
+    case '1':
+    case '2':
+    case '3':
+    case '4':
+    case '5':
+    case '6':
+    case '7':
+      return HandleOctEscape(ch);
+    case 'u':
+      return HandleUCN(4);
+    case 'U':
+      return HandleUCN(8);
+    default: {
+      Error(loc_, "unknown escape sequence '\\{}'", ch);
+    }
   }
 }
 
@@ -678,4 +678,4 @@ std::int32_t Scanner::HandleUCN(std::int32_t length) {
   return val;
 }
 
-} // namespace kcc
+}  // namespace kcc

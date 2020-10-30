@@ -23,7 +23,7 @@ namespace kcc {
 // LLVM 中使用的是 DWARF
 // 它是一种广泛使用的标准化调试数据格式
 class DebugInfo {
-public:
+ public:
   DebugInfo();
   // 代码生成完毕之后调用它
   void Finalize();
@@ -38,7 +38,7 @@ public:
   void EmitLocalVar(const Declaration *node);
   void EmitGlobalVar(const Declaration *node);
 
-private:
+ private:
   llvm::DIScope *GetScope();
 
   llvm::DIType *GetOrCreateType(Type *type, const Location &loc = Location{});
@@ -64,4 +64,4 @@ private:
   std::unordered_map<Type *, llvm::DIType *> type_cache_;
 };
 
-} // namespace kcc
+}  // namespace kcc

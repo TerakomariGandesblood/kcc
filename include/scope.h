@@ -32,7 +32,7 @@ enum ScopeType { kBlock, kFile, kFunc, kFuncProto };
 // 该类型由成员访问运算符左运算数确定
 // 所有其他标识符, 会在通常命名空间中查找
 class Scope {
-public:
+ public:
   static Scope *Get(Scope *parent, enum ScopeType type);
 
   auto begin() { return std::begin(usual_); }
@@ -58,7 +58,7 @@ public:
   bool IsFileScope() const;
   bool IsBlockScope() const;
 
-private:
+ private:
   Scope(Scope *parent, enum ScopeType type);
 
   Scope *parent_;
@@ -70,4 +70,4 @@ private:
   std::unordered_map<std::string, IdentifierExpr *> usual_;
 };
 
-} // namespace kcc
+}  // namespace kcc

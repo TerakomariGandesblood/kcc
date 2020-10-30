@@ -76,4 +76,4 @@ bool Token::IsDeclSpec() const {
          tag_ == Tag::kRegister;
 }
 
-} // namespace kcc
+}  // namespace kcc

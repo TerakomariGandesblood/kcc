@@ -15,11 +15,11 @@
 namespace kcc {
 
 class JsonGen : public Visitor {
-public:
+ public:
   explicit JsonGen(const std::string &filter = "");
   void GenJson(const TranslationUnit *root, const std::string &file_name);
 
-private:
+ private:
   bool CheckFileName(const AstNode *node) const;
 
   virtual void Visit(const UnaryOpExpr *node) override;
@@ -282,4 +282,4 @@ private:
       "</html>\n"};
 };
 
-} // namespace kcc
+}  // namespace kcc

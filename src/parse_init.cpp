@@ -519,4 +519,4 @@ llvm::Constant *Parser::ParseLiteralInitializer(Type *type, bool need_ptr) {
   }
 }
 
-} // namespace kcc
+}  // namespace kcc

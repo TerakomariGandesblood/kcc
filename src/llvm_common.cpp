@@ -512,4 +512,4 @@ llvm::Value *GetBitFieldValue(llvm::Value *value, std::int32_t size,
   }
 }
 
-} // namespace kcc
+}  // namespace kcc

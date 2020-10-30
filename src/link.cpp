@@ -18,16 +18,21 @@ bool Link() {
   std::vector<const char *> args{
       "--eh-frame-hdr",
       "-melf_x86_64",
-      "/usr/bin/../lib64/gcc/x86_64-pc-linux-gnu/10.2.0/../../../../lib64/"
+      "/usr/bin/../lib/gcc/x86_64-linux-gnu/10/../../../x86_64-linux-gnu/"
+      "crt1.o",
+      "/usr/bin/../lib/gcc/x86_64-linux-gnu/10/../../../x86_64-linux-gnu/"
       "crti.o",
-      "/usr/bin/../lib64/gcc/x86_64-pc-linux-gnu/10.2.0/crtbeginS.o",
-      "-L/usr/bin/../lib64/gcc/x86_64-pc-linux-gnu/10.2.0",
-      "-L/usr/bin/../lib64/gcc/x86_64-pc-linux-gnu/10.2.0/../../../../lib64",
-      "-L/usr/bin/../lib64",
+      "/usr/bin/../lib/gcc/x86_64-linux-gnu/10/crtbegin.o",
+      "-L/usr/bin/../lib/gcc/x86_64-linux-gnu/10",
+      "-L/usr/bin/../lib/gcc/x86_64-linux-gnu/10/../../../x86_64-linux-gnu",
+      "-L/usr/bin/../lib/gcc/x86_64-linux-gnu/10/../../../../lib64",
+      "-L/lib/x86_64-linux-gnu",
       "-L/lib/../lib64",
+      "-L/usr/lib/x86_64-linux-gnu",
       "-L/usr/lib/../lib64",
-      "-L/usr/bin/../lib64/gcc/x86_64-pc-linux-gnu/10.2.0/../../..",
-      "-L/usr/bin/../lib",
+      "-L/usr/lib/x86_64-linux-gnu/../../lib64",
+      "-L/usr/bin/../lib/gcc/x86_64-linux-gnu/10/../../..",
+      "-L/usr/lib/llvm-11/bin/../lib",
       "-L/lib",
       "-L/usr/lib",
       "-lgcc",
@@ -39,19 +44,15 @@ bool Link() {
       "--as-needed",
       "-lgcc_s",
       "--no-as-needed",
-      "/usr/bin/../lib64/gcc/x86_64-pc-linux-gnu/10.2.0/crtendS.o",
-      "/usr/bin/../lib64/gcc/x86_64-pc-linux-gnu/10.2.0/../../../../lib64/"
+      "/usr/bin/../lib/gcc/x86_64-linux-gnu/10/crtend.o",
+      "/usr/bin/../lib/gcc/x86_64-linux-gnu/10/../../../x86_64-linux-gnu/"
       "crtn.o"};
 
   if (Shared) {
     args.push_back("-shared");
   } else {
-    args.push_back("-pie");
     args.push_back("-dynamic-linker");
     args.push_back("/lib64/ld-linux-x86-64.so.2");
-    args.push_back(
-        "/usr/bin/../lib64/gcc/x86_64-pc-linux-gnu/10.2.0/../../../../lib64/"
-        "Scrt1.o");
   }
   /*
    * End of Platform Specific Code
@@ -91,4 +92,4 @@ bool Link() {
   return lld::elf::link(args, false, llvm::outs(), llvm::errs());
 }
 
-} // namespace kcc
+}  // namespace kcc

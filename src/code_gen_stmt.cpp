@@ -308,4 +308,4 @@ void CodeGen::Visit(const ReturnStmt *node) {
   EmitBranchThroughCleanup(return_block_);
 }
 
-} // namespace kcc
+}  // namespace kcc

@@ -15,42 +15,42 @@ Stmt *Parser::ParseStmt() {
   TryParseAttributeSpec();
 
   switch (Peek().GetTag()) {
-  case Tag::kIdentifier: {
-    Next();
-    if (Peek().TagIs(Tag::kColon)) {
-      PutBack();
-      return ParseLabelStmt();
-    } else {
-      PutBack();
-      return ParseExprStmt();
+    case Tag::kIdentifier: {
+      Next();
+      if (Peek().TagIs(Tag::kColon)) {
+        PutBack();
+        return ParseLabelStmt();
+      } else {
+        PutBack();
+        return ParseExprStmt();
+      }
     }
-  }
-  case Tag::kCase:
-    return ParseCaseStmt();
-  case Tag::kDefault:
-    return ParseDefaultStmt();
-  case Tag::kLeftBrace:
-    return ParseCompoundStmt();
-  case Tag::kIf:
-    return ParseIfStmt();
-  case Tag::kSwitch:
-    return ParseSwitchStmt();
-  case Tag::kWhile:
-    return ParseWhileStmt();
-  case Tag::kDo:
-    return ParseDoWhileStmt();
-  case Tag::kFor:
-    return ParseForStmt();
-  case Tag::kGoto:
-    return ParseGotoStmt();
-  case Tag::kContinue:
-    return ParseContinueStmt();
-  case Tag::kBreak:
-    return ParseBreakStmt();
-  case Tag::kReturn:
-    return ParseReturnStmt();
-  default:
-    return ParseExprStmt();
+    case Tag::kCase:
+      return ParseCaseStmt();
+    case Tag::kDefault:
+      return ParseDefaultStmt();
+    case Tag::kLeftBrace:
+      return ParseCompoundStmt();
+    case Tag::kIf:
+      return ParseIfStmt();
+    case Tag::kSwitch:
+      return ParseSwitchStmt();
+    case Tag::kWhile:
+      return ParseWhileStmt();
+    case Tag::kDo:
+      return ParseDoWhileStmt();
+    case Tag::kFor:
+      return ParseForStmt();
+    case Tag::kGoto:
+      return ParseGotoStmt();
+    case Tag::kContinue:
+      return ParseContinueStmt();
+    case Tag::kBreak:
+      return ParseBreakStmt();
+    case Tag::kReturn:
+      return ParseReturnStmt();
+    default:
+      return ParseExprStmt();
   }
 }
 
@@ -247,4 +247,4 @@ Stmt *Parser::ParseReturnStmt() {
   }
 }
 
-} // namespace kcc
+}  // namespace kcc

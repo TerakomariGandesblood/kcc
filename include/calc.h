@@ -16,14 +16,14 @@
 namespace kcc {
 
 class CalcConstantExpr : public Visitor {
-public:
+ public:
   explicit CalcConstantExpr(const Location &loc = {});
 
   llvm::Constant *Calc(const Expr *expr);
   std::optional<std::int64_t> CalcInteger(const Expr *expr,
                                           bool as_error = true);
 
-private:
+ private:
   static llvm::Constant *Throw(llvm::Constant *value = nullptr);
 
   virtual void Visit(const UnaryOpExpr *node) override;
@@ -95,4 +95,4 @@ private:
   Location loc_;
 };
 
-} // namespace kcc
+}  // namespace kcc

@@ -195,4 +195,4 @@ bool DoNotLink() {
          EmitAST || EmitLLVM;
 }
 
-} // namespace kcc
+}  // namespace kcc
