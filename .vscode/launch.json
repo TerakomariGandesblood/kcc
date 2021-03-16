@@ -2,23 +2,12 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "(gdb) 启动",
-      "type": "cppdbg",
+      "type": "vgdb",
       "request": "launch",
+      "name": "C/C++ Debug Launch",
       "program": "${command:cmake.launchTargetPath}",
       "args": [],
-      "stopAtEntry": false,
-      "cwd": "${command:cmake.launchTargetDirectory}",
-      "environment": [],
-      "externalConsole": false,
-      "MIMode": "gdb",
-      "setupCommands": [
-        {
-          "description": "为 gdb 启用整齐打印",
-          "text": "-enable-pretty-printing",
-          "ignoreFailures": false
-        }
-      ]
+      "cwd": "${command:cmake.launchTargetDirectory}"
     }
   ]
 }

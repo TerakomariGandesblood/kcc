@@ -8,7 +8,7 @@ include(AddCompilerFlag)
 # ---------------------------------------------------------------------------------------
 # Coverage
 # ---------------------------------------------------------------------------------------
-if(KCC_BUILD_COVERAGE)
+if(KCC_BUILD_COVERAGE OR KCC_BUILD_ALL)
   if(CMAKE_COMPILER_IS_GNUCXX)
     add_cxx_compiler_flag("--coverage")
   else()
@@ -33,6 +33,14 @@ if(KCC_USE_LIBCXX)
                                              "RelWithDebInfo"))
     add_cxx_compiler_flag("-fstandalone-debug")
   endif()
+endif()
+
+# ---------------------------------------------------------------------------------------
+# lld
+# ---------------------------------------------------------------------------------------
+if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+  message(STATUS "Use lld")
+  add_link_options("-fuse-ld=lld")
 endif()
 
 # ---------------------------------------------------------------------------------------
@@ -100,8 +108,8 @@ add_cxx_compiler_flag("-Wextra")
 add_cxx_compiler_flag("-Wpedantic")
 add_cxx_compiler_flag("-Werror")
 
+# FIXME
 add_cxx_compiler_flag("-Wno-unused-parameter")
-
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
   add_cxx_compiler_flag("-Wno-ambiguous-reversed-operator")
 endif()

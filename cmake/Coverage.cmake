@@ -1,10 +1,9 @@
-if(KCC_BUILD_COVERAGE)
+if(KCC_BUILD_COVERAGE OR KCC_BUILD_ALL)
   if(CMAKE_COMPILER_IS_GNUCXX)
     message(
       STATUS
         "Build tests with coverage information, use lcov to generate reports")
 
-    # https://github.com/RWTH-HPC/CMake-codecov/blob/master/cmake/FindGcov.cmake
     get_filename_component(COMPILER_PATH ${CMAKE_CXX_COMPILER} PATH)
     string(REGEX MATCH "^[0-9]+" GCC_VERSION ${CMAKE_CXX_COMPILER_VERSION})
     find_program(

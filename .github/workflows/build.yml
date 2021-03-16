@@ -1,0 +1,51 @@
+name: Build
+
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: "0 0 1 * *"
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        build_type:
+          - { name: "Release" }
+          - { name: "Debug" }
+        config:
+          - { cc: "gcc", cxx: "g++" }
+          - { cc: "clang", cxx: "clang++" }
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Cache dependencies
+        id: cache-dependencies
+        uses: actions/cache@v2
+        with:
+          path: dependencies
+          key: ${{ runner.os }}-dependencies-20210228
+
+      - name: Build and install dependencies
+        if: steps.cache-dependencies.outputs.cache-hit != 'true'
+        run: sudo bash ./scripts/build-install.sh
+
+      - name: Install dependencies
+        if: steps.cache-dependencies.outputs.cache-hit == 'true'
+        run: sudo bash ./scripts/install.sh
+
+      - name: Configure
+        run: |
+          cmake -S . -B build -DCMAKE_BUILD_TYPE=${{ matrix.build_type.name }} \
+          -DKCC_BUILD_TESTS=ON
+        env:
+          CC: ${{ matrix.config.cc }}
+          CXX: ${{ matrix.config.cxx }}
+
+      - name: Build
+        run: cmake --build build --config ${{ matrix.build_type.name }} -j$(nproc)
+
+      - name: Test
+        run: cd build ; ctest -C ${{ matrix.build_type.name }} -j$(nproc) --output-on-failure

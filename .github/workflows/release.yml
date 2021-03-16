@@ -1,0 +1,86 @@
+name: Release
+
+on:
+  release:
+    types: published
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        config:
+          - { cc: "gcc", cxx: "g++" }
+          - { cc: "clang", cxx: "clang++" }
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Cache dependencies
+        id: cache-dependencies
+        uses: actions/cache@v2
+        with:
+          path: dependencies
+          key: ${{ runner.os }}-dependencies-20210228
+
+      - name: Build and install dependencies
+        if: steps.cache-dependencies.outputs.cache-hit != 'true'
+        run: sudo bash ./scripts/build-install.sh
+
+      - name: Install dependencies
+        if: steps.cache-dependencies.outputs.cache-hit == 'true'
+        run: sudo bash ./scripts/install.sh
+
+      - name: Set environment variable
+        run: echo "RELEASE_VERSION=${TAG_NAME:1}" >> $GITHUB_ENV
+        env:
+          TAG_NAME: ${{ github.event.release.tag_name }}
+
+      - name: Configure
+        run: cmake -S . -B build
+
+      - name: Build
+        run: cmake --build build --config Release -j$(nproc)
+
+      - name: CPack
+        run: cd build ; cpack
+
+      - name: Install
+        run: |
+          sudo dpkg -i build/kcc-${{ env.RELEASE_VERSION }}-Linux.deb
+          sudo ldconfig
+
+      - name: Run executable
+        run: executable
+
+      - name: Build examples
+        run: |
+          cd examples
+          cmake -S . -B build
+          cmake --build build --config Release -j$(nproc)
+        env:
+          CC: ${{ matrix.config.cc }}
+          CXX: ${{ matrix.config.cxx }}
+
+      - name: Upload release asset(deb)
+        if: ${{ matrix.config.cxx == 'g++' }}
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: build/kcc-${{ env.RELEASE_VERSION }}-Linux.deb
+          asset_name: kcc-${{ env.RELEASE_VERSION }}-Linux.deb
+          asset_content_type: application/vnd.debian.binary-package
+
+      - name: Upload release asset(tgz)
+        if: ${{ matrix.config.cxx == 'g++' }}
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: build/kcc-${{ env.RELEASE_VERSION }}-Linux.tar.gz
+          asset_name: kcc-${{ env.RELEASE_VERSION }}-Linux.tar.gz
+          # https://en.wikipedia.org/wiki/List_of_archive_formats
+          asset_content_type: application/x-gtar

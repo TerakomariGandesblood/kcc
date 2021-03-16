@@ -1,12 +1,13 @@
 {
   "recommendations": [
-    "ms-vscode.cpptools",
     "amiralizadeh9480.cpp-helper",
     "matepek.vscode-catch2-test-adapter",
+    "llvm-vs-code-extensions.vscode-clangd",
     "twxs.cmake",
     "ms-vscode.cmake-tools",
     "cheshirekow.cmake-format",
     "cschlosser.doxdocgen",
-    "surajbarkale.ninja"
+    "surajbarkale.ninja",
+    "penagos.vgdb"
   ]
 }

@@ -32,9 +32,11 @@
 *.app
 
 # Development files
+.cache
 build
 cmake-build-*
 compile_commands.json
+*.profraw
 
 # Dev files
 dev

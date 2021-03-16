@@ -1,5 +1,4 @@
-# TODO
-name: Build
+name: Valgrind
 
 on:
   push:
@@ -9,17 +8,12 @@ on:
 
 jobs:
   build:
-    # TODO Use ubuntu-latest
-    # https://docs.github.com/en/free-pro-team@latest/actions/reference/specifications-for-github-hosted-runners
     runs-on: ubuntu-20.04
     strategy:
       matrix:
-        build_type:
-          - { name: "Release" }
-          - { name: "Debug" }
         config:
-          - { cc: "gcc-10", cxx: "g++-10" }
-          - { cc: "clang-10", cxx: "clang++-10" }
+          - { cc: "gcc", cxx: "g++" }
+          - { cc: "clang", cxx: "clang++" }
 
     steps:
       - uses: actions/checkout@v2
@@ -29,7 +23,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: dependencies
-          key: ${{ runner.os }}-dependencies-20201031
+          key: ${{ runner.os }}-dependencies-20210228
 
       - name: Build and install dependencies
         if: steps.cache-dependencies.outputs.cache-hit != 'true'
@@ -41,14 +35,14 @@ jobs:
 
       - name: Configure
         run: |
-          cmake -S . -B build -DCMAKE_BUILD_TYPE=${{ matrix.build_type.name }} \
-          -DKLIB_BUILD_TESTS=ON
+          cmake -S . -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+          -DKCC_BUILD_TESTS=ON -DKCC_VALGRIND=ON
         env:
           CC: ${{ matrix.config.cc }}
           CXX: ${{ matrix.config.cxx }}
 
       - name: Build
-        run: cmake --build build --config ${{ matrix.build_type.name }} -j$(nproc)
+        run: cmake --build build --config RelWithDebInfo -j$(nproc)
 
       - name: Test
-        run: cd build ; ctest -C ${{ matrix.build_type.name }} -j1 --output-on-failure
+        run: cd build ; ctest -C RelWithDebInfo -j$(nproc) --output-on-failure

@@ -1,5 +1,7 @@
 # kcc
 
+**It can only be compiled for the time being, and the other parts are being sorted out **
+
 [![Build](https://github.com/KaiserLancelot/kcc/workflows/Build/badge.svg)](https://github.com/KaiserLancelot/kcc/actions?query=workflow%3ABuild)
 [![Coverage Status](https://coveralls.io/repos/github/KaiserLancelot/kcc/badge.svg)](https://coveralls.io/github/KaiserLancelot/kcc)
 [![GitHub License](https://img.shields.io/github/license/KaiserLancelot/kcc)](https://raw.githubusercontent.com/KaiserLancelot/kcc/master/LICENSE)
@@ -33,15 +35,14 @@ A small C11 compiler
 #### Build
 
 ```bash
-mkdir build && cd build
-cmake ..
-cmake --build . -j$(nproc)
+cmake -S . -B build
+cmake --build build --config Release -j$(nproc)
 ```
 
 #### Install
 
 ```bash
-make install
+sudo cmake --build build --config Release --target install
 ```
 
 #### Use

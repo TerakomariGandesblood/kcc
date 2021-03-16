@@ -9,8 +9,8 @@ BUILD_TYPE=Release
 while getopts 'g' OPT; do
     case $OPT in
     g)
-        export CC=clang-10
-        export CXX=clang++-10
+        export CC=clang
+        export CXX=clang++
         BUILD_TYPE=RelWithDebInfo
         ;;
     ?)
@@ -30,16 +30,6 @@ cd lcov-*
 sudo make install
 cd ..
 echo "Install lcov completed"
-
-cd doxygen-Release_*
-sudo cmake --build build --config Release --target install
-cd ..
-echo "Install doxygen completed"
-
-cd benchmark-*
-sudo cmake --build build --config Release --target install
-cd ..
-echo "Install google benchmark completed"
 
 if [ -d llvm-project-llvmorg-* ]; then
     cd llvm-project-llvmorg-*

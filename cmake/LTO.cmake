@@ -1,4 +1,3 @@
-# https://github.com/ninja-build/ninja/blob/master/CMakeLists.txt
 if(CMAKE_BUILD_TYPE STREQUAL "Release")
   include(CheckIPOSupported)
   check_ipo_supported(RESULT LTO_SUPPORTED OUTPUT ERROR)

@@ -1,0 +1,60 @@
+name: Install
+
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: "0 0 1 * *"
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        use_add_subdirectory: ["ON", "OFF"]
+        config:
+          - { cc: "gcc", cxx: "g++" }
+          - { cc: "clang", cxx: "clang++" }
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Cache dependencies
+        id: cache-dependencies
+        uses: actions/cache@v2
+        with:
+          path: dependencies
+          key: ${{ runner.os }}-dependencies-20210228
+
+      - name: Build and install dependencies
+        if: steps.cache-dependencies.outputs.cache-hit != 'true'
+        run: sudo bash ./scripts/build-install.sh
+
+      - name: Install dependencies
+        if: steps.cache-dependencies.outputs.cache-hit == 'true'
+        run: sudo bash ./scripts/install.sh
+
+      - name: Configure
+        run: cmake -S . -B build
+
+      - name: Build
+        run: cmake --build build --config Release -j$(nproc)
+
+      - name: Install
+        run: |
+          sudo cmake --build build --config Release --target install
+          sudo ldconfig
+
+      - name: Run executable
+        run: executable
+
+      - name: Build examples
+        run: |
+          cp -r examples ../
+          cd ../examples
+          cp -r ../kcc .
+          cmake -S . -B build -DEXAMPLES_USE_ADD_SUBDIRECTORY=${{ matrix.use_add_subdirectory }}
+          cmake --build build --config Release -j$(nproc)
+        env:
+          CC: ${{ matrix.config.cc }}
+          CXX: ${{ matrix.config.cxx }}

@@ -1,4 +1,3 @@
-# https://github.com/google/benchmark/blob/master/cmake/AddCXXCompilerFlag.cmake
 function(mangle_compiler_flag FLAG OUTPUT)
   string(TOUPPER "HAVE_FLAG_${FLAG}" SANITIZED_FLAG)
   string(REPLACE "+" "X" SANITIZED_FLAG ${SANITIZED_FLAG})
