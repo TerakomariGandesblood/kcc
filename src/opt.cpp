@@ -80,12 +80,10 @@ void Optimization() {
     llvm::initializeInstrumentation(registry);
     llvm::initializeTarget(registry);
     llvm::initializeExpandMemCmpPassPass(registry);
-    llvm::initializeScalarizeMaskedMemIntrinPass(registry);
     llvm::initializeCodeGenPreparePass(registry);
     llvm::initializeAtomicExpandPass(registry);
     llvm::initializeRewriteSymbolsLegacyPassPass(registry);
     llvm::initializeWinEHPreparePass(registry);
-    llvm::initializeDwarfEHPreparePass(registry);
     llvm::initializeSafeStackLegacyPassPass(registry);
     llvm::initializeSjLjEHPreparePass(registry);
     llvm::initializeStackProtectorPass(registry);

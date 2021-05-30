@@ -49,8 +49,8 @@ void DebugInfo::EmitLocation(const AstNode *node) {
   }
 
   auto loc{node->GetLoc()};
-  Builder.SetCurrentDebugLocation(
-      llvm::DebugLoc::get(loc.GetRow(), loc.GetColumn(), GetScope()));
+  Builder.SetCurrentDebugLocation(llvm::DebugLoc(llvm::DILocation::get(
+      Context, loc.GetRow(), loc.GetColumn(), GetScope())));
 }
 
 void DebugInfo::EmitFuncStart(const FuncDef *node) {
@@ -88,9 +88,10 @@ void DebugInfo::EmitParamVar(const std::string &name, Type *type,
                                               file_, line_no,
                                               GetOrCreateType(type), true)};
 
-  builder_.insertDeclare(ptr, param, builder_.createExpression(),
-                         llvm::DebugLoc::get(line_no, 0, subprogram_),
-                         Builder.GetInsertBlock());
+  builder_.insertDeclare(
+      ptr, param, builder_.createExpression(),
+      llvm::DebugLoc(llvm::DILocation::get(Context, line_no, 0, subprogram_)),
+      Builder.GetInsertBlock());
 }
 
 void DebugInfo::EmitLocalVar(const Declaration *decl) {
@@ -109,10 +110,10 @@ void DebugInfo::EmitLocalVar(const Declaration *decl) {
       scope, ident->GetName(), file_, loc.GetRow(),
       GetOrCreateType(ident->GetType()), optimize_)};
 
-  builder_.insertDeclare(
-      ptr, var, builder_.createExpression(),
-      llvm::DebugLoc::get(loc.GetRow(), loc.GetColumn(), scope),
-      Builder.GetInsertBlock());
+  builder_.insertDeclare(ptr, var, builder_.createExpression(),
+                         llvm::DebugLoc(llvm::DILocation::get(
+                             Context, loc.GetRow(), loc.GetColumn(), scope)),
+                         Builder.GetInsertBlock());
 }
 
 void DebugInfo::EmitGlobalVar(const Declaration *decl) {

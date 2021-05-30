@@ -32,11 +32,11 @@ bool JsonGen::CheckFileName(const AstNode *node) const {
 }
 
 void JsonGen::Visit(const UnaryOpExpr *node) {
-  nlohmann::json root;
+  boost::json::object root;
   auto str{node->KindQString()};
   root["name"] = str.append(" ").append(magic_enum::enum_name(node->GetOp()));
 
-  nlohmann::json children;
+  boost::json::array children;
   node->GetExpr()->Accept(*this);
   children.push_back(result_);
 
@@ -46,14 +46,14 @@ void JsonGen::Visit(const UnaryOpExpr *node) {
 }
 
 void JsonGen::Visit(const TypeCastExpr *node) {
-  nlohmann::json root;
+  boost::json::object root;
   root["name"] = node->KindQString();
 
-  nlohmann::json children;
+  boost::json::array children;
   node->GetExpr()->Accept(*this);
   children.push_back(result_);
 
-  nlohmann::json type;
+  boost::json::object type;
   type["name"] = "cast to: " + node->GetCastToType()->ToString();
   children.push_back(type);
 
@@ -63,11 +63,11 @@ void JsonGen::Visit(const TypeCastExpr *node) {
 }
 
 void JsonGen::Visit(const BinaryOpExpr *node) {
-  nlohmann::json root;
+  boost::json::object root;
   auto str{node->KindQString()};
   root["name"] = str.append(" ").append(magic_enum::enum_name(node->GetOp()));
 
-  nlohmann::json children;
+  boost::json::array children;
 
   node->GetLHS()->Accept(*this);
   children.push_back(result_);
@@ -81,10 +81,10 @@ void JsonGen::Visit(const BinaryOpExpr *node) {
 }
 
 void JsonGen::Visit(const ConditionOpExpr *node) {
-  nlohmann::json root;
+  boost::json::object root;
   root["name"] = node->KindQString();
 
-  nlohmann::json children;
+  boost::json::array children;
   node->GetCond()->Accept(*this);
   children.push_back(result_);
 
@@ -100,10 +100,10 @@ void JsonGen::Visit(const ConditionOpExpr *node) {
 }
 
 void JsonGen::Visit(const FuncCallExpr *node) {
-  nlohmann::json root;
+  boost::json::object root;
   root["name"] = node->KindQString();
 
-  nlohmann::json children;
+  boost::json::array children;
   node->GetCallee()->Accept(*this);
   children.push_back(result_);
 
@@ -128,30 +128,30 @@ void JsonGen::Visit(const ConstantExpr *node) {
     assert(false);
   }
 
-  nlohmann::json root;
+  boost::json::object root;
   root["name"] = str;
 
   result_ = root;
 }
 
 void JsonGen::Visit(const StringLiteralExpr *node) {
-  nlohmann::json root;
+  boost::json::object root;
   root["name"] = node->KindQString().append(": ").append(node->GetStr());
 
   result_ = root;
 }
 
 void JsonGen::Visit(const IdentifierExpr *node) {
-  nlohmann::json root;
+  boost::json::object root;
   root["name"] = node->KindQString();
 
-  nlohmann::json children;
+  boost::json::array children;
 
-  nlohmann::json type;
+  boost::json::object type;
   type["name"] = "type: " + node->GetType()->ToString();
   children.push_back(type);
 
-  nlohmann::json name;
+  boost::json::object name;
   name["name"] = "name: " + node->GetName();
   children.push_back(name);
 
@@ -161,16 +161,16 @@ void JsonGen::Visit(const IdentifierExpr *node) {
 }
 
 void JsonGen::Visit(const EnumeratorExpr *node) {
-  nlohmann::json root;
+  boost::json::object root;
   root["name"] = node->KindQString();
 
-  nlohmann::json children;
+  boost::json::array children;
 
-  nlohmann::json name;
+  boost::json::object name;
   name["name"] = "name: " + node->GetName();
   children.push_back(name);
 
-  nlohmann::json value;
+  boost::json::object value;
   value["name"] = node->GetVal();
   children.push_back(value);
 
@@ -180,16 +180,16 @@ void JsonGen::Visit(const EnumeratorExpr *node) {
 }
 
 void JsonGen::Visit(const ObjectExpr *node) {
-  nlohmann::json root;
+  boost::json::object root;
   root["name"] = node->KindQString();
 
-  nlohmann::json children;
+  boost::json::array children;
 
-  nlohmann::json type;
+  boost::json::object type;
   type["name"] = "type: " + node->GetType()->ToString();
   children.push_back(type);
 
-  nlohmann::json name;
+  boost::json::object name;
   name["name"] = "name: " + node->GetName();
   children.push_back(name);
 
@@ -199,10 +199,10 @@ void JsonGen::Visit(const ObjectExpr *node) {
 }
 
 void JsonGen::Visit(const StmtExpr *node) {
-  nlohmann::json root;
+  boost::json::object root;
   root["name"] = node->KindQString();
 
-  nlohmann::json children;
+  boost::json::array children;
   node->GetBlock()->Accept(*this);
   children.push_back(result_);
 
@@ -212,12 +212,12 @@ void JsonGen::Visit(const StmtExpr *node) {
 }
 
 void JsonGen::Visit(const LabelStmt *node) {
-  nlohmann::json root;
+  boost::json::object root;
   root["name"] = node->KindQString();
 
-  nlohmann::json children;
+  boost::json::array children;
 
-  nlohmann::json name;
+  boost::json::object name;
   name["name"] = "label: " + node->GetName();
   children.push_back(name);
 
@@ -230,7 +230,7 @@ void JsonGen::Visit(const LabelStmt *node) {
 }
 
 void JsonGen::Visit(const CaseStmt *node) {
-  nlohmann::json root;
+  boost::json::object root;
 
   auto rhs{node->GetRHS()};
   if (rhs) {
@@ -244,7 +244,7 @@ void JsonGen::Visit(const CaseStmt *node) {
         node->KindQString().append(" ").append(std::to_string(node->GetLHS()));
   }
 
-  nlohmann::json children;
+  boost::json::array children;
   if (node->GetStmt()) {
     node->GetStmt()->Accept(*this);
     children.push_back(result_);
@@ -256,10 +256,10 @@ void JsonGen::Visit(const CaseStmt *node) {
 }
 
 void JsonGen::Visit(const DefaultStmt *node) {
-  nlohmann::json root;
+  boost::json::object root;
   root["name"] = node->KindQString();
 
-  nlohmann::json children;
+  boost::json::array children;
   if (node->GetStmt()) {
     node->GetStmt()->Accept(*this);
     children.push_back(result_);
@@ -271,10 +271,10 @@ void JsonGen::Visit(const DefaultStmt *node) {
 }
 
 void JsonGen::Visit(const CompoundStmt *node) {
-  nlohmann::json root;
+  boost::json::object root;
   root["name"] = node->KindQString();
 
-  nlohmann::json children;
+  boost::json::array children;
 
   for (const auto &item : node->GetStmts()) {
     item->Accept(*this);
@@ -287,15 +287,15 @@ void JsonGen::Visit(const CompoundStmt *node) {
 }
 
 void JsonGen::Visit(const ExprStmt *node) {
-  nlohmann::json root;
+  boost::json::object root;
   root["name"] = node->KindQString();
 
-  nlohmann::json children;
+  boost::json::array children;
   if (node->GetExpr()) {
     node->GetExpr()->Accept(*this);
     children.push_back(result_);
   } else {
-    nlohmann::json obj;
+    boost::json::object obj;
     obj["name"] = "empty stmt";
     children.push_back(obj);
   }
@@ -306,10 +306,10 @@ void JsonGen::Visit(const ExprStmt *node) {
 }
 
 void JsonGen::Visit(const IfStmt *node) {
-  nlohmann::json root;
+  boost::json::object root;
   root["name"] = node->KindQString();
 
-  nlohmann::json children;
+  boost::json::array children;
 
   node->GetCond()->Accept(*this);
   children.push_back(result_);
@@ -328,10 +328,10 @@ void JsonGen::Visit(const IfStmt *node) {
 }
 
 void JsonGen::Visit(const SwitchStmt *node) {
-  nlohmann::json root;
+  boost::json::object root;
   root["name"] = node->KindQString();
 
-  nlohmann::json children;
+  boost::json::array children;
   node->GetCond()->Accept(*this);
   children.push_back(result_);
 
@@ -344,10 +344,10 @@ void JsonGen::Visit(const SwitchStmt *node) {
 }
 
 void JsonGen::Visit(const WhileStmt *node) {
-  nlohmann::json root;
+  boost::json::object root;
   root["name"] = node->KindQString();
 
-  nlohmann::json children;
+  boost::json::array children;
 
   node->GetCond()->Accept(*this);
   children.push_back(result_);
@@ -361,10 +361,10 @@ void JsonGen::Visit(const WhileStmt *node) {
 }
 
 void JsonGen::Visit(const DoWhileStmt *node) {
-  nlohmann::json root;
+  boost::json::object root;
   root["name"] = node->KindQString();
 
-  nlohmann::json children;
+  boost::json::array children;
 
   node->GetCond()->Accept(*this);
   children.push_back(result_);
@@ -378,10 +378,10 @@ void JsonGen::Visit(const DoWhileStmt *node) {
 }
 
 void JsonGen::Visit(const ForStmt *node) {
-  nlohmann::json root;
+  boost::json::object root;
   root["name"] = node->KindQString();
 
-  nlohmann::json children;
+  boost::json::array children;
 
   if (node->GetInit()) {
     node->GetInit()->Accept(*this);
@@ -409,11 +409,11 @@ void JsonGen::Visit(const ForStmt *node) {
 }
 
 void JsonGen::Visit(const GotoStmt *node) {
-  nlohmann::json root;
+  boost::json::object root;
   root["name"] = node->KindQString();
 
-  nlohmann::json children;
-  nlohmann::json name;
+  boost::json::array children;
+  boost::json::object name;
   name["name"] = "label: " + node->GetName();
   children.push_back(name);
 
@@ -423,27 +423,27 @@ void JsonGen::Visit(const GotoStmt *node) {
 }
 
 void JsonGen::Visit(const ContinueStmt *node) {
-  nlohmann::json root;
+  boost::json::object root;
   root["name"] = node->KindQString();
   result_ = root;
 }
 
 void JsonGen::Visit(const BreakStmt *node) {
-  nlohmann::json root;
+  boost::json::object root;
   root["name"] = node->KindQString();
   result_ = root;
 }
 
 void JsonGen::Visit(const ReturnStmt *node) {
-  nlohmann::json root;
+  boost::json::object root;
   root["name"] = node->KindQString();
 
-  nlohmann::json children;
+  boost::json::array children;
   if (node->GetExpr()) {
     node->GetExpr()->Accept(*this);
     children.push_back(result_);
   } else {
-    nlohmann::json obj;
+    boost::json::object obj;
     obj["name"] = "void";
     children.push_back(obj);
   }
@@ -454,10 +454,10 @@ void JsonGen::Visit(const ReturnStmt *node) {
 }
 
 void JsonGen::Visit(const TranslationUnit *node) {
-  nlohmann::json root;
+  boost::json::object root;
   root["name"] = node->KindQString();
 
-  nlohmann::json children;
+  boost::json::array children;
   for (const auto &item : node->GetExtDecl()) {
     if (!CheckFileName(item)) {
       continue;
@@ -472,24 +472,24 @@ void JsonGen::Visit(const TranslationUnit *node) {
 }
 
 void JsonGen::Visit(const Declaration *node) {
-  nlohmann::json root;
+  boost::json::object root;
   root["name"] = node->KindQString();
 
-  nlohmann::json children;
+  boost::json::array children;
   node->GetIdent()->Accept(*this);
   children.push_back(result_);
 
   if (node->HasConstantInit()) {
-    nlohmann::json obj;
+    boost::json::object obj;
     obj["name"] = LLVMConstantToStr(node->GetConstant());
     children.push_back(obj);
   } else if (node->ValueInit()) {
-    nlohmann::json obj;
+    boost::json::object obj;
     obj["name"] = "value init";
     children.push_back(obj);
   } else if (node->HasLocalInit()) {
     for (const auto &item : node->GetLocalInits()) {
-      nlohmann::json obj;
+      boost::json::object obj;
 
       std::string str;
       for (const auto &index : item.GetIndexs()) {
@@ -498,7 +498,7 @@ void JsonGen::Visit(const Declaration *node) {
 
       obj["name"] = str;
 
-      nlohmann::json arr;
+      boost::json::array arr;
       item.GetExpr()->Accept(*this);
       arr.push_back(result_);
 
@@ -514,10 +514,10 @@ void JsonGen::Visit(const Declaration *node) {
 }
 
 void JsonGen::Visit(const FuncDef *node) {
-  nlohmann::json root;
+  boost::json::object root;
   root["name"] = node->KindQString();
 
-  nlohmann::json children;
+  boost::json::array children;
 
   node->GetIdent()->Accept(*this);
   children.push_back(result_);

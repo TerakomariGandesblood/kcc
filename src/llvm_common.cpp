@@ -10,6 +10,7 @@
 #include <clang/Basic/LangStandard.h>
 #include <clang/Basic/TargetOptions.h>
 #include <clang/Frontend/FrontendOptions.h>
+#include <clang/Lex/PreprocessorOptions.h>
 #include <llvm/ADT/Optional.h>
 #include <llvm/Support/Casting.h>
 #include <llvm/Support/CodeGen.h>
@@ -41,7 +42,7 @@ void InitLLVM() {
   Ci.setTarget(TargetInfo);
   Ci.getInvocation().setLangDefaults(
       Ci.getLangOpts(), clang::InputKind{clang::Language::C},
-      TargetInfo->getTriple(), Ci.getPreprocessorOpts(),
+      TargetInfo->getTriple(), Ci.getPreprocessorOpts().Includes,
       clang::LangStandard::lang_c17);
 
   auto &lang_opt{Ci.getLangOpts()};

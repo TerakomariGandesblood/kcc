@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.19)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 # TODO ???
-list(APPEND CMAKE_PREFIX_PATH "/usr/lib/llvm-11/lib/cmake/lld")
+list(APPEND CMAKE_PREFIX_PATH "/usr/lib/llvm-12/lib/cmake/lld")
 
 project(
   kcc
@@ -24,11 +24,10 @@ include(LTO)
 set(THREADS_PREFER_PTHREAD_FLAG TRUE)
 
 find_package(Clang REQUIRED CONFIG)
-find_package(LLVM 11 REQUIRED CONFIG)
+find_package(LLVM 12 REQUIRED CONFIG)
 find_package(LLD REQUIRED CONFIG)
 find_package(fmt REQUIRED)
-find_package(nlohmann_json REQUIRED)
-find_package(Boost REQUIRED)
+find_package(Boost REQUIRED json)
 find_package(ICU REQUIRED COMPONENTS uc)
 find_package(Threads REQUIRED)
 
@@ -51,11 +50,11 @@ target_link_libraries(
   ${EXECUTABLE}
   PRIVATE ${CMAKE_THREAD_LIBS_INIT}
           ${ICU_LIBRARIES}
+        ${Boost_LIBRARIES}
           clang-cpp
           LLVM
           lldELF
           lldCommon
-          nlohmann_json::nlohmann_json
           fmt::fmt-header-only)
 
 # ---------------------------------------------------------------------------------------

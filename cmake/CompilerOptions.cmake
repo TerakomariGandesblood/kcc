@@ -1,4 +1,4 @@
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -109,7 +109,9 @@ add_cxx_compiler_flag("-Wpedantic")
 add_cxx_compiler_flag("-Werror")
 
 # FIXME
-add_cxx_compiler_flag("-Wno-unused-parameter")
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-  add_cxx_compiler_flag("-Wno-ambiguous-reversed-operator")
+  add_cxx_compiler_flag("-Wno-unused-parameter")
+else()
+  add_cxx_compiler_flag("-Wno-unused-parameter")
+  add_cxx_compiler_flag("-Wno-mismatched-new-delete")
 endif()

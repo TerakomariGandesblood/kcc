@@ -1,13 +1,9 @@
-//
-// Created by kaiser on 2019/11/1.
-//
-
 #pragma once
 
 #include <string>
 #include <string_view>
 
-#include <nlohmann/json.hpp>
+#include <boost/json.hpp>
 
 #include "ast.h"
 #include "visitor.h"
@@ -54,7 +50,7 @@ class JsonGen : public Visitor {
   virtual void Visit(const FuncDef *node) override;
 
   std::string filter_;
-  nlohmann::json result_;
+  boost::json::value result_;
 
   constexpr static std::string_view Before{
       "<!DOCTYPE html>\n"
