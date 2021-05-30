@@ -54,8 +54,8 @@ include(CompilerOptions)
 # ---------------------------------------------------------------------------------------
 # Find package
 # ---------------------------------------------------------------------------------------
-find_package(Clang REQUIRED CONFIG)
 find_package(LLVM 12 REQUIRED CONFIG)
+find_package(Clang REQUIRED CONFIG)
 find_package(LLD REQUIRED CONFIG)
 find_package(fmt REQUIRED)
 find_package(Boost 1.75.0 REQUIRED json)
