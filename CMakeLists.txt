@@ -6,6 +6,7 @@ message(STATUS "CMake version: ${CMAKE_VERSION}")
 # Start kcc project
 # ---------------------------------------------------------------------------------------
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+list(APPEND CMAKE_PREFIX_PATH "/usr/lib/llvm-12/lib/cmake/clang")
 list(APPEND CMAKE_PREFIX_PATH "/usr/lib/llvm-12/lib/cmake/lld")
 
 include(Version)
@@ -72,15 +73,8 @@ include_directories(${LLVM_INCLUDE_DIRS})
 add_library(${LIBRARY} STATIC ${LIBRARY_SRC})
 target_include_directories(${LIBRARY} PUBLIC "${KCC_SOURCE_DIR}/include")
 target_link_libraries(
-  ${LIBRARY}
-  PRIVATE ${CMAKE_THREAD_LIBS_INIT}
-          ${ICU_LIBRARIES}
-          ${Boost_LIBRARIES}
-          clang-cpp
-          LLVM
-          lldELF
-          lldCommon
-          fmt::fmt)
+  ${LIBRARY} PRIVATE ${CMAKE_THREAD_LIBS_INIT} ${ICU_LIBRARIES}
+                     ${Boost_LIBRARIES} clangFrontend lldELF fmt::fmt)
 
 set_target_properties(
   ${LIBRARY}
