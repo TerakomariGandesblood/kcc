@@ -36,7 +36,9 @@ void CodeGen::Visit(const CaseStmt *node) {
   }
 
   for (auto i{begin}; i <= end; ++i) {
-    switch_inst_->addCase(llvm::ConstantInt::get(Builder.getInt64Ty(), i),
+    // FIXME
+    switch_inst_->addCase(llvm::ConstantInt::get(Builder.getInt64Ty(),
+                                                 static_cast<std::uint64_t>(i)),
                           block);
   }
 

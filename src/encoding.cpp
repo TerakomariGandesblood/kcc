@@ -46,18 +46,18 @@ void ConvertToUtf16(std::string &str) {
   mbstate_t state = {};
 
   while ((rc = mbrtoc16(&out, begin, std::size(str), &state))) {
-    assert(rc != static_cast<std::size_t>(-3));
+    if (rc == static_cast<std::size_t>(-3)) {
+      for (std::int32_t i{0}; i < 2; ++i) {
+        result.push_back(*(reinterpret_cast<char *>(&out) + i));
+      }
+    } else if (rc <= SIZE_MAX / 2) {
+      begin += rc;
 
-    if (rc == static_cast<std::size_t>(-2)) {
-      Error("Incomplete byte composition Incomplete byte composition");
-    } else if (rc == static_cast<std::size_t>(-1)) {
-      Error("Character encoding error");
-    }
-
-    begin += rc;
-
-    for (std::int32_t i{0}; i < 2; ++i) {
-      result.push_back(*(reinterpret_cast<char *>(&out) + i));
+      for (std::int32_t i{0}; i < 2; ++i) {
+        result.push_back(*(reinterpret_cast<char *>(&out) + i));
+      }
+    } else {
+      break;
     }
   }
 
@@ -77,16 +77,14 @@ void ConvertToUtf32(std::string &str) {
   while ((rc = mbrtoc32(&out, begin, std::size(str), &state))) {
     assert(rc != static_cast<std::size_t>(-3));
 
-    if (rc == static_cast<std::size_t>(-2)) {
-      Error("Incomplete byte composition Incomplete byte composition");
-    } else if (rc == static_cast<std::size_t>(-1)) {
-      Error("Character encoding error");
-    }
+    if (rc > static_cast<std::size_t>(-1) / 2) {
+      break;
+    } else {
+      begin += rc;
 
-    begin += rc;
-
-    for (std::int32_t i{0}; i < 4; ++i) {
-      result.push_back(*(reinterpret_cast<char *>(&out) + i));
+      for (std::int32_t i{0}; i < 4; ++i) {
+        result.push_back(*(reinterpret_cast<char *>(&out) + i));
+      }
     }
   }
 

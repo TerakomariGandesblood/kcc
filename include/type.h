@@ -14,7 +14,7 @@
 
 namespace kcc {
 
-enum TypeSpec {
+enum TypeSpec : std::uint32_t {
   kSigned = 0x1,
   kUnsigned = 0x2,
   kVoid = 0x4,
@@ -36,7 +36,7 @@ enum TypeSpec {
   kLongLong = 0x8000
 };
 
-enum TypeQualifier {
+enum TypeQualifier : std::uint32_t {
   kConst = 0x1,
   // 不支持
   kRestrict = 0x2,
@@ -45,7 +45,7 @@ enum TypeQualifier {
   kAtomic = 0x8
 };
 
-enum StorageClassSpec {
+enum StorageClassSpec : std::uint32_t {
   kTypedef = 0x1,
   kExtern = 0x2,
   kStatic = 0x4,
@@ -55,9 +55,9 @@ enum StorageClassSpec {
   kRegister = 0x20
 };
 
-enum FuncSpec { kInline = 0x1, kNoreturn = 0x2 };
+enum FuncSpec : std::uint32_t { kInline = 0x1, kNoreturn = 0x2 };
 
-enum TypeSpecCompatibility {
+enum TypeSpecCompatibility : std::uint32_t {
   kCompSigned = kShort | kInt | kLong | kLongLong,
   kCompUnsigned = kShort | kInt | kLong | kLongLong,
   kCompChar = kSigned | kUnsigned,

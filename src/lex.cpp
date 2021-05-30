@@ -68,7 +68,8 @@ std::string Scanner::HandleIdentifier() {
     if (IsUCN(ch)) {
       AppendUCN(ident, HandleEscape());
     } else {
-      ident.push_back(ch);
+      // FIXME
+      ident.push_back(static_cast<char>(ch));
     }
   }
 
@@ -122,7 +123,8 @@ std::pair<std::string, Encoding> Scanner::HandleStringLiteral(
     if (handle_escape && is_ucn) {
       AppendUCN(str, ch);
     } else {
-      str.push_back(ch);
+      // FIXME
+      str.push_back(static_cast<char>(ch));
     }
   }
 
@@ -143,7 +145,8 @@ std::int32_t Scanner::Next(bool push) {
   ++index_;
 
   if (push) {
-    buffer_.push_back(ch);
+    // FIXME
+    buffer_.push_back(static_cast<char>(ch));
   }
 
   if (ch == '\n') {
