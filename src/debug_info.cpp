@@ -14,6 +14,7 @@
 
 #include "scope.h"
 #include "util.h"
+#include "version.h"
 
 namespace kcc {
 
@@ -25,8 +26,8 @@ DebugInfo::DebugInfo() {
                               path.parent_path().string());
 
   cu_ = builder_.createCompileUnit(
-      llvm::dwarf::DW_LANG_C11, file_, "kcc " KCC_VERSION, optimize_, "", 0, "",
-      llvm::DICompileUnit::DebugEmissionKind::FullDebug, 0, true, false,
+      llvm::dwarf::DW_LANG_C11, file_, "kcc " KCC_VERSION_STR, optimize_, "", 0,
+      "", llvm::DICompileUnit::DebugEmissionKind::FullDebug, 0, true, false,
       llvm::DICompileUnit::DebugNameTableKind::None);
 
   Module->addModuleFlag(llvm::Module::Warning, "Dwarf Version",

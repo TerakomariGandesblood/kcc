@@ -1,5 +1,5 @@
 if(KCC_VALGRIND)
-  message(STATUS "Execute tests with valgrind")
+  message(STATUS "Execute test with valgrind")
 
   find_program(VALGRIND_EXECUTABLE valgrind)
 
@@ -8,8 +8,10 @@ if(KCC_VALGRIND)
   endif()
 
   add_test(
-    NAME ${TESTS_EXECUTABLE}-valgrind
-    COMMAND ${VALGRIND_EXECUTABLE} --error-exitcode=1 --track-origins=yes
-            --gen-suppressions=all --leak-check=full ./${TESTS_EXECUTABLE}
-    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/tests)
+    NAME ${TEST_EXECUTABLE}-valgrind
+    COMMAND
+      ${VALGRIND_EXECUTABLE} --leak-check=full --show-leak-kinds=all
+      --leak-resolution=med --track-origins=yes --vgdb=no --tool=memcheck
+      --gen-suppressions=all --error-exitcode=1 ./${TEST_EXECUTABLE}
+    WORKING_DIRECTORY ${KCC_BINARY_DIR}/test)
 endif()

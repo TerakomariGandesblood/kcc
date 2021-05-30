@@ -7,11 +7,11 @@ on:
     - cron: "0 0 1 * *"
 
 jobs:
-  address-undefined:
+  build:
     runs-on: ubuntu-20.04
     strategy:
       matrix:
-        config:
+        compiler:
           - { cc: "gcc", cxx: "g++" }
           - { cc: "clang", cxx: "clang++" }
 
@@ -23,101 +23,26 @@ jobs:
         uses: actions/cache@v2
         with:
           path: dependencies
-          key: ${{ runner.os }}-dependencies-20210228
-
-      - name: Build and install dependencies
-        if: steps.cache-dependencies.outputs.cache-hit != 'true'
-        run: sudo bash ./scripts/build-install.sh
+          key: sanitizer-dependencies-20210530
 
       - name: Install dependencies
-        if: steps.cache-dependencies.outputs.cache-hit == 'true'
-        run: sudo bash ./scripts/install.sh
+        run: sudo bash script/build.sh
 
       - name: Configure
         run: |
           cmake -S . -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo \
-          -DKCC_BUILD_TESTS=ON -DKCC_SANITIZER="Address;Undefined"
+          -DKCC_BUILD_TEST=ON -DKCC_SANITIZER=ON
         env:
-          CC: ${{ matrix.config.cc }}
-          CXX: ${{ matrix.config.cxx }}
+          CC: ${{ matrix.compiler.cc }}
+          CXX: ${{ matrix.compiler.cxx }}
 
       - name: Build
-        run: cmake --build build --config RelWithDebInfo -j$(nproc)
+        run: cmake --build build --config RelWithDebInfo -j"$(nproc)"
 
       - name: Test
-        run: cd build ; ctest -C RelWithDebInfo -j$(nproc) --output-on-failure
+        run: cd build ; ctest -C RelWithDebInfo -j"$(nproc)" --output-on-failure
         env:
+          # https://clang.llvm.org/docs/AddressSanitizer.html
           ASAN_OPTIONS: detect_stack_use_after_return=1
+          # # https://clang.llvm.org/docs/UndefinedBehaviorSanitizer.html
           UBSAN_OPTIONS: print_stacktrace=1
-
-  memory:
-    runs-on: ubuntu-20.04
-
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Cache dependencies
-        id: cache-dependencies
-        uses: actions/cache@v2
-        with:
-          path: dependencies
-          key: ${{ runner.os }}-dependencies-memory-20210228
-
-      - name: Build and install dependencies
-        if: steps.cache-dependencies.outputs.cache-hit != 'true'
-        run: sudo bash ./scripts/build-install.sh -m
-
-      - name: Install dependencies
-        if: steps.cache-dependencies.outputs.cache-hit == 'true'
-        run: sudo bash ./scripts/install.sh -g
-
-      - name: Configure
-        run: |
-          cmake -S . -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo \
-          -DKCC_BUILD_TESTS=ON -DKCC_SANITIZER=Memory -DKCC_USE_LIBCXX=ON
-        env:
-          CC: clang
-          CXX: clang++
-
-      - name: Build
-        run: cmake --build build --config RelWithDebInfo -j$(nproc)
-
-      - name: Test
-        run: cd build ; ctest -C RelWithDebInfo -j$(nproc) --output-on-failure
-        env:
-          MSAN_OPTIONS: poison_in_dtor=1
-
-  thread:
-    runs-on: ubuntu-20.04
-
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Cache dependencies
-        id: cache-dependencies
-        uses: actions/cache@v2
-        with:
-          path: dependencies
-          key: ${{ runner.os }}-dependencies-thread-20210228
-
-      - name: Build and install dependencies
-        if: steps.cache-dependencies.outputs.cache-hit != 'true'
-        run: sudo bash ./scripts/build-install.sh -t
-
-      - name: Install dependencies
-        if: steps.cache-dependencies.outputs.cache-hit == 'true'
-        run: sudo bash ./scripts/install.sh -g
-
-      - name: Configure
-        run: |
-          cmake -S . -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo \
-          -DKCC_BUILD_TESTS=ON -DKCC_SANITIZER=Thread -DKCC_USE_LIBCXX=ON
-        env:
-          CC: clang
-          CXX: clang++
-
-      - name: Build
-        run: cmake --build build --config RelWithDebInfo -j$(nproc)
-
-      - name: Test
-        run: cd build ; ctest -C RelWithDebInfo -j$(nproc) --output-on-failure

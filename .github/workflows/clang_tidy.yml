@@ -18,18 +18,13 @@ jobs:
         uses: actions/cache@v2
         with:
           path: dependencies
-          key: ${{ runner.os }}-dependencies-20210228
-
-      - name: Build and install dependencies
-        if: steps.cache-dependencies.outputs.cache-hit != 'true'
-        run: sudo bash ./scripts/build-install.sh
+          key: clang-tidy-dependencies-20210530
 
       - name: Install dependencies
-        if: steps.cache-dependencies.outputs.cache-hit == 'true'
-        run: sudo bash ./scripts/install.sh
+        run: sudo bash script/build.sh
 
       - name: Configure
         run: cmake -S . -B build -DKCC_CLANG_TIDY=ON
 
       - name: Build
-        run: cmake --build build --config Release -j$(nproc)
+        run: cmake --build build --config Release -j"$(nproc)"

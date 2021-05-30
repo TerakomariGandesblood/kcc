@@ -18,6 +18,7 @@
 #include <llvm/Support/raw_ostream.h>
 
 #include "error.h"
+#include "version.h"
 
 namespace kcc {
 
@@ -26,7 +27,7 @@ void InitCommandLine(int argc, char *argv[]) {
 
   llvm::cl::SetVersionPrinter([](llvm::raw_ostream &os) {
     os << "Kaiser's C Compiler\n";
-    os << "Version " << KCC_VERSION << '\n';
+    os << "Version " << KCC_VERSION_STR << '\n';
     os << "InstalledDir: " << GetPath() << '\n';
   });
 

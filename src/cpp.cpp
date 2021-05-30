@@ -29,7 +29,7 @@ Preprocessor::Preprocessor() {
   /*
    * Platform Specific Code
    */
-  AddIncludePath("/usr/lib/gcc/x86_64-linux-gnu/10/include", true);
+  AddIncludePath("/usr/lib/gcc/x86_64-linux-gnu/11/include", true);
   AddIncludePath("/usr/include/x86_64-linux-gnu", true);
   /*
    * End of Platform Specific Code
@@ -37,8 +37,8 @@ Preprocessor::Preprocessor() {
 
   pp_->setPredefines(pp_->getPredefines() +
                      "#define __KCC__ 1\n"
-                     "#define __GNUC__ 10\n"
-                     "#define __GNUC_MINOR__ 2\n"
+                     "#define __GNUC__ 11\n"
+                     "#define __GNUC_MINOR__ 1\n"
                      "#define __GNUC_PATCHLEVEL__ 0\n"
                      "#define __STDC_NO_ATOMICS__ 1\n"
                      "#define __STDC_NO_COMPLEX__ 1\n"

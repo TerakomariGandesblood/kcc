@@ -1,7 +1,8 @@
 {
   "cmake.configureArgs": [
-    "-DKCC_BUILD_ALL=ON",
-    "-DKCC_FORMAT=ON"
-    //"-DKCC_SANITIZER=Address;Undefined"
+    "-DKCC_BUILD_TEST=ON",
+    "-DKCC_FORMAT=ON",
+    "-DKCC_BUILD_COVERAGE=ON",
+    "-DKCC_SANITIZER=ON"
   ]
 }

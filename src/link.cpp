@@ -18,21 +18,21 @@ bool Link() {
   std::vector<const char *> args{
       "--eh-frame-hdr",
       "-melf_x86_64",
-      "/usr/bin/../lib/gcc/x86_64-linux-gnu/10/../../../x86_64-linux-gnu/"
+      "/usr/bin/../lib/gcc/x86_64-linux-gnu/11/../../../x86_64-linux-gnu/"
       "crt1.o",
-      "/usr/bin/../lib/gcc/x86_64-linux-gnu/10/../../../x86_64-linux-gnu/"
+      "/usr/bin/../lib/gcc/x86_64-linux-gnu/11/../../../x86_64-linux-gnu/"
       "crti.o",
-      "/usr/bin/../lib/gcc/x86_64-linux-gnu/10/crtbegin.o",
-      "-L/usr/bin/../lib/gcc/x86_64-linux-gnu/10",
-      "-L/usr/bin/../lib/gcc/x86_64-linux-gnu/10/../../../x86_64-linux-gnu",
-      "-L/usr/bin/../lib/gcc/x86_64-linux-gnu/10/../../../../lib64",
+      "/usr/bin/../lib/gcc/x86_64-linux-gnu/11/crtbegin.o",
+      "-L/usr/bin/../lib/gcc/x86_64-linux-gnu/11",
+      "-L/usr/bin/../lib/gcc/x86_64-linux-gnu/11/../../../x86_64-linux-gnu",
+      "-L/usr/bin/../lib/gcc/x86_64-linux-gnu/11/../../../../lib64",
       "-L/lib/x86_64-linux-gnu",
       "-L/lib/../lib64",
       "-L/usr/lib/x86_64-linux-gnu",
       "-L/usr/lib/../lib64",
       "-L/usr/lib/x86_64-linux-gnu/../../lib64",
-      "-L/usr/bin/../lib/gcc/x86_64-linux-gnu/10/../../..",
-      "-L/usr/lib/llvm-11/bin/../lib",
+      "-L/usr/bin/../lib/gcc/x86_64-linux-gnu/11/../../..",
+      "-L/usr/lib/llvm-12/bin/../lib",
       "-L/lib",
       "-L/usr/lib",
       "-lgcc",
@@ -44,8 +44,8 @@ bool Link() {
       "--as-needed",
       "-lgcc_s",
       "--no-as-needed",
-      "/usr/bin/../lib/gcc/x86_64-linux-gnu/10/crtend.o",
-      "/usr/bin/../lib/gcc/x86_64-linux-gnu/10/../../../x86_64-linux-gnu/"
+      "/usr/bin/../lib/gcc/x86_64-linux-gnu/11/crtend.o",
+      "/usr/bin/../lib/gcc/x86_64-linux-gnu/11/../../../x86_64-linux-gnu/"
       "crtn.o"};
 
   if (Shared) {

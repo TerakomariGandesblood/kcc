@@ -1,67 +1,40 @@
-if(KCC_INSTALL)
-  message(STATUS "Generate the install target")
+include(GNUInstallDirs)
 
-  include(GNUInstallDirs)
+# ---------------------------------------------------------------------------------------
+# Install executable
+# ---------------------------------------------------------------------------------------
+# https://stackoverflow.com/questions/30398238/cmake-rpath-not-working-could-not-find-shared-object-file
+set_target_properties(
+  ${EXECUTABLE} PROPERTIES INSTALL_RPATH "$ORIGIN/../${CMAKE_INSTALL_LIBDIR}"
+                           INSTALL_RPATH_USE_LINK_PATH TRUE)
 
-  # ---------------------------------------------------------------------------------------
-  # Install executable
-  # ---------------------------------------------------------------------------------------
-  if(KCC_BUILD_EXECUTABLE OR KCC_BUILD_ALL)
-    set(CMAKE_SKIP_BUILD_RPATH FALSE)
-    set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
-    set(CMAKE_INSTALL_RPATH
-        "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR};$\{ORIGIN\}")
-    set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+install(
+  TARGETS ${EXECUTABLE}
+  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
-    list(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES
-         "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}" isSystemDir)
-    if(${isSystemDir} STREQUAL "-1")
-      set(CMAKE_INSTALL_RPATH
-          "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR};$\{ORIGIN\}")
-    endif()
+# ---------------------------------------------------------------------------------------
+# Support creation of installable packages
+# ---------------------------------------------------------------------------------------
+# https://cmake.org/cmake/help/latest/module/CPack.html
+set(CPACK_INCLUDE_TOPLEVEL_DIRECTORY OFF)
+set(CPACK_INSTALL_CMAKE_PROJECTS ${KCC_BINARY_DIR} ${LIBRARY} ALL .)
 
-    install(TARGETS ${EXECUTABLE} DESTINATION ${CMAKE_INSTALL_BINDIR})
-  endif()
+# https://cmake.org/cmake/help/latest/cpack_gen/deb.html
+set(CPACK_PACKAGE_CONTACT "kaiser <KaiserLancelot123@gmail.com>")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "A small C11 compiler")
+set(CPACK_PACKAGE_VERSION
+    ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH})
 
-  # ---------------------------------------------------------------------------------------
-  # Project information
-  # ---------------------------------------------------------------------------------------
-  set(KCC_VENDOR "kaiser")
-  set(KCC_CONTACT "kaiser <KaiserLancelot123@gmail.com>")
-  set(KCC_PROJECT_URL "https://github.com/KaiserLancelot/kcc")
-  set(KCC_DESCRIPTION_SUMMARY "A small C11 compiler")
+# https://cmake.org/cmake/help/latest/manual/cpack-generators.7.html
+set(CPACK_GENERATOR "TGZ;DEB")
 
-  # ---------------------------------------------------------------------------------------
-  # Support creation of installable packages
-  # ---------------------------------------------------------------------------------------
-  set(CPACK_INCLUDE_TOPLEVEL_DIRECTORY 0)
-  set(CPACK_INSTALL_CMAKE_PROJECTS ${CMAKE_CURRENT_BINARY_DIR} ${LIBRARY} ALL .)
+set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
 
-  set(CPACK_PROJECT_URL ${KCC_PROJECT_URL})
-  set(CPACK_PACKAGE_VENDOR ${KCC_VENDOR})
-  set(CPACK_PACKAGE_CONTACT ${KCC_CONTACT})
-  set(CPACK_PACKAGE_DESCRIPTION_SUMMARY ${KCC_DESCRIPTION_SUMMARY})
-  set(CPACK_PACKAGE_VERSION_MAJOR ${PROJECT_VERSION_MAJOR})
-  set(CPACK_PACKAGE_VERSION_MINOR ${PROJECT_VERSION_MINOR})
-  set(CPACK_PACKAGE_VERSION_PATCH ${PROJECT_VERSION_PATCH})
-  set(CPACK_PACKAGE_VERSION
-      ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}
-  )
-  if(PROJECT_VERSION_TWEAK)
-    set(CPACK_PACKAGE_VERSION ${CPACK_PACKAGE_VERSION}.${PROJECT_VERSION_TWEAK})
-  endif()
-  set(CPACK_PACKAGE_RELOCATABLE
-      ON
-      CACHE BOOL "Build relocatable package")
+# https://cmake.org/cmake/help/latest/module/InstallRequiredSystemLibraries.html
+set(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS
+    "/usr/lib/llvm-12/lib/libclang-cpp.so.12;/usr/lib/x86_64-linux-gnu/libLLVM-12.so.1"
+)
+include(InstallRequiredSystemLibraries)
 
-  set(CPACK_GENERATOR
-      "TGZ;DEB"
-      CACHE STRING "Semicolon separated list of generators")
-
-  set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
-
-  set(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS "")
-  include(InstallRequiredSystemLibraries)
-
-  include(CPack)
-endif()
+include(CPack)
