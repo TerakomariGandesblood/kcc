@@ -29,7 +29,7 @@ Preprocessor::Preprocessor() {
   /*
    * Platform Specific Code
    */
-  AddIncludePath("/usr/lib/gcc/x86_64-linux-gnu/11/include", true);
+  AddIncludePath("/usr/lib/llvm-12/lib/clang/12.0.1/include", true);
   AddIncludePath("/usr/include/x86_64-linux-gnu", true);
   /*
    * End of Platform Specific Code
@@ -44,6 +44,7 @@ Preprocessor::Preprocessor() {
                      "#define __STDC_NO_COMPLEX__ 1\n"
                      "#define __STDC_NO_THREADS__ 1\n"
                      "#define __STDC_NO_VLA__ 1\n"
+                     "#define _VA_LIST_DEFINED 1\n"
                      "#define __builtin_va_arg(args,type) "
                      "  *(type*)__builtin_va_arg_sub(args,type)\n");
 }
