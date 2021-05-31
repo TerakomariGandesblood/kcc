@@ -23,16 +23,17 @@ Preprocessor::Preprocessor() {
   pp_ = &Ci.getPreprocessor();
   header_search_ = &pp_->getHeaderSearchInfo();
 
+  AddIncludePath("/usr/include", true);
+  AddIncludePath("/usr/local/include", true);
+
   /*
    * Platform Specific Code
    */
-  AddIncludePath("/usr/lib/llvm-12/lib/clang/12.0.1/include", true);
+  AddIncludePath("/usr/lib/gcc/x86_64-linux-gnu/11/include", true);
   AddIncludePath("/usr/include/x86_64-linux-gnu", true);
   /*
    * End of Platform Specific Code
    */
-  AddIncludePath("/usr/include", true);
-  AddIncludePath("/usr/local/include", true);
 
   pp_->setPredefines(pp_->getPredefines() +
                      "#define __KCC__ 1\n"
@@ -43,7 +44,6 @@ Preprocessor::Preprocessor() {
                      "#define __STDC_NO_COMPLEX__ 1\n"
                      "#define __STDC_NO_THREADS__ 1\n"
                      "#define __STDC_NO_VLA__ 1\n"
-                     "#define _VA_LIST_DEFINED 1\n"
                      "#define __builtin_va_arg(args,type) "
                      "  *(type*)__builtin_va_arg_sub(args,type)\n");
 }

@@ -33,8 +33,7 @@ jobs:
 
       - name: Configure
         run: |
-          cmake -S . -B build -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
-          -DKCC_BUILD_TEST=ON
+          cmake -S . -B build -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
         env:
           CC: ${{ matrix.compiler.cc }}
           CXX: ${{ matrix.compiler.cxx }}
@@ -47,9 +46,6 @@ jobs:
 
       - name: Run executable
         run: kcc -v
-
-      - name: Test
-        run: cd build ; ctest -C ${{ matrix.build_type }} -j"$(nproc)" --output-on-failure
 
       - name: Uninstall
         run: sudo cmake --build build --config ${{ matrix.build_type }} --target uninstall

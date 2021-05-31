@@ -17,7 +17,6 @@ A small C11 compiler
 - Linux
 - gcc 11.1
 - gcc/clang(Request to support C++17)
-- libreadline-dev
 
 ## Libraries:
 
@@ -25,6 +24,7 @@ A small C11 compiler
 - fmt
 - magic_enum
 - Boost
+- libreadline-dev(for test)
 
 ## Build
 

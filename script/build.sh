@@ -23,7 +23,7 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
 
   cd dependencies
 
-  sudo apt install -y llvm-12-dev libclang-12-dev liblld-12-dev
+  sudo apt install -y llvm-12-dev libclang-12-dev liblld-12-dev libreadline-dev
   kpkg install lcov fmt boost magic_enum -i
 else
   echo "The system does not support: $OSTYPE"
