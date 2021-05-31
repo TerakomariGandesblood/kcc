@@ -23,9 +23,6 @@ Preprocessor::Preprocessor() {
   pp_ = &Ci.getPreprocessor();
   header_search_ = &pp_->getHeaderSearchInfo();
 
-  AddIncludePath("/usr/include", true);
-  AddIncludePath("/usr/local/include", true);
-
   /*
    * Platform Specific Code
    */
@@ -34,6 +31,8 @@ Preprocessor::Preprocessor() {
   /*
    * End of Platform Specific Code
    */
+  AddIncludePath("/usr/include", true);
+  AddIncludePath("/usr/local/include", true);
 
   pp_->setPredefines(pp_->getPredefines() +
                      "#define __KCC__ 1\n"
